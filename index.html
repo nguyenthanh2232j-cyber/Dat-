@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>ANNIE GAG2 SHOP</title>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
         body{background:#0d1627;color:#fff;padding-bottom:20px}
@@ -120,58 +122,77 @@
 <div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)"><div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div><input class="ctrl" id="tk-rb" placeholder="Tài khoản Roblox" required><button class="btn b-green" style="width:100%">✅ Mua</button></form></div></div>
 
 <script>
+// ==============================================
+// ✅ ĐÃ DÁN SẴN MÃ FIREBASE CỦA BẠN! KHÔNG CẦN THAY ĐỔI GÌ NỮA
+const firebaseConfig = {
+  apiKey: "AIzaSyCdmkb-hoRllGGnTp8t1XNlBODtaYTQnWg",
+  authDomain: "annie-gag2-shop.firebaseapp.com",
+  databaseURL: "https://annie-gag2-shop-default-rtdb.asia-southeast1.firebasedatabase.app",
+  projectId: "annie-gag2-shop",
+  storageBucket: "annie-gag2-shop.firebasestorage.app",
+  messagingSenderId: "178028797329",
+  appId: "1:178028797329:web:5b3b8481e753593d8d4e30",
+  measurementId: "G-01RPNSJT9X"
+};
+// ==============================================
+firebase.initializeApp(firebaseConfig);
+const db = firebase.database();
+
 const AD={u:'xuanthanh',p:'20122014'};
 let ad=false, tk=null, spMua=null;
-const getDB=k=>JSON.parse(localStorage.getItem(k))||[], setDB=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+
+const docDS = async ten => (await db.ref(ten).once('value')).val() || [];
+const luuDS = (ten, ds) => db.ref(ten).set(ds);
+
 const gia=s=>String(s).replace(/[^0-9k]/gi,'').replace('k','000')*1||0;
-const soDu=u=>getDB('tien').find(x=>x.tk===u)?.tien||0;
-const cong=(u,v)=>{let d=getDB('tien');let x=d.find(x=>x.tk===u);x?x.tien+=v:d.push({tk:u,tien:v});setDB('tien',d)};
+const soDu=async u=>{let ds=await docDS('tai_khoan');return ds[u]?.tien||0};
+const cong=async(u,v)=>{let ds=await docDS('tai_khoan');if(!ds[u])ds[u]={tien:0};ds[u].tien+=v;luuDS('tai_khoan',ds)};
 
 function capNhat(){
-  document.getElementById('u-status').innerText=ad?'👑 ADMIN':tk?`👤 ${tk} | 💰 ${soDu(tk).toLocaleString()}đ`:'👤 Khách';
+  document.getElementById('u-status').innerText=ad?'👑 ADMIN':tk?`👤 ${tk}`:'👤 Khách';
   document.getElementById('btn-ad').style.display=ad?'inline':'none';
   document.getElementById('ad-pan').style.display=ad?'block':'none';
   document.getElementById('btn-reg').style.display=document.getElementById('btn-log').style.display=tk?'none':'inline';
   document.getElementById('btn-out').style.display=tk?'inline':'none';
   document.getElementById('nd-chuyen').innerText=`NAP ${tk||'TÊN_TK'}`;
   hienSP();hienDon();hienBank();hienThe();
+  if(tk) soDu(tk).then(sd=>document.getElementById('u-status').innerText += ` | 💰 ${sd.toLocaleString()}đ`);
 }
 function adShow(){document.getElementById('ad-pan').style.display=ad?'block':'none'}
 function openM(i){document.getElementById(i).style.display='flex'}
 function closeM(i){document.getElementById(i).style.display='none'}
 
-function guiThe(e){e.preventDefault();if(!tk)return openM('login');let d=getDB('the');d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});setDB('the',d);e.target.reset();alert('✅ Đã gửi thẻ! Chờ Admin duyệt.')}
-function hienThe(){if(!ad)return;let d=getDB('the').filter(x=>x.tt==='cho');document.getElementById('list-the').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>'}
-function duyetThe(i){let d=getDB('the');let x=d.find(a=>a.id===i);x.tt='ok';cong(x.tk,x.gia);setDB('the',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
-function huyThe(i){let d=getDB('the');let x=d.find(a=>a.id===i);x.tt='huy';setDB('the',d);hienThe();alert('❌ Đã hủy!')}
+async function guiThe(e){e.preventDefault();if(!tk)return openM('login');let d=await docDS('the');d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});luuDS('the',d);e.target.reset();alert('✅ Đã gửi thẻ! Chờ Admin duyệt.')}
+async function hienThe(){if(!ad)return;let d=(await docDS('the')).filter(x=>x.tt==='cho');document.getElementById('list-the').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>'}
+async function duyetThe(i){let d=await docDS('the');let x=d.find(a=>a.id===i);x.tt='ok';await cong(x.tk,x.gia);luuDS('the',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
+async function huyThe(i){let d=await docDS('the');let x=d.find(a=>a.id===i);x.tt='huy';luuDS('the',d);hienThe();alert('❌ Đã hủy!')}
 
-function guiBank(){if(!tk)return openM('login');let s=prompt('Số tiền chuyển:');let v=parseInt(s);if(!v||v<10000)return alert('Tối thiểu 10.000đ!');let d=getDB('bank');d.push({id:Date.now(),tk:tk,tien:v,trangthai:'cho'});setDB('bank',d);alert('✅ Đã gửi! Chờ duyệt.')}
-function hienBank(){if(!ad)return;let d=getDB('bank').filter(x=>x.trangthai==='cho');document.getElementById('list-bank').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.tien.toLocaleString()}đ</div><div><button class="btn b-green" onclick="duyetBank(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyBank(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có yêu cầu</div>'}
-function duyetBank(i){let d=getDB('bank');let x=d.find(a=>a.id===i);x.trangthai='ok';cong(x.tk,x.tien);setDB('bank',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
-function huyBank(i){let d=getDB('bank');let x=d.find(a=>a.id===i);x.trangthai='huy';setDB('bank',d);hienBank();alert('❌ Đã hủy!')}
+async function guiBank(){if(!tk)return openM('login');let s=prompt('Số tiền chuyển:');let v=parseInt(s);if(!v||v<10000)return alert('Tối thiểu 10.000đ!');let d=await docDS('bank');d.push({id:Date.now(),tk:tk,tien:v,trangthai:'cho'});luuDS('bank',d);alert('✅ Đã gửi! Chờ duyệt.')}
+async function hienBank(){if(!ad)return;let d=(await docDS('bank')).filter(x=>x.trangthai==='cho');document.getElementById('list-bank').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.tien.toLocaleString()}đ</div><div><button class="btn b-green" onclick="duyetBank(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyBank(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có yêu cầu</div>'}
+async function duyetBank(i){let d=await docDS('bank');let x=d.find(a=>a.id===i);x.trangthai='ok';await cong(x.tk,x.tien);luuDS('bank',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
+async function huyBank(i){let d=await docDS('bank');let x=d.find(a=>a.id===i);x.trangthai='huy';luuDS('bank',d);hienBank();alert('❌ Đã hủy!')}
 
-function hienSP(){let d=getDB('sp');document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh||'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️</button>`:''}</div></div></div>`).join(''):'<div class="empty">Chưa có sản phẩm</div>'}
-function xoaSP(i){if(confirm('Xóa?')){let d=getDB('sp');d.splice(i,1);setDB('sp',d);hienSP()}}
-function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,a=document.getElementById('anh-sp').value;if(t&&g){let d=getDB('sp');d.push({ten:t,gia:g,anh:a});setDB('sp',d);e.target.reset();hienSP();alert('✅ Đã thêm!')}}
+async function hienSP(){let d=await docDS('san_pham');document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh||'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️</button>`:''}</div></div></div>`).join(''):'<div class="empty">Chưa có sản phẩm</div>'}
+async function xoaSP(i){if(confirm('Xóa?')){let d=await docDS('san_pham');d.splice(i,1);luuDS('san_pham',d);hienSP()}}
+async function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,a=document.getElementById('anh-sp').value;if(t&&g){let d=await docDS('san_pham');d.push({ten:t,gia:g,anh:a});luuDS('san_pham',d);e.target.reset();hienSP();alert('✅ Đã thêm!')}}
 
-function hienDon(){let d=getDB('don').filter(x=>ad||x.tk===tk);document.getElementById('list-don').innerHTML=d.length?d.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn</div>'}
+async function hienDon(){let d=await docDS('don_hang');let loc=ad?d:d.filter(x=>x.tk===tk);document.getElementById('list-don').innerHTML=loc.length?loc.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn</div>'}
 
-function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();ad=(t===AD.u&&m===AD.p);tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ OK!')}
-function tao(e){e.preventDefault();alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
+async function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();let ds=await docDS('tai_khoan');ad=(t===AD.u&&m===AD.p);if(!ad&&(!ds[t]||ds[t].mk!==m))return alert('Sai tài khoản/mật khẩu!');tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ OK!')}
+async function tao(e){e.preventDefault();let t=document.getElementById('tk-moi').value.trim(),m=document.getElementById('mk-moi').value;if(!t||!m)return alert('Nhập đủ thông tin!');let ds=await docDS('tai_khoan');if(ds[t])return alert('Tài khoản đã tồn tại!');ds[t]={mk:m,tien:0};luuDS('tai_khoan',ds);alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
 function out(){ad=false;tk=null;capNhat()}
-function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ!`);capNhat()}}
-function mua(i){if(!tk)return openM('login');spMua=getDB('sp')[i];if(soDu(tk)<gia(spMua.gia))return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`;openM('mua')}
-function xacNhan(e){e.preventDefault();let rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');cong(tk,-gia(spMua.gia));let d=getDB('don');d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});setDB('don',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK!')}
+async function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){await cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ!`);capNhat()}}
+async function mua(i){if(!tk)return openM('login');spMua=(await docDS('san_pham'))[i];if(await soDu(tk)<gia(spMua.gia))return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`;openM('mua')}
+async function xacNhan(e){e.preventDefault();let rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');await cong(tk,-gia(spMua.gia));let d=await docDS('don_hang');d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});luuDS('don_hang',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK!')}
 
 window.onload=()=>{
-  if(!localStorage.getItem('sp'))setDB('sp',[{ten:'Sản phẩm mẫu',gia:'20k',anh:'https://via.placeholder.com/100'}]);
-  if(!localStorage.getItem('tien'))setDB('tien',[]);
-  if(!localStorage.getItem('bank'))setDB('bank',[]);
-  if(!localStorage.getItem('the'))setDB('the',[]);
-  if(!localStorage.getItem('don'))setDB('don',[]);
-  capNhat();
+  Promise.all(['san_pham','tai_khoan','don_hang','the','bank'].map(k=>db.ref(k).once('value'))).then(s=>{
+    s.forEach((x,i)=>{if(!s[i].exists()) luuDS(['san_pham','tai_khoan','don_hang','the','bank'][i],['san_pham'][i]==='san_pham'?[{ten:'Sản phẩm mẫu',gia:'20k',anh:'https://via.placeholder.com/100'}]:{})});
+    capNhat();
+    db.ref().on('value',capNhat);
+  })
 };
 </script>
 </body>
-                               </html>
-                               
+                                                                                                                                                                                                                                                     </html>
+                                                                                                                                                                                                                                                     
