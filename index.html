@@ -34,10 +34,11 @@
     .empty-state{text-align:center;color:#9ca3af;padding:10px 0;font-size:.85rem}
     .order-item{background:#1a2c42;border-radius:6px;padding:10px;margin-bottom:8px;justify-content:space-between;font-size:.85rem}
     .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;justify-content:center;align-items:center}
-    .modal-content{background:#132238;border:1px solid #1e3250;border-radius:10px;width:90%;max-width:420px;padding:18px;position:relative}
+    .modal-content{background:#132238;border:1px solid #1e3250;border-radius:10px;width:90%;max-width:420px;padding:18px;position:relative;max-height:90vh;overflow-y:auto}
     .close-btn{position:absolute;top:8px;right:12px;font-size:1.4rem;color:#aaa;cursor:pointer}
     .badge-pending{background:#ff9800;color:#000;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:.75rem}
     .badge-success{background:#4caf50;color:#fff;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:.75rem}
+    .badge-reject{background:#e53935;color:#fff;padding:2px 6px;border-radius:4px;font-weight:bold;font-size:.75rem}
   </style>
 </head>
 <body>
@@ -84,9 +85,9 @@
         <div class="form-group">
           <select class="form-control" id="card-amount">
             <option value="10000">10.000đ</option>
-            <option value="20000">20.000đ</option>
-            <option value="50000">50.000đ</option>
-            <option value="100000">100.000đ</option>
+            <option value="20000">20.000đ (20k)</option>
+            <option value="50000">50.000đ (50k)</option>
+            <option value="100000">100.000đ (100k)</option>
           </select>
         </div>
         <div class="form-group"><input type="text" class="form-control" placeholder="Mã thẻ" id="card-code" required></div>
@@ -94,9 +95,9 @@
         <button type="submit" class="btn-pink" style="width:100%">✅ Gửi Nạp Thẻ</button>
       </form>
 
-      <!-- LỊCH SỬ THẺ CỦA KHÁCH -->
+      <!-- THÔNG BÁO XỬ LÝ THẺ DÀNH CHO KHÁCH HÀNG -->
       <div style="margin-top:15px;border-top:1px dashed #1f334d;padding-top:10px">
-        <div style="font-weight:bold;font-size:.9rem;margin-bottom:8px;color:#4da6ff">📜 Thẻ Cào Đã Gửi Của Bạn</div>
+        <div style="font-weight:bold;font-size:.9rem;margin-bottom:8px;color:#4da6ff">🔔 THÔNG BÁO XỬ LÝ THẺ KHÁCH HÀNG</div>
         <div id="user-cards-container"></div>
       </div>
     </div>
@@ -118,9 +119,9 @@
       <div id="product-list-container"></div>
     </div>
 
-    <!-- ĐƠN HÀNG CHỜ DUYỆT -->
+    <!-- ĐƠN HÀNG MUA BẰNG TIỀN TÀI KHOẢN -->
     <div id="don-hang" class="card-box">
-      <div class="box-title">📋 ĐƠN HÀNG CỦA BẠN</div>
+      <div class="box-title">📋 ĐƠN HÀNG ĐÃ MUA</div>
       <div id="orders-container"></div>
     </div>
   </div>
@@ -151,25 +152,25 @@
     </div>
   </div>
 
-  <!-- MODAL ADMIN -->
+  <!-- MODAL ADMIN PANEL -->
   <div id="admin-modal" class="modal">
     <div class="modal-content" style="max-width:500px">
       <span class="close-btn" onclick="closeM('admin-modal')">&times;</span>
-      <h3 style="color:#ffcc00;margin-bottom:12px">⚙️ BẢNG ADMIN</h3>
+      <h3 style="color:#ffcc00;margin-bottom:12px">⚙️ BẢNG ĐIỀU KHIỂN ADMIN</h3>
       
-      <!-- Thêm Sản Phẩm -->
+      <!-- Đăng/Thêm Sản Phẩm -->
       <form onsubmit="handleAddProduct(event)" style="margin-bottom:15px;border-bottom:1px solid #1f334d;padding-bottom:10px">
         <h4 style="margin-bottom:8px;font-size:.9rem">➕ Thêm sản phẩm mới</h4>
         <div class="form-group"><input type="text" class="form-control" id="p-name" placeholder="Tên sản phẩm" required></div>
-        <div class="form-group"><input type="text" class="form-control" id="p-price" placeholder="Giá tiền (ví dụ: 10.000đ)" required></div>
+        <div class="form-group"><input type="text" class="form-control" id="p-price" placeholder="Giá tiền (ví dụ: 20k hoặc 20000)" required></div>
         <div class="form-group"><input type="text" class="form-control" id="p-cat" placeholder="Danh mục" required></div>
         <div class="form-group"><input type="text" class="form-control" id="p-img" placeholder="Link ảnh sản phẩm" required></div>
         <button type="submit" class="btn-pink" style="width:100%">➕ Đăng Sản Phẩm</button>
       </form>
 
-      <!-- Duyệt Thẻ Cào -->
+      <!-- MỤC XỬ LÝ THẺ KHÁCH HÀNG BÊN ADMIN -->
       <div>
-        <h4 style="margin-bottom:8px;font-size:.9rem;color:#ffcc00">📱 Thẻ Cào Chờ Duyệt & Cộng Tiền</h4>
+        <h4 style="margin-bottom:8px;font-size:.9rem;color:#ffcc00">📲 XỬ LÝ THẺ KHÁCH HÀNG CHỜ DUYỆT</h4>
         <div id="admin-cards-container"></div>
       </div>
     </div>
@@ -180,19 +181,27 @@
     let isAdmin = false, currentUser = null;
 
     const defaultProducts = [
-      { id: 1, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/80/132238/ff4081?text=Ghost" },
-      { id: 2, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/80/132238/ff4081?text=Ghost" }
+      { id: 1, name: "Ghost pepper", price: "20k", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/80/132238/ff4081?text=Ghost" },
+      { id: 2, name: "Ghost pepper Super", price: "50k", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/80/132238/ff4081?text=Ghost" }
     ];
 
     const getDb = (k, f) => JSON.parse(localStorage.getItem(k)) || f;
     const setDb = (k, v) => localStorage.setItem(k, JSON.stringify(v));
+
+    // Chuyển chuỗi giá trị chữ (ví dụ 20k, 20.000đ) sang con số nguyên chuẩn (20000)
+    function parsePrice(str) {
+      if (typeof str === 'number') return str;
+      let s = String(str).toLowerCase().replace(/[^0-9k]/g, '');
+      if (s.includes('k')) return parseInt(s.replace('k', '')) * 1000;
+      return parseInt(s) || 0;
+    }
 
     function getUserBalance(user) {
       const balances = getDb('annie_balances', {});
       return balances[user] || 0;
     }
 
-    function addBalance(user, amount) {
+    function changeBalance(user, amount) {
       const balances = getDb('annie_balances', {});
       balances[user] = (balances[user] || 0) + parseInt(amount);
       setDb('annie_balances', balances);
@@ -217,9 +226,9 @@
         <div class="product-item">
           <img src="${p.img}" class="product-img" alt="${p.name}">
           <div class="product-info">
-            <div style="font-weight:bold;font-size:1rem">${p.name} - ${p.price}</div>
+            <div style="font-weight:bold;font-size:1rem">${p.name} - <span style="color:#ffcc00">${p.price}</span></div>
             <div style="font-size:.8rem;color:#9ca3af;margin:4px 0">Mã: ${p.code} | Danh mục: ${p.category}</div>
-            <button class="btn-green" onclick="buyProduct('${p.name}', '${p.price}')">🛒 Mua</button>
+            <button class="btn-green" onclick="buyProduct(${p.id}, '${p.name}', '${p.price}')">🛒 Mua Ngay</button>
             ${isAdmin ? `<button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️ Xóa</button>` : ''}
           </div>
         </div>
@@ -236,41 +245,51 @@
             <div style="font-weight:bold;color:#ffcc00">🛒 ${o.productName} (${o.price})</div>
             <div style="color:#9ca3af">Khách: <strong>${o.user}</strong> | Lúc: ${o.time}</div>
           </div>
-          ${isAdmin ? `<button class="btn-green" onclick="approveOrder(${o.id})">✅ Duyệt</button>` : '<span class="badge-pending">Đang chờ duyệt...</span>'}
+          <span class="badge-success">Thành công</span>
         </div>
       `).join('') : '<div class="empty-state">Chưa có đơn hàng nào</div>';
     }
 
+    // Hiển thị danh sách thông báo xử lý thẻ cho khách hàng
     function renderUserCards() {
       const cards = getDb('annie_cards', []);
       const myCards = isAdmin ? cards : cards.filter(c => c.user === currentUser);
       const el = document.getElementById('user-cards-container');
-      el.innerHTML = myCards.length ? myCards.map(c => `
-        <div class="order-item">
-          <div>
-            <div><strong>${c.type} - ${parseInt(c.amount).toLocaleString('vi-VN')}đ</strong></div>
-            <div style="color:#9ca3af">Mã: <span style="color:#ffcc00">${c.code}</span> | Seri: <span style="color:#4da6ff">${c.seri}</span></div>
+      
+      el.innerHTML = myCards.length ? myCards.map(c => {
+        let statusTag = '<span class="badge-pending">⏳ Đang chờ admin xử lý</span>';
+        if (c.status === 'done') statusTag = `<span class="badge-success">✅ Thành công (+${parseInt(c.approvedVal).toLocaleString('vi-VN')}đ)</span>`;
+        if (c.status === 'rejected') statusTag = `<span class="badge-reject">❌ Bị từ chối (${c.reason || 'Thẻ sai'})</span>`;
+
+        return `
+          <div class="order-item">
+            <div>
+              <div><strong>${c.type} - ${parseInt(c.amount).toLocaleString('vi-VN')}đ</strong></div>
+              <div style="color:#9ca3af">Mã: <span style="color:#ffcc00">${c.code}</span> | Seri: <span style="color:#4da6ff">${c.seri}</span></div>
+            </div>
+            <div>${statusTag}</div>
           </div>
-          <div>${c.status === 'done' ? '<span class="badge-success">✓ Đã duyệt</span>' : '<span class="badge-pending">⏳ Chờ xử lý</span>'}</div>
-        </div>
-      `).join('') : '<div class="empty-state">Bạn chưa gửi thẻ cào nào</div>';
+        `;
+      }).join('') : '<div class="empty-state">Chưa có lịch sử nạp thẻ</div>';
     }
 
+    // Giao diện xử lý thẻ trong Admin
     function renderAdminCards() {
       if (!isAdmin) return;
       const cards = getDb('annie_cards', []).filter(c => c.status === 'pending');
       const el = document.getElementById('admin-cards-container');
       el.innerHTML = cards.length ? cards.map(c => `
         <div class="order-item" style="flex-direction:column;align-items:flex-start;gap:6px">
-          <div>👤 Tài khoản: <strong style="color:#ffcc00">${c.user}</strong></div>
-          <div>📱 Loaị thẻ: <strong>${c.type} - ${parseInt(c.amount).toLocaleString('vi-VN')}đ</strong></div>
-          <div>🔑 Mã: <span style="color:#ffcc00">${c.code}</span> | Seri: <span style="color:#4da6ff">${c.seri}</span></div>
+          <div>👤 Tài khoản gửi: <strong style="color:#ffcc00">${c.user}</strong></div>
+          <div>📱 Loại thẻ: <strong>${c.type} - ${parseInt(c.amount).toLocaleString('vi-VN')}đ</strong></div>
+          <div>🔑 Mã thẻ: <span style="color:#ffcc00">${c.code}</span> | Seri: <span style="color:#4da6ff">${c.seri}</span></div>
           <div style="display:flex;gap:5px;width:100%;margin-top:4px">
-            <input type="number" id="add-val-${c.id}" value="${c.amount}" class="form-control" style="padding:4px 8px;font-size:.8rem" placeholder="Số tiền cộng">
-            <button class="btn-green" onclick="approveCard(${c.id})">✅ Duyệt & Cộng Tiền</button>
+            <input type="number" id="add-val-${c.id}" value="${c.amount}" class="form-control" style="padding:4px 8px;font-size:.8rem" placeholder="Tiền cộng">
+            <button class="btn-green" onclick="processCard(${c.id}, 'done')">✅ Duyệt & Cộng</button>
+            <button class="btn-danger" onclick="processCard(${c.id}, 'rejected')">❌ Từ Chối</button>
           </div>
         </div>
-      `).join('') : '<div class="empty-state">Không có thẻ nào chờ duyệt</div>';
+      `).join('') : '<div class="empty-state">Không có thẻ nào chờ xử lý</div>';
     }
 
     const openM = id => document.getElementById(id).style.display = 'flex';
@@ -327,23 +346,31 @@
 
       e.target.reset();
       renderUserCards();
-      alert('Đã gửi thẻ cào thành công! Trạng thái: Chờ xử lý.');
+      alert('Đã gửi thẻ! Trạng thái xử lý sẽ hiển thị thông báo bên dưới.');
     }
 
-    function approveCard(id) {
+    // Admin xử lý thẻ khách hàng (Duyệt/Từ chối & Gửi thông báo)
+    function processCard(id, action) {
       const cards = getDb('annie_cards', []);
       const card = cards.find(c => c.id === id);
       if (!card) return;
 
-      const customVal = document.getElementById(`add-val-${id}`).value;
-      const addAmount = parseInt(customVal) || parseInt(card.amount);
+      if (action === 'done') {
+        const valInput = document.getElementById(`add-val-${id}`).value;
+        const addAmount = parseInt(valInput) || parseInt(card.amount);
+        card.status = 'done';
+        card.approvedVal = addAmount;
+        changeBalance(card.user, addAmount);
+        alert(`Đã duyệt thẻ & cộng +${addAmount.toLocaleString('vi-VN')}đ cho khách [${card.user}]`);
+      } else {
+        const reason = prompt("Nhập lý do từ chối (Ví dụ: Mã thẻ sai, Seri sai):", "Thẻ cào không hợp lệ");
+        card.status = 'rejected';
+        card.reason = reason || "Thẻ cào không hợp lệ";
+        alert(`Đã từ chối thẻ của khách [${card.user}]!`);
+      }
 
-      card.status = 'done';
       setDb('annie_cards', cards);
-      addBalance(card.user, addAmount);
-
       renderAdminCards(); renderUserCards(); updateHeaderUI();
-      alert(`Đã duyệt thẻ và cộng +${addAmount.toLocaleString('vi-VN')}đ vào TK [${card.user}]!`);
     }
 
     function handleAddProduct(e) {
@@ -360,7 +387,7 @@
       });
       setDb('annie_products', products);
       renderProducts(); closeM('admin-modal');
-      alert('Thêm sản phẩm thành công!');
+      alert('Thêm sản phẩm mới thành công!');
     }
 
     function deleteProduct(id) {
@@ -370,26 +397,7 @@
       }
     }
 
-    function buyProduct(name, price) {
+    // Mua sản phẩm & Tự động trừ tiền tương ứng
+    function buyProduct(id, name, priceStr) {
       if (!currentUser) return (alert("Vui lòng đăng nhập trước khi mua!"), openM('login-modal'));
-      const orders = getDb('annie_orders', []);
-      orders.push({ id: Date.now(), productName: name, price, user: currentUser, time: new Date().toLocaleTimeString('vi-VN') });
-      setDb('annie_orders', orders);
-      renderOrders();
-      alert(`Đã gửi đơn hàng "${name}". Vui lòng chờ admin duyệt!`);
-    }
-
-    function approveOrder(id) {
-      if (!isAdmin) return;
-      setDb('annie_orders', getDb('annie_orders', []).filter(o => o.id !== id));
-      renderOrders();
-      alert('Đã duyệt đơn hàng!');
-    }
-
-    window.onload = function() {
-      if (!localStorage.getItem('annie_products')) setDb('annie_products', defaultProducts);
-      updateHeaderUI(); renderProducts(); renderOrders(); renderUserCards();
-    };
-  </script>
-</body>
-      </html>
+      
