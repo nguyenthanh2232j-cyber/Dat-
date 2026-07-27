@@ -33,17 +33,20 @@
     </form>
     
     <form onsubmit="handleAddProduct(event)" style="margin-bottom:6px;border-bottom:1px solid #1f334d;padding-bottom:4px">
-      <h5 style="font-size:.75rem;color:#ff4081">➕ ĐĂNG SẢN PHẨM</h5>
+      <h5 style="font-size:.75rem;color:#ff4081">➕ THÊM DANH MỤC & ĐĂNG SẢN PHẨM</h5>
       <div class="form-group"><input class="form-control" id="p-name" placeholder="Tên SP" required></div>
       <div class="form-group"><input class="form-control" id="p-price" placeholder="Giá (VD: 20k)" required></div>
-      <div class="form-group"><input class="form-control" id="p-cat" placeholder="Danh mục" required></div>
+      <div class="form-group"><input class="form-control" id="p-cat" placeholder="Tên Danh Mục (Ví dụ: Trái ác quỷ, Pet...)" required></div>
       <div class="form-group">
-        <input class="form-control" id="p-img" placeholder="Link hình ảnh (https://...)" oninput="previewAdminImg(this.value)" required>
+        <label style="font-size:.68rem;color:#ffcc00">Chọn ảnh (Bắt buộc > 19KB):</label>
+        <input type="file" class="form-control" id="p-img-file" accept="image/*" onchange="handleImageUpload(event)" required>
       </div>
+      <input type="hidden" id="p-img-base64">
       <div id="p-img-preview-box" style="display:none;margin-bottom:5px;text-align:center;">
         <img id="p-img-preview" src="" style="max-height:80px;border-radius:4px;border:1px solid #ff4081;">
+        <div id="img-size-info" style="font-size:.65rem;color:#4da6ff"></div>
       </div>
-      <button class="btn-pink" style="width:100%">➕ Đăng SP</button>
+      <button class="btn-pink" style="width:100%">➕ Đăng SP Lên Trang Chủ</button>
     </form>
     
     <div style="margin-bottom:6px;border-bottom:1px solid #1f334d;padding-bottom:4px"><h5 style="font-size:.75rem;color:#ffcc00">📲 DUYỆT THẺ</h5><div id="admin-cards-container"></div></div>
@@ -72,14 +75,14 @@
     <button class="btn-pink" onclick="alert('Đã gửi thông báo!')">💸 Đã Chuyển Khoản</button>
   </div>
 
-  <div id="danh-muc" class="card-box"><div class="box-title">📁 SẢN PHẨM</div><div id="product-list-container"></div></div>
+  <div id="danh-muc" class="card-box"><div class="box-title">📁 SẢN PHẨM & DANH MỤC TRANG CHỦ</div><div id="product-list-container"></div></div>
   <div id="don-hang" class="card-box"><div class="box-title">📋 ĐƠN HÀNG CỦA BẠN</div><div id="orders-container"></div></div>
 </div>
 
 <div id="login-modal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeM('login-modal')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="handleLogin(event)"><div class="form-group"><input class="form-control" id="login-user" placeholder="Tài khoản web" required></div><div class="form-group"><input type="password" class="form-control" id="login-pass" placeholder="Mật khẩu" required></div><button class="btn-pink" style="width:100%">Đăng Nhập</button></form></div></div>
 <div id="register-modal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeM('register-modal')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="handleRegister(event)"><div class="form-group"><input class="form-control" id="reg-user" placeholder="Tài khoản mới" required></div><div class="form-group"><input type="password" class="form-control" id="reg-pass" placeholder="Mật khẩu" required></div><button class="btn-pink" style="width:100%;background:#4da6ff">Đăng Ký</button></form></div></div>
 
-<!-- MODAL MUA HÀNG: CHỈ YÊU CẦU TÊN ROBLOX CỦA KHÁCH -->
+<!-- MODAL MUA HÀNG -->
 <div id="buy-modal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeM('buy-modal')">&times;</span><h4 style="color:#26a69a">🛒 Mua Sản Phẩm</h4><form onsubmit="confirmBuyProduct(event)"><input type="hidden" id="buy-pname"><input type="hidden" id="buy-pprice"><div style="font-size:.8rem;color:#ffcc00" id="buy-info"></div><div class="form-group"><label style="font-size:.7rem;color:#aaa">Tên tài khoản Roblox nhận đồ:</label><input class="form-control" id="buy-roblox-user" placeholder="Nhập tên tài khoản Roblox..." required></div><button class="btn-green" style="width:100%">✅ Xác Nhận Mua</button></form></div></div>
 
 <script>
@@ -114,15 +117,28 @@ function toggleAdminPanel(){
   updateUI();
 }
 
-function previewAdminImg(url){
-  const box=document.getElementById('p-img-preview-box');
-  const img=document.getElementById('p-img-preview');
-  if(url.trim()){
-    img.src=url;
-    box.style.display='block';
-  } else {
-    box.style.display='none';
+function handleImageUpload(e){
+  const file=e.target.files[0];
+  if(!file)return;
+  
+  // Kiểm tra kích thước phải TRÊN 19KB (19456 bytes)
+  if(file.size <= 19456){
+    alert(`❌ Ảnh quá nhỏ! (${(file.size/1024).toFixed(1)}KB). Vui lòng chọn ảnh có dung lượng TRÊN 19KB.`);
+    e.target.value='';
+    document.getElementById('p-img-preview-box').style.display='none';
+    return;
   }
+
+  const reader=new FileReader();
+  reader.onload=function(event){
+    const base64Str=event.target.result;
+    document.getElementById('p-img-base64').value=base64Str;
+    const img=document.getElementById('p-img-preview');
+    img.src=base64Str;
+    document.getElementById('img-size-info').innerText=`Dung lượng: ${(file.size/1024).toFixed(1)}KB (Hợp lệ > 19KB)`;
+    document.getElementById('p-img-preview-box').style.display='block';
+  };
+  reader.readAsDataURL(file);
 }
 
 function renderProducts(){
@@ -132,13 +148,13 @@ function renderProducts(){
       <img class="product-img" src="${p.img || 'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'">
       <div class="product-info">
         <div style="font-weight:bold">${p.name} - <span style="color:#ffcc00">${p.price}</span></div>
-        <div style="font-size:.68rem;color:#9ca3af">DM: ${p.category}</div>
-        <div style="margin-top:3px;">
+        <div style="font-size:.72rem;color:#4da6ff;font-weight:bold;margin-top:2px;">📁 Danh mục: ${p.category}</div>
+        <div style="margin-top:4px;">
           <button class="btn-green" onclick="openBuyModal('${p.name}','${p.price}')">🛒 Mua</button>
           ${isAdmin?`<button class="btn-danger" onclick="delProd(${p.id})">🗑️ Xóa</button>`:''}
         </div>
       </div>
-    </div>`).join(''):'<div class="empty-state">Chưa có SP</div>';
+    </div>`).join(''):'<div class="empty-state">Chưa có sản phẩm nào</div>';
 }
 
 function renderOrders(){
@@ -190,24 +206,25 @@ function procOrd(i,a){const o=getDb('annie_ords',[]),x=o.find(d=>d.id===i);if(!x
 
 function handleAddProduct(e){
   e.preventDefault();if(!isAdmin)return;
+  const imgBase64=document.getElementById('p-img-base64').value;
+  if(!imgBase64)return alert('Vui lòng chọn hình ảnh sản phẩm hợp lệ!');
+
   const p=getDb('annie_prods',defP);
   p.push({
     id:Date.now(),
     name:document.getElementById('p-name').value,
     price:document.getElementById('p-price').value,
     category:document.getElementById('p-cat').value,
-    img:document.getElementById('p-img').value
+    img:imgBase64
   });
   setDb('annie_prods',p);
   e.target.reset();
   document.getElementById('p-img-preview-box').style.display='none';
+  document.getElementById('p-img-base64').value='';
   renderProducts();
-  alert('Đã thêm sản phẩm thành công!');
+  alert('Đã thêm sản phẩm kèm danh mục thành công ra ngoài trang chủ!');
 }
 
 function delProd(i){if(isAdmin&&confirm('Xóa sản phẩm này?')){setDb('annie_prods',getDb('annie_prods',[]).filter(p=>p.id!==i));renderProducts()}}
 function openBuyModal(n,p){if(!currentUser)return openM('login-modal');const pN=parsePrice(p),cB=getUserBal(currentUser);if(cB<pN)return alert(`❌ Không đủ tiền! Giá: ${p}`);document.getElementById('buy-pname').value=n;document.getElementById('buy-pprice').value=p;document.getElementById('buy-info').innerText=`Sản phẩm: ${n} (${p})`;document.getElementById('buy-roblox-user').value='';openM('buy-modal')}
-function confirmBuyProduct(e){e.preventDefault();const n=document.getElementById('buy-pname').value,p=document.getElementById('buy-pprice').value,r=document.getElementById('buy-roblox-user').value.trim(),pN=parsePrice(p);if(!r)return alert('Chưa nhập tên Roblox!');changeBal(currentUser,-pN);const o=getDb('annie_ords',[]);o.push({id:Date.now(),pName:n,price:p,user:currentUser,robloxUser:r,status:'pending'});setDb('annie_ords',o);closeM('buy-modal');updateUI();renderOrders();renderAdminOrders();alert('Đã đặt mua! Admin sẽ giao tới Roblox: '+r)}
-
-window.onload=function(){if(!localStorage.getItem('annie_prods'))setDb('annie_prods',defP);updateUI();renderProducts();renderOrders();renderUserCards()};
-</script></body></html>
+function confirmBuyProduct(e){e.preventDefault();const n=do
