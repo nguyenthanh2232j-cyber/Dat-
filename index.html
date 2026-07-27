@@ -25,6 +25,7 @@
         button {background:#f472b6; color:white; font-weight:bold; cursor:pointer; border:none;}
         .btn-quanly {background:#facc15; color:#0f172a;}
         .btn-ok {background:#10b981;}
+        .btn-xacnhan {background:#f59e0b; color:#0f172a;}
         .btn-doi {background:#3b82f6;}
         .btn-xoa {background:#ef4444; color:white; padding:6px 12px; font-size:13px;}
         .bank-box {background:#334155; padding:12px; border-radius:5px; margin:10px 0;}
@@ -34,12 +35,14 @@
         .sp-ma {font-size:13px; color:#94a3b8; margin-top:2px;}
         .don-item {padding:10px; border-bottom:1px solid #475569; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:8px;}
         .cho-xn {color:#facc15; font-weight:500;}
+        .da-giao {color:#10b981; font-weight:500;}
         .tb {margin-top:10px; color:#7ee787; display:none; font-weight:bold;}
         .modal {display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); justify-content:center; align-items:center; z-index:999;}
         .modal-content {background:#1e293b; padding:25px; border-radius:8px; width:90%; max-width:420px; border:1px solid #f472b6;}
         .close {float:right; font-size:22px; cursor:pointer; color:#94a3b8;}
         .chi-nguoi-ban {display:none;}
         .btn-sm {padding:6px 10px; font-size:13px;}
+        .danhgia-txt {margin-top:4px; font-size:13px; color:#f472b6; font-style:italic;}
         .label {font-weight:500; margin-bottom:4px; display:block; color:#cbd5e1;}
         .thongbao {color:#10b981; font-weight:bold; margin-top:10px; text-align:center;}
         .list-dm {margin-top:10px; max-height:120px; overflow-y:auto;}
@@ -157,7 +160,7 @@
     </div>
 
     <div class="box" id="don-hang">
-        <h3>📋 ĐƠN HÀNG CHỜ DUYỆT <span class="chi-nguoi-ban" style="color:#facc15;">(Chỉ Admin xem & xử lý)</span></h3>
+        <h3>📋 QUẢN LÝ ĐƠN HÀNG <span class="chi-nguoi-ban" style="color:#facc15;">(Quyền Quản Trị)</span></h3>
         <div id="danhSachDon"></div>
     </div>
 </div>
@@ -201,6 +204,15 @@
     </div>
 </div>
 
+<div class="modal" id="modalDanhGia">
+    <div class="modal-content"><span class="close" onclick="dongModal('modalDanhGia')">&times;</span>
+    <h3 style="text-align:center; margin-bottom:15px;">⭐ ĐÁNH GIÁ ĐƠN HÀNG</h3>
+    <p style="text-align:center; margin-bottom:10px; color:#94a3b8;">Đơn hàng đã hoàn thành!</p>
+    <textarea id="noiDungDanhGia" placeholder="Viết đánh giá của bạn..." style="height:80px; margin-bottom:15px;"></textarea>
+    <button class="btn-ok" onclick="guiDanhGia()">Gửi Đánh Giá</button>
+    </div>
+</div>
+
 <script>
 const TAIKHOAN_CHU = 'xuanthanh';
 const MATKHAU_CHU = '20122014';
@@ -209,8 +221,10 @@ let dsTaiKhoan = JSON.parse(localStorage.getItem('dsTaiKhoan')) || [];
 let dsDanhMuc = JSON.parse(localStorage.getItem('dsDanhMuc')) || [];
 let dsSanPham = JSON.parse(localStorage.getItem('dsSanPham')) || [];
 let dsDonHang = JSON.parse(localStorage.getItem('dsDonHang')) || [];
+
 let nguoiDung = null;
 let spDangChon = null;
+let donDangDanhGia = null;
 
 function luuDuLieu(){
     localStorage.setItem('dsTaiKhoan', JSON.stringify(dsTaiKhoan));
@@ -244,6 +258,7 @@ function taiDuLieu(){
     
     let isOwner = nguoiDung && nguoiDung.loai === 'chu';
     
+    // Render Danh sách Sản phẩm
     let htmlSP = '';
     dsSanPham.forEach((sp, idx)=>{
         htmlSP += `<div class="sp-item">
@@ -251,6 +266,7 @@ function taiDuLieu(){
             <div class="sp-thongtin">
                 <strong>${sp.ten}</strong> - ${parseInt(sp.gia).toLocaleString('vi-VN')}đ
                 <div class="sp-ma">Mã: ${sp.ma||'---'} | Danh mục: ${sp.danhMuc||'Chưa có'}</div>
+                ${sp.moTa ? `<div style="font-size:12px; color:#cbd5e1; margin-top:2px;">${sp.moTa}</div>` : ''}
             </div>
             ${isOwner ? `<button class="btn-xoa btn-sm" onclick="xoaSanPham(${idx})" style="margin-right:5px;">🗑️ Xóa</button>` : ''}
             <button class="btn-ok btn-sm" onclick="moMua(${idx})">🛒 Mua</button>
@@ -259,33 +275,59 @@ function taiDuLieu(){
     if(dsSanPham.length===0) htmlSP = `<p style="color:#94a3b8; text-align:center; padding:15px;">Chưa có sản phẩm nào</p>`;
     document.getElementById('danhSachSP').innerHTML = htmlSP;
 
+    // Render Danh sách Đơn hàng
     let htmlDon = '';
     dsDonHang.forEach((don, idx)=>{
+        let isUserOrder = nguoiDung && (nguoiDung.ten === don.tenKhach || isOwner);
+        if(!isUserOrder) return; // Chỉ hiển thị đơn của mình hoặc admin xem hết
+
+        let statusText = don.trangThai === 'da_duyet' 
+            ? `<span class="da-giao">✅ ĐÃ HOÀN THÀNH</span>` 
+            : `<span class="cho-xn">⚠️ CHỜ DUYỆT</span>`;
+
+        let actionBtn = '';
+        if(isOwner && don.trangThai !== 'da_duyet'){
+            actionBtn += `<button class="btn-xacnhan btn-sm" onclick="duyetDonHang(${idx})">✔️ Duyệt</button> `;
+        }
+        if(isOwner){
+            actionBtn += `<button class="btn-xoa btn-sm" onclick="xoaDonHang(${idx})">🗑️ Hủy</button>`;
+        }
+        if(!isOwner && don.trangThai === 'da_duyet' && !don.danhGia){
+            actionBtn += `<button class="btn-ok btn-sm" onclick="moDanhGia(${idx})">⭐ Đánh Giá</button>`;
+        }
+
         htmlDon += `<div class="don-item">
             <div>
-                <strong>${don.tenSP}</strong> | Khách: ${don.tenKhach} | TK Game: ${don.taiKhoanRoblox}
+                <strong>${don.tenSP}</strong> | Khách: <b>${don.tenKhach}</b> | TK Game: <code>${don.taiKhoanRoblox}</code>
                 <br><small style="color:#94a3b8;">Giá: ${parseInt(don.gia).toLocaleString('vi-VN')}đ | ${don.thoiGian}</small>
+                ${don.danhGia ? `<div class="danhgia-txt">💬 Đánh giá: "${don.danhGia}"</div>` : ''}
             </div>
-            <span class="cho-xn"> ⚠️ CHỜ DUYỆT</span>
-            ${isOwner ? `<button class="btn-xoa btn-sm" onclick="xoaDonHang(${idx})" style="margin-left:10px;">🗑️ Hủy đơn</button>` : ''}
+            <div>
+                ${statusText}
+                <div style="margin-top:5px; text-align:right;">${actionBtn}</div>
+            </div>
         </div>`;
     });
-    if(dsDonHang.length===0) htmlDon = `<p style="color:#94a3b8; text-align:center; padding:15px;">Chưa có đơn hàng nào chờ duyệt</p>`;
+    if(!htmlDon) htmlDon = `<p style="color:#94a3b8; text-align:center; padding:15px;">Chưa có đơn hàng nào</p>`;
     document.getElementById('danhSachDon').innerHTML = htmlDon;
 }
 
+// === MODAL FUNCTIONS ===
 function moDangKy(){document.getElementById('modalDangKy').style.display='flex'; document.getElementById('tbDangKy').style.display='none';}
 function moDangNhap(){document.getElementById('modalDangNhap').style.display='flex';}
 function moDoiMatKhau(){document.getElementById('modalDoiMK').style.display='flex';}
-
 function moMua(idx){
     if(!nguoiDung) return alert('⚠️ Bạn cần đăng nhập tài khoản trước khi mua!');
     spDangChon = idx; 
     document.getElementById('modalMua').style.display='flex';
 }
-
+function moDanhGia(idx){
+    donDangDanhGia = idx;
+    document.getElementById('modalDanhGia').style.display='flex';
+}
 function dongModal(id){document.getElementById(id).style.display='none';}
 
+// === TÀI KHOẢN & ĐĂNG NHẬP ===
 function dangKy(){
     let tk = document.getElementById('dk_tk').value.trim();
     let mk = document.getElementById('dk_mk').value.trim();
@@ -347,55 +389,4 @@ function dangXuat(){
     nguoiDung = null;
     document.getElementById('guestMenu').style.display='inline';
     document.getElementById('userMenu').style.display='none';
-    document.getElementById('ownerMenu').style.display='none';
-    document.querySelectorAll('.chi-nguoi-ban').forEach(e=>e.style.display='none');
-    taiDuLieu();
-    alert('Đã đăng xuất!');
-}
-
-// === NẠP TIỀN & THẺ ===
-function napThe(){
-    let ma = document.getElementById('maTheInput').value.trim();
-    let seri = document.getElementById('seriTheInput').value.trim();
-    if(!ma || !seri) return alert('Vui lòng nhập đủ mã thẻ và số seri!');
-    let tb = document.getElementById('tb-the');
-    tb.style.display = 'block';
-    setTimeout(()=> tb.style.display='none', 3000);
-    document.getElementById('maTheInput').value = '';
-    document.getElementById('seriTheInput').value = '';
-}
-
-function chuyenKhoan(){
-    let tb = document.getElementById('tb-ck');
-    tb.style.display = 'block';
-    setTimeout(()=> tb.style.display='none', 3000);
-}
-
-// === QUẢN LÝ DANH MỤC ===
-function luuDanhMuc(){
-    if(!nguoiDung || nguoiDung.loai!=='chu') return alert('Chỉ Admin!');
-    let ten = document.getElementById('tenDanhMuc').value.trim();
-    if(!ten) return alert('Nhập tên danh mục!');
-    if(dsDanhMuc.some(dm=>dm.ten===ten)) return alert('Đã có danh mục này!');
-    dsDanhMuc.push({ten});
-    luuDuLieu(); taiDuLieu();
-    document.getElementById('tb-dm').style.display='block';
-    setTimeout(()=>document.getElementById('tb-dm').style.display='none',3000);
-    document.getElementById('tenDanhMuc').value='';
-}
-
-function xoaDanhMuc(idx){
-    if(!confirm('Bạn có chắc muốn xóa danh mục này?\nSản phẩm cũ vẫn được giữ lại!')) return;
-    dsDanhMuc.splice(idx,1);
-    luuDuLieu(); taiDuLieu();
-}
-
-// === QUẢN LÝ SẢN PHẨM ===
-function dangBan(){
-    if(!nguoiDung || nguoiDung.loai!=='chu') return alert('Chỉ Admin!');
-    let ten = document.getElementById('tenSP').value.trim();
-    let ma = document.getElementById('maSP').value.trim();
-    let dm = document.getElementById('danhMucSP').value;
-    let link = document.getElementById('linkAnhSP').value.trim();
-    let gia = document.getElementById('giaSP').value.trim();
-    let mk = document.getElementById('mkSP')
+    document.getElementById('ownerMenu')
