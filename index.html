@@ -6,30 +6,32 @@
   <style>
     *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,sans-serif}
     body{background:#0d1627;color:#fff;padding-bottom:30px}
-    .container{max-width:550px;margin:0 auto;padding:12px}
+    .container{max-width:550px;margin:0 auto;padding:10px}
     .top-nav,.main-nav,.product-item,.order-item{display:flex;align-items:center;justify-content:space-between}
-    .top-nav{padding:8px 0;font-size:.85rem}
-    .top-nav a,.main-nav a{color:#4da6ff;text-decoration:none;font-weight:600;cursor:pointer}
-    .main-nav{padding:10px 0;border-bottom:1px solid #1a283d;margin-bottom:12px;font-size:.95rem}
-    .support-bar{background:#132238;border-radius:6px;padding:8px;margin-bottom:15px;font-size:.8rem;border:1px solid #1e324d}
-    .brand-logo{text-align:center;margin:10px 0 15px}
-    .brand-logo h1{color:#ffcc00;font-size:1.8rem}
-    .card-box{background:#132238;border:1px solid #1e3250;border-radius:8px;padding:12px;margin-bottom:15px}
-    .box-title{font-size:1rem;font-weight:bold;color:#ff4081;margin-bottom:10px}
-    .form-group{margin-bottom:8px}
-    .form-control{width:100%;padding:8px;background:#0b1320;border:1px solid #1f334d;border-radius:5px;color:#fff;font-size:.85rem;outline:none}
-    .btn-pink,.btn-green,.btn-danger{border:none;border-radius:5px;font-weight:bold;cursor:pointer;color:#fff;padding:6px 10px;font-size:.8rem}
-    .btn-pink{background:#ff4081}.btn-green{background:#26a69a}.btn-danger{background:#e53935;margin-left:4px}
-    .bank-inner-box{background:#1a2c42;border-radius:5px;padding:10px;margin-bottom:10px;font-size:.85rem;line-height:1.5;color:#d1d5db}
-    .product-item{gap:10px;padding:10px 0;border-bottom:1px solid #1a2c42}
-    .product-img{width:70px;height:70px;border-radius:5px;object-fit:cover;background:#1a2c42;border:1px solid #ff4081}
+    .top-nav{padding:6px 0;font-size:.8rem}
+    .top-nav a{color:#4da6ff;text-decoration:none;font-weight:600;cursor:pointer}
+    /* Menu thu nhỏ gọn gàng đúng chuẩn ảnh */
+    .main-nav{justify-content:space-between;padding:8px 12px;border-bottom:1px solid #1a283d;margin-bottom:12px;background:#132238;border-radius:6px}
+    .main-nav a{color:#4da6ff;text-decoration:none;font-weight:700;font-size:.82rem}
+    .support-bar{background:#132238;border-radius:6px;padding:6px 10px;margin-bottom:12px;font-size:.75rem;border:1px solid #1e324d}
+    .brand-logo{text-align:center;margin:8px 0 12px}
+    .brand-logo h1{color:#ffcc00;font-size:1.6rem}
+    .card-box{background:#132238;border:1px solid #1e3250;border-radius:8px;padding:10px;margin-bottom:12px}
+    .box-title{font-size:.9rem;font-weight:bold;color:#ff4081;margin-bottom:8px}
+    .form-group{margin-bottom:6px}
+    .form-control{width:100%;padding:6px 8px;background:#0b1320;border:1px solid #1f334d;border-radius:4px;color:#fff;font-size:.8rem;outline:none}
+    .btn-pink,.btn-green,.btn-danger{border:none;border-radius:4px;font-weight:bold;cursor:pointer;color:#fff;padding:5px 8px;font-size:.75rem}
+    .btn-pink{background:#ff4081}.btn-green{background:#26a69a}.btn-danger{background:#e53935;margin-left:3px}
+    .bank-inner-box{background:#1a2c42;border-radius:5px;padding:8px;margin-bottom:8px;font-size:.8rem;line-height:1.4;color:#d1d5db}
+    .product-item{gap:8px;padding:8px 0;border-bottom:1px solid #1a2c42}
+    .product-img{width:60px;height:60px;border-radius:4px;object-fit:cover;background:#1a2c42;border:1px solid #ff4081}
     .product-info{flex:1}
-    .empty-state{text-align:center;color:#9ca3af;padding:8px 0;font-size:.8rem}
-    .order-item{background:#1a2c42;border-radius:5px;padding:8px;margin-bottom:6px;font-size:.8rem}
+    .empty-state{text-align:center;color:#9ca3af;padding:6px 0;font-size:.75rem}
+    .order-item{background:#1a2c42;border-radius:4px;padding:6px;margin-bottom:5px;font-size:.75rem}
     .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;justify-content:center;align-items:center}
-    .modal-content{background:#132238;border:1px solid #1e3250;border-radius:8px;width:90%;max-width:400px;padding:15px;position:relative;max-height:85vh;overflow-y:auto}
-    .close-btn{position:absolute;top:5px;right:10px;font-size:1.3rem;color:#aaa;cursor:pointer}
-    .tag{padding:2px 5px;border-radius:3px;font-weight:bold;font-size:.7rem}
+    .modal-content{background:#132238;border:1px solid #1e3250;border-radius:8px;width:90%;max-width:380px;padding:12px;position:relative;max-height:85vh;overflow-y:auto}
+    .close-btn{position:absolute;top:4px;right:8px;font-size:1.2rem;color:#aaa;cursor:pointer}
+    .tag{padding:2px 4px;border-radius:3px;font-weight:bold;font-size:.68rem}
     .tag-wait{background:#ff9800;color:#000}.tag-ok{background:#4caf50;color:#fff}.tag-err{background:#e53935;color:#fff}
   </style>
 </head>
@@ -39,13 +41,14 @@
     <div class="top-nav">
       <div id="user-status-text" style="font-weight:bold;color:#ffcc00">👤 Khách hàng</div>
       <div>
-        <a id="admin-panel-btn" style="display:none;color:#ffcc00;margin-right:8px" onclick="openM('admin-modal')">⚙️ Admin</a>
+        <a id="admin-panel-btn" style="display:none;color:#ffcc00;margin-right:6px" onclick="openM('admin-modal')">⚙️ Admin</a>
         <a id="register-btn" onclick="openM('register-modal')">📝 Đăng Ký</a>
-        <a id="login-btn" onclick="openM('login-modal')" style="margin-left:8px">🔐 Đăng Nhập</a>
+        <a id="login-btn" onclick="openM('login-modal')" style="margin-left:6px">🔐 Đăng Nhập</a>
         <a id="logout-btn" style="display:none;color:#e53935" onclick="handleLogout()">🚪 Thoát</a>
       </div>
     </div>
 
+    <!-- Thanh Menu đã thu nhỏ thu gọn -->
     <div class="main-nav">
       <a href="#nap-the">Nạp Thẻ</a>
       <a href="#nap-bank">Ngân Hàng</a>
@@ -54,7 +57,7 @@
     </div>
 
     <div class="support-bar">
-      📞 HỖ TRỢ: <a href="https://www.facebook.com/share/1CFAzF9o2r/" target="_blank" style="color:#ffca28">📘 FB Xuân Thành</a> | <a href="https://discord.gg/rscNF8X57" target="_blank" style="color:#ffca28">💬 Discord</a>
+      📞 HỖ TRỢ: <a href="https://www.facebook.com/share/1CFAzF9o2r/" target="_blank" style="color:#ffca28">FB Xuân Thành</a> | <a href="https://discord.gg/rscNF8X57" target="_blank" style="color:#ffca28">Discord</a>
     </div>
 
     <div class="brand-logo"><h1>🛒 ANNIE GAG2 SHOP</h1></div>
@@ -63,9 +66,7 @@
     <div id="nap-the" class="card-box">
       <div class="box-title">📱 NẠP THẺ CÀO</div>
       <form onsubmit="handleTopupCard(event)">
-        <div class="form-group">
-          <select class="form-control" id="card-type"><option>Viettel</option><option>Vinaphone</option><option>Mobifone</option></select>
-        </div>
+        <div class="form-group"><select class="form-control" id="card-type"><option>Viettel</option><option>Vinaphone</option><option>Mobifone</option></select></div>
         <div class="form-group">
           <select class="form-control" id="card-amount">
             <option value="10000">10.000đ</option>
@@ -79,13 +80,13 @@
         <button class="btn-pink" style="width:100%">✅ Gửi Nạp Thẻ</button>
       </form>
 
-      <div style="margin-top:12px;border-top:1px dashed #1f334d;padding-top:8px">
-        <div style="font-weight:bold;font-size:.85rem;margin-bottom:6px;color:#4da6ff">🔔 THÔNG BÁO XỬ LÝ THẺ</div>
+      <div style="margin-top:10px;border-top:1px dashed #1f334d;padding-top:6px">
+        <div style="font-weight:bold;font-size:.8rem;margin-bottom:4px;color:#4da6ff">🔔 THÔNG BÁO XỬ LÝ THẺ KHÁCH HÀNG</div>
         <div id="user-cards-container"></div>
       </div>
     </div>
 
-    <!-- NẠP NGÂN HÀNG -->
+    <!-- NẠP BANK -->
     <div id="nap-bank" class="card-box">
       <div class="box-title">💳 NẠP NGÂN HÀNG</div>
       <div class="bank-inner-box">
@@ -96,15 +97,15 @@
       <button class="btn-pink" onclick="alert('Đã gửi thông báo! Admin sẽ duyệt sớm.')">💸 Đã Chuyển Khoản</button>
     </div>
 
-    <!-- DANH MỤC SẢN PHẨM -->
+    <!-- SẢN PHẨM -->
     <div id="danh-muc" class="card-box">
       <div class="box-title">📁 DANH MỤC SẢN PHẨM</div>
       <div id="product-list-container"></div>
     </div>
 
-    <!-- ĐƠN HÀNG -->
+    <!-- ĐƠN HÀNG CHỜ DUYỆT / THÔNG BÁO ĐƠN HÀNG -->
     <div id="don-hang" class="card-box">
-      <div class="box-title">📋 ĐƠN HÀNG ĐÃ MUA</div>
+      <div class="box-title">📋 ĐƠN HÀNG CỦA BẠN</div>
       <div id="orders-container"></div>
     </div>
   </div>
@@ -113,7 +114,7 @@
   <div id="login-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeM('login-modal')">&times;</span>
-      <h3 style="color:#ff4081;margin-bottom:10px">Đăng Nhập</h3>
+      <h3 style="color:#ff4081;margin-bottom:8px">Đăng Nhập</h3>
       <form onsubmit="handleLogin(event)">
         <div class="form-group"><input class="form-control" id="login-user" placeholder="Tên tài khoản" required></div>
         <div class="form-group"><input type="password" class="form-control" id="login-pass" placeholder="Mật khẩu" required></div>
@@ -126,7 +127,7 @@
   <div id="register-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeM('register-modal')">&times;</span>
-      <h3 style="color:#4da6ff;margin-bottom:10px">Đăng Ký</h3>
+      <h3 style="color:#4da6ff;margin-bottom:8px">Đăng Ký</h3>
       <form onsubmit="handleRegister(event)">
         <div class="form-group"><input class="form-control" id="reg-user" placeholder="Tên tài khoản mới" required></div>
         <div class="form-group"><input type="password" class="form-control" id="reg-pass" placeholder="Mật khẩu" required></div>
@@ -139,10 +140,19 @@
   <div id="admin-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeM('admin-modal')">&times;</span>
-      <h3 style="color:#ffcc00;margin-bottom:10px">⚙️ BẢNG ADMIN</h3>
+      <h3 style="color:#ffcc00;margin-bottom:8px">⚙️ BẢNG ĐIỀU KHIỂN ADMIN</h3>
       
-      <form onsubmit="handleAddProduct(event)" style="margin-bottom:12px;border-bottom:1px solid #1f334d;padding-bottom:8px">
-        <h4 style="margin-bottom:6px;font-size:.85rem">➕ Thêm sản phẩm (VD: 20k, 50k)</h4>
+      <!-- CỘNG TIỀN CHO KHÁCH -->
+      <form onsubmit="handleAdminAddMoney(event)" style="margin-bottom:10px;border-bottom:1px solid #1f334d;padding-bottom:8px">
+        <h4 style="margin-bottom:4px;font-size:.8rem;color:#4da6ff">💰 CỘNG TIỀN CHO KHÁCH HÀNG</h4>
+        <div class="form-group"><input class="form-control" id="m-user" placeholder="Tên tài khoản khách" required></div>
+        <div class="form-group"><input type="number" class="form-control" id="m-val" placeholder="Số tiền cộng (VD: 20000)" required></div>
+        <button class="btn-green" style="width:100%">💵 Cộng Tiền & Gửi Thông Báo</button>
+      </form>
+
+      <!-- ĐĂNG SẢN PHẨM -->
+      <form onsubmit="handleAddProduct(event)" style="margin-bottom:10px;border-bottom:1px solid #1f334d;padding-bottom:8px">
+        <h4 style="margin-bottom:4px;font-size:.8rem">➕ ĐĂNG SẢN PHẨM MỚI</h4>
         <div class="form-group"><input class="form-control" id="p-name" placeholder="Tên sản phẩm" required></div>
         <div class="form-group"><input class="form-control" id="p-price" placeholder="Giá tiền (Ví dụ: 20k)" required></div>
         <div class="form-group"><input class="form-control" id="p-cat" placeholder="Danh mục" required></div>
@@ -150,9 +160,16 @@
         <button class="btn-pink" style="width:100%">➕ Đăng Sản Phẩm</button>
       </form>
 
-      <div>
-        <h4 style="margin-bottom:6px;font-size:.85rem;color:#ffcc00">📲 XỬ LÝ THẺ KHÁCH HÀNG</h4>
+      <!-- XỬ LÝ THẺ KHÁCH -->
+      <div style="margin-bottom:10px;border-bottom:1px solid #1f334d;padding-bottom:8px">
+        <h4 style="margin-bottom:4px;font-size:.8rem;color:#ffcc00">📲 XỬ LÝ THẺ KHÁCH HÀNG</h4>
         <div id="admin-cards-container"></div>
+      </div>
+
+      <!-- XỬ LÝ ĐƠN HÀNG KHÁCH -->
+      <div>
+        <h4 style="margin-bottom:4px;font-size:.8rem;color:#ffcc00">📋 XỬ LÝ ĐƠN HÀNG KHÁCH HÀNG</h4>
+        <div id="admin-orders-container"></div>
       </div>
     </div>
   </div>
@@ -162,8 +179,8 @@
     let isAdmin=false, currentUser=null;
 
     const defaultProducts=[
-      {id:1, name:"Ghost pepper", price:"20k", code:"---", category:"Ghost pepper", img:"https://via.placeholder.com/70/132238/ff4081?text=Ghost"},
-      {id:2, name:"Ghost pepper VIP", price:"50k", code:"---", category:"Ghost pepper", img:"https://via.placeholder.com/70/132238/ff4081?text=Ghost"}
+      {id:1, name:"Ghost pepper", price:"20k", code:"---", category:"Ghost pepper", img:"https://via.placeholder.com/60/132238/ff4081?text=Ghost"},
+      {id:2, name:"Ghost pepper VIP", price:"50k", code:"---", category:"Ghost pepper", img:"https://via.placeholder.com/60/132238/ff4081?text=Ghost"}
     ];
 
     const getDb=(k,f)=>JSON.parse(localStorage.getItem(k))||f;
@@ -193,7 +210,7 @@
           <img src="${p.img}" class="product-img" alt="${p.name}">
           <div class="product-info">
             <div style="font-weight:bold">${p.name} - <span style="color:#ffcc00">${p.price}</span></div>
-            <div style="font-size:.75rem;color:#9ca3af;margin:2px 0">Mã: ${p.code} | DM: ${p.category}</div>
+            <div style="font-size:.7rem;color:#9ca3af;margin:2px 0">Mã: ${p.code} | DM: ${p.category}</div>
             <button class="btn-green" onclick="buyProduct('${p.name}','${p.price}')">🛒 Mua</button>
             ${isAdmin ? `<button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️</button>` : ''}
           </div>
@@ -204,12 +221,12 @@
     function renderOrders(){
       const orders=getDb('annie_orders',[]);
       const my=isAdmin ? orders : orders.filter(o=>o.user===currentUser);
-      document.getElementById('orders-container').innerHTML=my.length ? my.map(o=>`
-        <div class="order-item">
-          <div><strong style="color:#ffcc00">🛒 ${o.productName} (${o.price})</strong><br><small style="color:#9ca3af">Khách: ${o.user} | ${o.time}</small></div>
-          <span class="tag tag-ok">Thành công</span>
-        </div>
-      `).join('') : '<div class="empty-state">Chưa có đơn hàng</div>';
+      document.getElementById('orders-container').innerHTML=my.length ? my.map(o=>{
+        let st='<span class="tag tag-wait">⏳ Đang chờ admin duyệt</span>';
+        if(o.status==='done') st='<span class="tag tag-ok">✅ Đã duyệt & Gửi hàng</span>';
+        if(o.status==='rejected') st=`<span class="tag tag-err">❌ Đơn bị hủy (${o.reason||'Hết hàng/Hoàn tiền'})</span>`;
+        return `<div class="order-item"><div><strong style="color:#ffcc00">🛒 ${o.productName} (${o.price})</strong><br><small style="color:#9ca3af">Khách: ${o.user} | ${o.time}</small></div><div>${st}</div></div>`;
+      }).join('') : '<div class="empty-state">Chưa có đơn hàng</div>';
     }
 
     function renderUserCards(){
@@ -231,12 +248,27 @@
           <div>Khách: <strong style="color:#ffcc00">${c.user}</strong> | ${c.type} - ${parseInt(c.amount).toLocaleString('vi-VN')}đ</div>
           <div>Mã: <span style="color:#ffcc00">${c.code}</span> | Seri: <span style="color:#4da6ff">${c.seri}</span></div>
           <div style="display:flex;gap:4px;width:100%;margin-top:2px">
-            <input type="number" id="val-${c.id}" value="${c.amount}" class="form-control" style="padding:2px 5px;font-size:.75rem">
+            <input type="number" id="val-${c.id}" value="${c.amount}" class="form-control" style="padding:2px 5px;font-size:.7rem">
             <button class="btn-green" onclick="processCard(${c.id},'done')">✅ Duyệt</button>
             <button class="btn-danger" onclick="processCard(${c.id},'rejected')">❌ Từ chối</button>
           </div>
         </div>
       `).join('') : '<div class="empty-state">Không có thẻ chờ duyệt</div>';
+    }
+
+    function renderAdminOrders(){
+      if(!isAdmin) return;
+      const orders=getDb('annie_orders',[]).filter(o=>o.status==='pending');
+      document.getElementById('admin-orders-container').innerHTML=orders.length ? orders.map(o=>`
+        <div class="order-item" style="flex-direction:column;align-items:flex-start;gap:4px">
+          <div>Đơn: <strong style="color:#ffcc00">${o.productName}</strong> (${o.price})</div>
+          <div>Tài khoản khách: <strong>${o.user}</strong></div>
+          <div style="display:flex;gap:4px;width:100%;margin-top:2px">
+            <button class="btn-green" style="flex:1" onclick="processOrder(${o.id},'done')">✅ Duyệt Đơn</button>
+            <button class="btn-danger" style="flex:1" onclick="processOrder(${o.id},'rejected')">❌ Từ Chối</button>
+          </div>
+        </div>
+      `).join('') : '<div class="empty-state">Không có đơn hàng chờ duyệt</div>';
     }
 
     const openM=id=>document.getElementById(id).style.display='flex';
@@ -253,7 +285,7 @@
       document.getElementById('logout-btn').style.display='inline';
       document.getElementById('bank-syntax').innerText=`NAP ${currentUser.toUpperCase()}`;
       updateHeaderUI(); closeM('login-modal');
-      renderProducts(); renderOrders(); renderUserCards(); renderAdminCards();
+      renderProducts(); renderOrders(); renderUserCards(); renderAdminCards(); renderAdminOrders();
     }
 
     function handleLogout(){
@@ -265,6 +297,19 @@
     }
 
     function handleRegister(e){ e.preventDefault(); alert('Đăng ký thành công!'); closeM('register-modal'); openM('login-modal'); }
+
+    // ADMIN CỘNG TIỀN TRỰC TIẾP CHO KHÁCH HÀNG
+    function handleAdminAddMoney(e){
+      e.preventDefault(); if(!isAdmin) return;
+      const targetUser = document.getElementById('m-user').value.trim();
+      const val = parseInt(document.getElementById('m-val').value) || 0;
+      if(!targetUser || val <= 0) return alert('Thông tin không hợp lệ!');
+      
+      changeBalance(targetUser, val);
+      alert(`Đã cộng +${val.toLocaleString()}đ vào tài khoản [${targetUser}] thành công!`);
+      document.getElementById('m-user').value = ''; document.getElementById('m-val').value = '';
+      updateHeaderUI();
+    }
 
     function handleTopupCard(e){
       e.preventDefault();
@@ -280,39 +325,31 @@
       if(act==='done'){
         let val=parseInt(document.getElementById(`val-${id}`).value)||parseInt(c.amount);
         c.status='done'; c.approvedVal=val; changeBalance(c.user, val);
+        alert(`Đã duyệt thẻ +${val.toLocaleString()}đ cho [${c.user}]`);
       } else {
         c.status='rejected'; c.reason=prompt("Lý do từ chối:","Thẻ sai/Đã dùng")||"Thẻ sai";
+        alert(`Đã từ chối thẻ của [${c.user}]`);
       }
       setDb('annie_cards',cards); renderAdminCards(); renderUserCards(); updateHeaderUI();
+    }
+
+    function processOrder(id, act){
+      const orders=getDb('annie_orders',[]); const o=orders.find(x=>x.id===id); if(!o) return;
+      if(act==='done'){
+        o.status='done';
+        alert(`Đã duyệt đơn "${o.productName}" cho khách [${o.user}]`);
+      } else {
+        o.status='rejected'; o.reason=prompt("Lý do hủy đơn:","Hết hàng - Hoàn tiền")||"Đơn bị hủy";
+        // Hoàn lại tiền cho khách nếu từ chối đơn
+        const pNum = parsePrice(o.price);
+        changeBalance(o.user, pNum);
+        alert(`Đã hủy đơn và hoàn lại ${pNum.toLocaleString()}đ cho khách [${o.user}]`);
+      }
+      setDb('annie_orders',orders); renderAdminOrders(); renderOrders(); updateHeaderUI();
     }
 
     function handleAddProduct(e){
       e.preventDefault(); if(!isAdmin) return;
       const products=getDb('annie_products',defaultProducts);
       products.push({ id:Date.now(), name:document.getElementById('p-name').value, price:document.getElementById('p-price').value, category:document.getElementById('p-cat').value, img:document.getElementById('p-img').value, code:"---" });
-      setDb('annie_products',products); renderProducts(); closeM('admin-modal'); alert('Đã thêm sản phẩm!');
-    }
-
-    function deleteProduct(id){
-      if(isAdmin && confirm('Xóa sản phẩm?')){ setDb('annie_products', getDb('annie_products',[]).filter(p=>p.id!==id)); renderProducts(); }
-    }
-
-    function buyProduct(name, priceStr){
-      if(!currentUser) return (alert("Vui lòng đăng nhập!"), openM('login-modal'));
-      const pNum=parsePrice(priceStr), cBal=getUserBalance(currentUser);
-      if(cBal < pNum) return alert(`❌ TÀI KHOẢN KHÔNG ĐỦ TIỀN!\nGiá: ${priceStr} (${pNum.toLocaleString()}đ)\nSố dư: ${cBal.toLocaleString()}đ`);
-      if(confirm(`Xác nhận mua "${name}" (${priceStr})?`)){
-        changeBalance(currentUser, -pNum);
-        const orders=getDb('annie_orders',[]);
-        orders.push({ id:Date.now(), productName:name, price:priceStr, user:currentUser, time:new Date().toLocaleTimeString('vi-VN') });
-        setDb('annie_orders',orders); updateHeaderUI(); renderOrders(); alert(`🎉 Mua thành công! Đã trừ ${pNum.toLocaleString()}đ.`);
-      }
-    }
-
-    window.onload=function(){
-      if(!localStorage.getItem('annie_products')) setDb('annie_products',defaultProducts);
-      updateHeaderUI(); renderProducts(); renderOrders(); renderUserCards();
-    };
-  </script>
-</body>
-        </html>
+      setDb('anni
