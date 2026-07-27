@@ -32,6 +32,7 @@
         .prod{gap:8px;padding:6px 0;border-bottom:1px solid #1a2c42;display:flex;align-items:center}
         .p-img{width:50px;height:50px;border-radius:4px;object-fit:cover;background:#1a2c42;border:1px solid #ff4081;flex-shrink:0}
         .p-info{flex:1}
+        .p-sl{color:#4caf50;font-weight:bold;font-size:.7rem;margin-top:2px}
         .empty{text-align:center;color:#9ca3af;padding:4px 0;font-size:.72rem}
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:1000}
         .m-body{background:#132238;border:1px solid #1e3250;border-radius:6px;width:92%;max-width:360px;padding:10px;position:relative;max-height:85vh;overflow-y:auto}
@@ -82,6 +83,7 @@
       <h5 style="font-size:.75rem;color:#ff4081;margin-bottom:4px">🛒 ĐĂNG SẢN PHẨM</h5>
       <input class="ctrl" id="ten-sp" placeholder="Tên sản phẩm" required>
       <input class="ctrl" id="gia-sp" placeholder="Giá (VD: 20k)" required>
+      <input type="number" class="ctrl" id="sl-sp" placeholder="Số lượng có sẵn" required min="1">
       <input class="ctrl" id="anh-sp" placeholder="Link ảnh">
       <button class="btn b-pink" style="width:100%">➕ Đăng</button>
     </form>
@@ -122,8 +124,6 @@
 <div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)"><div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div><input class="ctrl" id="tk-rb" placeholder="Tài khoản Roblox" required><button class="btn b-green" style="width:100%">✅ Mua</button></form></div></div>
 
 <script>
-// ==============================================
-// ✅ ĐÃ DÁN SẴN MÃ FIREBASE CỦA BẠN! KHÔNG CẦN THAY ĐỔI GÌ NỮA
 const firebaseConfig = {
   apiKey: "AIzaSyCdmkb-hoRllGGnTp8t1XNlBODtaYTQnWg",
   authDomain: "annie-gag2-shop.firebaseapp.com",
@@ -134,7 +134,6 @@ const firebaseConfig = {
   appId: "1:178028797329:web:5b3b8481e753593d8d4e30",
   measurementId: "G-01RPNSJT9X"
 };
-// ==============================================
 firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
@@ -172,9 +171,9 @@ async function hienBank(){if(!ad)return;let d=(await docDS('bank')).filter(x=>x.
 async function duyetBank(i){let d=await docDS('bank');let x=d.find(a=>a.id===i);x.trangthai='ok';await cong(x.tk,x.tien);luuDS('bank',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
 async function huyBank(i){let d=await docDS('bank');let x=d.find(a=>a.id===i);x.trangthai='huy';luuDS('bank',d);hienBank();alert('❌ Đã hủy!')}
 
-async function hienSP(){let d=await docDS('san_pham');document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh||'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️</button>`:''}</div></div></div>`).join(''):'<div class="empty">Chưa có sản phẩm</div>'}
+async function hienSP(){let d=await docDS('san_pham');document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh||'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div class="p-sl">📦 Còn lại: ${x.sl}</div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️</button>`:''}</div></div></div>`).join(''):'<div class="empty">Chưa có sản phẩm</div>'}
 async function xoaSP(i){if(confirm('Xóa?')){let d=await docDS('san_pham');d.splice(i,1);luuDS('san_pham',d);hienSP()}}
-async function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,a=document.getElementById('anh-sp').value;if(t&&g){let d=await docDS('san_pham');d.push({ten:t,gia:g,anh:a});luuDS('san_pham',d);e.target.reset();hienSP();alert('✅ Đã thêm!')}}
+async function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,sl=+document.getElementById('sl-sp').value,a=document.getElementById('anh-sp').value;if(t&&g&&sl>0){let d=await docDS('san_pham');d.push({ten:t,gia:g,sl:sl,anh:a});luuDS('san_pham',d);e.target.reset();hienSP();alert('✅ Đã thêm!')}}
 
 async function hienDon(){let d=await docDS('don_hang');let loc=ad?d:d.filter(x=>x.tk===tk);document.getElementById('list-don').innerHTML=loc.length?loc.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn</div>'}
 
@@ -182,17 +181,17 @@ async function nhap(e){e.preventDefault();let t=document.getElementById('tk').va
 async function tao(e){e.preventDefault();let t=document.getElementById('tk-moi').value.trim(),m=document.getElementById('mk-moi').value;if(!t||!m)return alert('Nhập đủ thông tin!');let ds=await docDS('tai_khoan');if(ds[t])return alert('Tài khoản đã tồn tại!');ds[t]={mk:m,tien:0};luuDS('tai_khoan',ds);alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
 function out(){ad=false;tk=null;capNhat()}
 async function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){await cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ!`);capNhat()}}
-async function mua(i){if(!tk)return openM('login');spMua=(await docDS('san_pham'))[i];if(await soDu(tk)<gia(spMua.gia))return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`;openM('mua')}
-async function xacNhan(e){e.preventDefault();let rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');await cong(tk,-gia(spMua.gia));let d=await docDS('don_hang');d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});luuDS('don_hang',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK!')}
+async function mua(i){if(!tk)return openM('login');spMua=(await docDS('san_pham'))[i];if(spMua.sl<=0)return alert('❌ Hết hàng!');if(await soDu(tk)<gia(spMua.gia))return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia} | Còn ${spMua.sl} sản phẩm`;openM('mua')}
+async function xacNhan(e){e.preventDefault();let rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');await cong(tk,-gia(spMua.gia));spMua.sl--;let dsSP=await docDS('san_pham');dsSP.find(x=>x.ten===spMua.ten).sl=spMua.sl;luuDS('san_pham',dsSP);let d=await docDS('don_hang');d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});luuDS('don_hang',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK!');}
 
 window.onload=()=>{
   Promise.all(['san_pham','tai_khoan','don_hang','the','bank'].map(k=>db.ref(k).once('value'))).then(s=>{
-    s.forEach((x,i)=>{if(!s[i].exists()) luuDS(['san_pham','tai_khoan','don_hang','the','bank'][i],['san_pham'][i]==='san_pham'?[{ten:'Sản phẩm mẫu',gia:'20k',anh:'https://via.placeholder.com/100'}]:{})});
+    s.forEach((x,i)=>{if(!s[i].exists()) luuDS(['san_pham','tai_khoan','don_hang','the','bank'][i],['san_pham'][i]==='san_pham'?[{ten:'Sản phẩm mẫu',gia:'20k',sl:10,anh:'https://via.placeholder.com/100'}]:{})});
     capNhat();
     db.ref().on('value',capNhat);
   })
 };
 </script>
 </body>
-                                                                                                                                                                                                                                                     </html>
-                                                                                                                                                                                                                                                     
+    </html>
+    
