@@ -47,7 +47,7 @@
       background-color: #132238;
       border-radius: 8px;
       padding: 12px 15px;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
       font-size: 0.9rem;
       border: 1px solid #1e324d;
     }
@@ -56,10 +56,10 @@
     .support-links a { color: #ffca28; text-decoration: none; font-weight: 600; }
 
     /* Logo Brand */
-    .brand-logo { text-align: center; margin: 15px 0 25px; }
+    .brand-logo { text-align: center; margin: 20px 0 30px; }
     .brand-logo h1 { color: #ffcc00; font-size: 2.2rem; font-weight: 900; letter-spacing: 1px; }
 
-    /* SECTION BOXES */
+    /* Section Boxes */
     .card-box {
       background-color: #132238;
       border: 1px solid #1e3250;
@@ -80,112 +80,7 @@
       text-transform: uppercase;
     }
 
-    /* TOP NẠP WIDGET (THEO MẪU HÌNH) */
-    .topnap-container {
-      background-color: #ffffff;
-      color: #333333;
-      border-radius: 16px;
-      padding: 20px;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
-    }
-
-    .topnap-header {
-      font-size: 1.3rem;
-      font-weight: 800;
-      color: #111;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      margin-bottom: 15px;
-    }
-
-    .topnap-tabs {
-      display: flex;
-      background-color: #f5f5f5;
-      border: 1px solid #e0e0e0;
-      border-radius: 12px;
-      padding: 4px;
-      margin-bottom: 20px;
-    }
-
-    .tab-btn {
-      flex: 1;
-      border: none;
-      background: transparent;
-      padding: 10px 0;
-      font-size: 0.95rem;
-      font-weight: 700;
-      color: #444;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: all 0.2s;
-    }
-
-    .tab-btn.active {
-      background-color: #ff3b30;
-      color: #ffffff;
-      box-shadow: 0 2px 8px rgba(255, 59, 48, 0.3);
-    }
-
-    .tab-content { display: none; }
-    .tab-content.active { display: block; }
-
-    /* Form Nạp Thẻ Style */
-    .white-form-control {
-      width: 100%;
-      padding: 12px 15px;
-      background-color: #ffffff;
-      border: 1px solid #d0d0d0;
-      border-radius: 8px;
-      color: #333;
-      font-size: 0.95rem;
-      outline: none;
-      margin-bottom: 12px;
-    }
-    .white-form-control::placeholder { color: #888; }
-    .white-form-control:focus { border-color: #ff3b30; }
-
-    /* Bảng Top Nạp Style */
-    .top-list { display: flex; flex-direction: column; gap: 10px; }
-    .top-item {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 6px 0;
-    }
-    .top-user { display: flex; align-items: center; gap: 10px; font-weight: 700; font-size: 0.95rem; color: #111; }
-    .top-rank {
-      width: 28px;
-      height: 28px;
-      border-radius: 50%;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-weight: 800;
-      color: #fff;
-      font-size: 0.85rem;
-    }
-    .rank-1 { background-color: #ffcc00; }
-    .rank-2 { background-color: #007aff; }
-    .rank-3 { background-color: #34c759; }
-    .rank-4, .rank-5 { background-color: #00c7be; }
-
-    .top-amount {
-      background-color: #ff3b30;
-      color: #fff;
-      padding: 8px 16px;
-      border-radius: 8px;
-      font-weight: 800;
-      font-size: 0.95rem;
-    }
-
-    /* Phần thưởng Style */
-    .reward-box { color: #222; font-size: 0.95rem; line-height: 1.8; }
-    .reward-title { color: #e53935; font-weight: 800; margin-bottom: 10px; text-transform: uppercase; line-height: 1.4; }
-    .reward-item { font-weight: 800; color: #111; }
-
-    /* Form Inputs & Buttons gốc */
+    /* Form Inputs */
     .form-group { margin-bottom: 12px; }
     .form-control {
       width: 100%;
@@ -197,19 +92,29 @@
       font-size: 0.95rem;
       outline: none;
     }
+    .form-control:focus { border-color: #ff4081; }
 
+    select.form-control {
+      appearance: none;
+      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
+      background-repeat: no-repeat;
+      background-position: right 10px center;
+      background-size: 20px;
+    }
+
+    /* Buttons */
     .btn-pink {
       background-color: #ff4081;
       color: #fff;
       border: none;
       border-radius: 8px;
-      padding: 12px 20px;
+      padding: 10px 20px;
       font-weight: bold;
       font-size: 0.95rem;
       cursor: pointer;
-      width: 100%;
-      text-align: center;
-      display: block;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
     }
     .btn-green {
       background-color: #26a69a;
@@ -280,6 +185,7 @@
       align-items: center;
     }
 
+    /* Status Badges */
     .badge-pending { color: #ffcc00; font-weight: bold; font-size: 0.85rem; }
     .badge-success { color: #00e676; font-weight: bold; font-size: 0.85rem; }
 
@@ -348,97 +254,33 @@
       <h1>🛒 ANNIE GAG2 SHOP</h1>
     </div>
 
-    <!-- WIDGET TOP NẠP T.07 (THIẾT KẾ MỚI TỔNG HỢP Ở GIỮA) -->
-    <div id="nap-the" class="topnap-container">
-      <div class="topnap-header">
-        🏆 TOP NẠP T.07
-      </div>
-
-      <!-- Navigation Tabs -->
-      <div class="topnap-tabs">
-        <button class="tab-btn active" onclick="switchTab('tab-napthe', this)">Nạp thẻ</button>
-        <button class="tab-btn" onclick="switchTab('tab-thangnay', this)">Tháng này</button>
-        <button class="tab-btn" onclick="switchTab('tab-phanthuong', this)">Phần thưởng</button>
-      </div>
-
-      <!-- TAB 1: NẠP THẺ -->
-      <div id="tab-napthe" class="tab-content active">
-        <form onsubmit="handleTopupCard(event)">
-          <select class="white-form-control" id="card-type">
+    <!-- NẠP THẺ CÀO -->
+    <div id="nap-the" class="card-box">
+      <div class="box-title">📱 NẠP THẺ CÀO</div>
+      <form onsubmit="handleTopupCard(event)">
+        <div class="form-group">
+          <select class="form-control" id="card-type">
             <option value="Viettel">Viettel</option>
             <option value="Vinaphone">Vinaphone</option>
             <option value="Mobifone">Mobifone</option>
           </select>
-
-          <select class="white-form-control" id="card-amount">
-            <option value="">-- Chọn đúng mệnh giá. Sai mất thẻ --</option>
+        </div>
+        <div class="form-group">
+          <select class="form-control" id="card-amount">
             <option value="10000">10.000đ</option>
             <option value="20000">20.000đ</option>
             <option value="50000">50.000đ</option>
             <option value="100000">100.000đ</option>
-            <option value="200000">200.000đ</option>
-            <option value="500000">500.000đ</option>
           </select>
-
-          <input type="text" class="white-form-control" placeholder="Nhập mã thẻ" id="card-code" required>
-          <input type="text" class="white-form-control" placeholder="Nhập số serial" id="card-seri" required>
-
-          <button type="submit" class="btn-pink" style="background:#ff3b30; font-size:1.05rem; padding:12px;">✅ Nạp Thẻ Ngay</button>
-        </form>
-      </div>
-
-      <!-- TAB 2: THÁNG NÀY (BẢNG XẾP HẠNG) -->
-      <div id="tab-thangnay" class="tab-content">
-        <div class="top-list">
-          <div class="top-item">
-            <div class="top-user">
-              <span class="top-rank rank-1">1</span>
-              <span>Nguyeng*****</span>
-            </div>
-            <div class="top-amount">400.000 đ</div>
-          </div>
-          <div class="top-item">
-            <div class="top-user">
-              <span class="top-rank rank-2">2</span>
-              <span>Tien*****</span>
-            </div>
-            <div class="top-amount">296.000 đ</div>
-          </div>
-          <div class="top-item">
-            <div class="top-user">
-              <span class="top-rank rank-3">3</span>
-              <span>vi*****</span>
-            </div>
-            <div class="top-amount">240.000 đ</div>
-          </div>
-          <div class="top-item">
-            <div class="top-user">
-              <span class="top-rank rank-4">4</span>
-              <span>Hungde*****</span>
-            </div>
-            <div class="top-amount">168.000 đ</div>
-          </div>
-          <div class="top-item">
-            <div class="top-user">
-              <span class="top-rank rank-5">5</span>
-              <span>H*****</span>
-            </div>
-            <div class="top-amount">160.000 đ</div>
-          </div>
         </div>
-      </div>
-
-      <!-- TAB 3: PHẦN THƯỞNG -->
-      <div id="tab-phanthuong" class="tab-content">
-        <div class="reward-box">
-          <div class="reward-title">ĐUA TOP NẠP THẺ HÀNG TUẦN - TRẢ THƯỞNG HÀNG TUẦN</div>
-          <p class="reward-item">TOP NẠP THÁNG 7</p>
-          <p class="reward-item">TOP 1 : 100 VÒI + 10 HẠT PEPPER</p>
-          <p class="reward-item">TOP 2 : 30 VÒI + 3 HẠT ỚT</p>
-          <p class="reward-item">TOP 3 : 20 VÒI + 1 HẠT ỚT</p>
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Mã thẻ" id="card-code" required>
         </div>
-      </div>
-
+        <div class="form-group">
+          <input type="text" class="form-control" placeholder="Số seri" id="card-seri" required>
+        </div>
+        <button type="submit" class="btn-pink">✅ Nạp Thẻ</button>
+      </form>
     </div>
 
     <!-- NẠP NGÂN HÀNG -->
@@ -458,7 +300,7 @@
       <div id="product-list-container"></div>
     </div>
 
-    <!-- LỊCH SỬ MUA HÀNG KHÁCH HÀNG -->
+    <!-- LỊCH SỬ MUA HÀNG (CỦA KHÁCH HÀNG) -->
     <div id="lich-su" class="card-box">
       <div class="box-title">📜 LỊCH SỬ MUA HÀNG KHÁCH HÀNG</div>
       <div id="user-history-container">
@@ -466,7 +308,7 @@
       </div>
     </div>
 
-    <!-- ĐƠN HÀNG CHỜ DUYỆT (ADMIN XUÂN THÀNH) -->
+    <!-- ĐƠN HÀNG CHỜ DUYỆT (CHỈ ADMIN XUANTHANH MỚI THẤY KHU VỰC NÀY) -->
     <div id="admin-orders-box" class="card-box" style="display:none; border-color:#ffcc00;">
       <div class="box-title" style="color:#ffcc00;">📋 ĐƠN HÀNG CHỜ DUYỆT (CHỈ ADMIN XUÂN THÀNH)</div>
       <div id="admin-orders-container">
@@ -510,7 +352,7 @@
     </div>
   </div>
 
-  <!-- MODAL MUA HÀNG -->
+  <!-- MODAL MUA HÀNG (ĐIỀN TÊN ROBLOX) -->
   <div id="buy-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('buy-modal')">&times;</span>
@@ -567,13 +409,6 @@
       { id: 2, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/90/132238/ff4081?text=Ghost" }
     ];
 
-    function switchTab(tabId, btnElement) {
-      document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
-      document.getElementById(tabId).classList.add('active');
-      btnElement.classList.add('active');
-    }
-
     function getProducts() {
       const stored = localStorage.getItem('annie_products');
       return stored ? JSON.parse(stored) : defaultProducts;
@@ -597,4 +432,125 @@
         <div class="product-item">
           <img src="${p.img}" class="product-img" alt="${p.name}">
           <div class="product-info">
-        
+            <div class="product-title">${p.name} - ${p.price}</div>
+            <div class="product-meta">Mã: ${p.code} | Danh mục: ${p.category}</div>
+            <button class="btn-green" onclick="openBuyModal('${p.name}', '${p.price}')">🛒 Mua</button>
+            ${isAdmin ? `<button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️ Xóa</button>` : ''}
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function renderOrders() {
+      const orders = getOrders();
+
+      // 1. Render Lịch Sử Cho Khách Hàng
+      const userContainer = document.getElementById('user-history-container');
+      if (!currentUser) {
+        userContainer.innerHTML = '<div class="empty-state">Vui lòng đăng nhập để xem lịch sử mua hàng</div>';
+      } else {
+        const userOrders = orders.filter(o => o.user.toLowerCase() === currentUser.toLowerCase());
+        if (userOrders.length === 0) {
+          userContainer.innerHTML = '<div class="empty-state">Bạn chưa mua đơn hàng nào</div>';
+        } else {
+          userContainer.innerHTML = userOrders.map(o => `
+            <div class="order-item">
+              <div>
+                <div style="font-weight:bold; color:#fff;">🛒 ${o.productName} (${o.price})</div>
+                <div style="font-size:0.85rem; color:#9ca3af;">Roblox Nick: <strong style="color:#4da6ff;">${o.robloxUser}</strong></div>
+                <div style="font-size:0.8rem; color:#6b7280;">Lập lúc: ${o.time}</div>
+              </div>
+              <div>
+                ${o.status === 'success' 
+                  ? '<span class="badge-success">✅ Thành công</span>' 
+                  : '<span class="badge-pending">⏳ Chờ duyệt...</span>'}
+              </div>
+            </div>
+          `).join('');
+        }
+      }
+
+      // 2. Render Đơn Hàng Chờ Duyệt (DÀNH RIÊNG CHO ADMIN XUÂN THÀNH)
+      const adminOrdersBox = document.getElementById('admin-orders-box');
+      const adminContainer = document.getElementById('admin-orders-container');
+
+      if (isAdmin) {
+        adminOrdersBox.style.display = 'block';
+        const pendingOrders = orders.filter(o => o.status === 'pending');
+
+        if (pendingOrders.length === 0) {
+          adminContainer.innerHTML = '<div class="empty-state">Không có đơn hàng nào chờ duyệt</div>';
+        } else {
+          adminContainer.innerHTML = pendingOrders.map(o => `
+            <div class="order-item">
+              <div>
+                <div style="font-weight:bold; color:#ffcc00;">🛒 ${o.productName} (${o.price})</div>
+                <div style="font-size:0.85rem; color:#d1d5db;">TK Shop: <strong>${o.user}</strong> | Nick Roblox: <strong style="color:#00e676;">${o.robloxUser}</strong></div>
+                <div style="font-size:0.8rem; color:#9ca3af;">Thời gian: ${o.time}</div>
+              </div>
+              <button class="btn-green" onclick="approveOrder(${o.id})">✅ Duyệt Đơn</button>
+            </div>
+          `).join('');
+        }
+      } else {
+        adminOrdersBox.style.display = 'none';
+      }
+    }
+
+    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
+    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+
+    function openBuyModal(name, price) {
+      if (!currentUser) {
+        alert("Vui lòng đăng nhập tài khoản shop trước khi mua hàng!");
+        openModal('login-modal');
+        return;
+      }
+      document.getElementById('buy-product-name').value = name;
+      document.getElementById('buy-product-price').value = price;
+      document.getElementById('buy-product-display').value = `${name} - ${price}`;
+      document.getElementById('roblox-username').value = '';
+      openModal('buy-modal');
+    }
+
+    function confirmBuyProduct(e) {
+      e.preventDefault();
+      const name = document.getElementById('buy-product-name').value;
+      const price = document.getElementById('buy-product-price').value;
+      const robloxUser = document.getElementById('roblox-username').value.trim();
+
+      const orders = getOrders();
+      orders.push({
+        id: Date.now(),
+        productName: name,
+        price: price,
+        user: currentUser,
+        robloxUser: robloxUser,
+        status: 'pending',
+        time: new Date().toLocaleTimeString('vi-VN') + ' ' + new Date().toLocaleDateString('vi-VN')
+      });
+
+      localStorage.setItem('annie_orders', JSON.stringify(orders));
+      closeModal('buy-modal');
+      renderOrders();
+      alert(`🎉 Đã gửi đơn hàng "${name}" cho Roblox: ${robloxUser}. Vui lòng chờ Admin duyệt!`);
+    }
+
+    function approveOrder(id) {
+      if(!isAdmin) return;
+      let orders = getOrders();
+      orders = orders.map(o => {
+        if (o.id === id) {
+          o.status = 'success';
+        }
+        return o;
+      });
+      localStorage.setItem('annie_orders', JSON.stringify(orders));
+      renderOrders();
+      alert('✅ Đã duyệt đơn hàng thành công! Trạng thái của khách hàng đã đổi sang "Thành công".');
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const userInput = document.getElementById('login-user').value.trim();
+      c
