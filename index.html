@@ -116,7 +116,7 @@
 </div>
 
 <div id="login" class="modal"><div class="m-body"><span class="close" onclick="closeM('login')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="nhap(event)"><input class="ctrl" id="tk" placeholder="Tài khoản" required><input type="password" class="ctrl" id="mk" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Vào</button></form></div></div>
-<div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo</button></form></div></div>
+<div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký Tài Khoản</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tên tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo Tài Khoản</button></form></div></div>
 <div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)"><div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div><input class="ctrl" id="tk-rb" placeholder="Tài khoản Roblox" required><button class="btn b-green" style="width:100%">✅ Mua</button></form></div></div>
 
 <script>
@@ -126,6 +126,7 @@ const getDB=k=>JSON.parse(localStorage.getItem(k))||[], setDB=(k,v)=>localStorag
 const gia=s=>String(s).replace(/[^0-9k]/gi,'').replace('k','000')*1||0;
 const soDu=u=>getDB('tien').find(x=>x.tk===u)?.tien||0;
 const cong=(u,v)=>{let d=getDB('tien');let x=d.find(x=>x.tk===u);x?x.tien+=v:d.push({tk:u,tien:v});setDB('tien',d)};
+const taiKhoanDaTonTai=u=>getDB('acc').some(x=>x.tk===u);
 
 function capNhat(){
   document.getElementById('u-status').innerText=ad?'👑 ADMIN':tk?`👤 ${tk} | 💰 ${soDu(tk).toLocaleString()}đ`:'👤 Khách';
@@ -139,6 +140,33 @@ function capNhat(){
 function adShow(){document.getElementById('ad-pan').style.display=ad?'block':'none'}
 function openM(i){document.getElementById(i).style.display='flex'}
 function closeM(i){document.getElementById(i).style.display='none'}
+
+// ✅ Đăng ký: Kiểm tra trùng, lưu tài khoản
+function tao(e){
+  e.preventDefault();
+  let u=document.getElementById('tk-moi').value.trim(),m=document.getElementById('mk-moi').value.trim();
+  if(!u||!m)return alert('Nhập đầy đủ thông tin!');
+  if(taiKhoanDaTonTai(u))return alert('❌ Tài khoản đã tồn tại! Chọn tên khác.');
+  let d=getDB('acc');d.push({tk:u,mk:m});setDB('acc',d);
+  alert('✅ Đăng ký thành công! Bây giờ hãy Đăng nhập.');
+  closeM('reg');openM('login');
+}
+
+// ✅ Đăng nhập: Chỉ cho tài khoản đã đăng ký + tài khoản admin
+function nhap(e){
+  e.preventDefault();
+  let u=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();
+  // Tài khoản admin đặc biệt
+  if(u===AD.u&&m===AD.p){
+    ad=true;tk=AD.u;
+  }else{
+    // Kiểm tra tài khoản khách đã đăng ký chưa
+    let ok=getDB('acc').some(x=>x.tk===u&&x.mk===m);
+    if(!ok)return alert('❌ Tài khoản hoặc mật khẩu sai, hoặc chưa đăng ký!');
+    ad=false;tk=u;
+  }
+  closeM('login');capNhat();alert('✅ Đăng nhập thành công!');
+}
 
 function guiThe(e){e.preventDefault();if(!tk)return openM('login');let d=getDB('the');d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});setDB('the',d);e.target.reset();alert('✅ Đã gửi thẻ! Chờ Admin duyệt.')}
 function hienThe(){if(!ad)return;let d=getDB('the').filter(x=>x.tt==='cho');document.getElementById('list-the').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>'}
@@ -156,8 +184,6 @@ function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').va
 
 function hienDon(){let d=getDB('don').filter(x=>ad||x.tk===tk);document.getElementById('list-don').innerHTML=d.length?d.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn</div>'}
 
-function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();ad=(t===AD.u&&m===AD.p);tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ OK!')}
-function tao(e){e.preventDefault();alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
 function out(){ad=false;tk=null;capNhat()}
 function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ!`);capNhat()}}
 function mua(i){if(!tk)return openM('login');spMua=getDB('sp')[i];if(soDu(tk)<gia(spMua.gia))return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`;openM('mua')}
@@ -166,6 +192,7 @@ function xacNhan(e){e.preventDefault();let rb=document.getElementById('tk-rb').v
 window.onload=()=>{
   if(!localStorage.getItem('sp'))setDB('sp',[{ten:'Sản phẩm mẫu',gia:'20k',anh:'https://via.placeholder.com/100'}]);
   if(!localStorage.getItem('tien'))setDB('tien',[]);
+  if(!localStorage.getItem('acc'))setDB('acc',[]);
   if(!localStorage.getItem('bank'))setDB('bank',[]);
   if(!localStorage.getItem('the'))setDB('the',[]);
   if(!localStorage.getItem('don'))setDB('don',[]);
@@ -173,5 +200,5 @@ window.onload=()=>{
 };
 </script>
 </body>
-        </html>
-                                                  
+    </html>
+    
