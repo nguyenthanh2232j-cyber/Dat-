@@ -1,193 +1,177 @@
 <!DOCTYPE html>
-<html lang="vi"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1.0"><title>ANNIE GAG2 SHOP</title>
-<style>
-*{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}body{background:#0d1627;color:#fff;padding-bottom:20px}.container{max-width:500px;margin:0 auto;padding:8px}.top-nav,.main-nav,.product-item,.order-item{display:flex;align-items:center;justify-content:space-between}.top-nav{padding:4px 0;font-size:.8rem}.top-nav a{color:#4da6ff;text-decoration:none;font-weight:600;cursor:pointer}.main-nav{justify-content:space-around;padding:6px 10px;border-bottom:1px solid #1a283d;margin-bottom:10px;background:#132238;border-radius:6px}.main-nav a{color:#4da6ff;text-decoration:none;font-weight:700;font-size:.8rem}.support-bar{background:#132238;border-radius:5px;padding:5px;margin-bottom:10px;font-size:.72rem;border:1px solid #1e324d}.brand-logo{text-align:center;margin:6px 0 10px}.brand-logo h1{color:#ffcc00;font-size:1.5rem}.card-box{background:#132238;border:1px solid #1e3250;border-radius:6px;padding:8px;margin-bottom:10px}.admin-box{border:1px solid #ffcc00;background:#18283f;display:none}.box-title{font-size:.85rem;font-weight:bold;color:#ff4081;margin-bottom:6px}.form-group{margin-bottom:5px}.form-control{width:100%;padding:5px;background:#0b1320;border:1px solid #1f334d;border-radius:4px;color:#fff;font-size:.78rem;outline:none}.btn-pink,.btn-green,.btn-danger,.btn-yellow{border:none;border-radius:4px;font-weight:bold;cursor:pointer;color:#fff;padding:4px 6px;font-size:.72rem}.btn-pink{background:#ff4081}.btn-green{background:#26a69a}.btn-danger{background:#e53935;margin-left:2px}.btn-yellow{background:#f57c00;color:#fff}.product-item{gap:8px;padding:6px 0;border-bottom:1px solid #1a2c42;align-items:center}.product-img{width:50px;height:50px;border-radius:4px;object-fit:cover;background:#1a2c42;border:1px solid #ff4081;flex-shrink:0}.product-info{flex:1}.empty-state{text-align:center;color:#9ca3af;padding:4px 0;font-size:.72rem}.order-item{background:#1a2c42;border-radius:4px;padding:5px;margin-bottom:4px;font-size:.72rem}.modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;justify-content:center;align-items:center}.modal-content{background:#132238;border:1px solid #1e3250;border-radius:6px;width:92%;max-width:360px;padding:10px;position:relative;max-height:85vh;overflow-y:auto}.close-btn{position:absolute;top:2px;right:6px;font-size:1.1rem;color:#aaa;cursor:pointer}.tag{padding:1px 3px;border-radius:2px;font-weight:bold;font-size:.65rem}.tag-wait{background:#ff9800;color:#000}.tag-ok{background:#4caf50;color:#fff}.tag-err{background:#e53935;color:#fff}
-</style></head>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width,initial-scale=1.0">
+    <title>ANNIE GAG2 SHOP</title>
+    <style>
+        *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
+        body{background:#0d1627;color:#fff;padding-bottom:20px}
+        .container{max-width:500px;margin:0 auto;padding:8px}
+        .top-nav,.main-nav,.item{display:flex;align-items:center;justify-content:space-between}
+        .top-nav{padding:4px 0;font-size:.8rem}
+        .top-nav a{color:#4da6ff;text-decoration:none;font-weight:600;cursor:pointer;margin-left:8px}
+        .main-nav{padding:6px 10px;border-bottom:1px solid #1a283d;margin-bottom:10px;background:#132238;border-radius:6px}
+        .main-nav a{color:#4da6ff;text-decoration:none;font-weight:700;font-size:.8rem}
+        .support{background:#132238;border-radius:5px;padding:5px;margin-bottom:10px;font-size:.72rem}
+        .support a{color:#ffca28;margin:0 4px}
+        .logo{text-align:center;margin:6px 0 10px}
+        .logo h1{color:#ffcc00;font-size:1.5rem}
+        .box{background:#132238;border:1px solid #1e3250;border-radius:6px;padding:8px;margin-bottom:10px}
+        .admin{border:1px solid #ffcc00;background:#18283f;display:none}
+        .title{font-size:.85rem;font-weight:bold;color:#ff4081;margin-bottom:6px}
+        .ctrl{width:100%;padding:5px;background:#0b1320;border:1px solid #1f334d;border-radius:4px;color:#fff;font-size:.78rem;outline:none;margin-bottom:5px}
+        .btn{border:none;border-radius:4px;font-weight:bold;cursor:pointer;color:#fff;padding:4px 6px;font-size:.72rem}
+        .b-pink{background:#ff4081}
+        .b-green{background:#26a69a}
+        .b-red{background:#e53935;margin-left:2px}
+        .b-yellow{background:#f57c00}
+        .bank-info{background:#1a2c42;border-radius:4px;padding:6px;margin-bottom:6px;font-size:.75rem}
+        .prod{gap:8px;padding:6px 0;border-bottom:1px solid #1a2c42;display:flex;align-items:center}
+        .p-img{width:50px;height:50px;border-radius:4px;object-fit:cover;background:#1a2c42;border:1px solid #ff4081;flex-shrink:0}
+        .p-info{flex:1}
+        .empty{text-align:center;color:#9ca3af;padding:4px 0;font-size:.72rem}
+        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:1000}
+        .m-body{background:#132238;border:1px solid #1e3250;border-radius:6px;width:92%;max-width:360px;padding:10px;position:relative;max-height:85vh;overflow-y:auto}
+        .close{position:absolute;top:2px;right:6px;font-size:1.1rem;color:#aaa;cursor:pointer}
+        .tag{padding:1px 3px;border-radius:2px;font-weight:bold;font-size:.65rem}
+        .t-wait{background:#ff9800;color:#000}
+        .t-ok{background:#4caf50;color:#fff}
+        .t-no{background:#e53935;color:#fff}
+    </style>
+</head>
 <body>
 <div class="container">
   <div class="top-nav">
     <div id="u-status" style="font-weight:bold;color:#ffcc00">👤 Khách hàng</div>
     <div>
-      <button id="btn-toggle-admin" class="btn-yellow" style="display:none;margin-right:4px;" onclick="toggleAdminPanel()">👁️ Admin Panel</button>
-      <a id="btn-reg" onclick="openM('register-modal')">📝 Đăng Ký</a> 
-      <a id="btn-log" onclick="openM('login-modal')">🔐 Đăng Nhập</a> 
-      <a id="btn-out" style="display:none;color:#e53935" onclick="handleLogout()">🚪 Thoát</a>
+      <button id="btn-ad" class="btn b-yellow" style="display:none;margin-right:4px;" onclick="adShow()">⚙️ Admin</button>
+      <a id="btn-reg" onclick="openM('reg')">📝 Đăng Ký</a> 
+      <a id="btn-log" onclick="openM('login')">🔐 Đăng Nhập</a> 
+      <a id="btn-out" style="display:none;color:#e53935" onclick="out()">🚪 Thoát</a>
     </div>
   </div>
-  <div class="main-nav"><a href="#danh-muc">Sản Phẩm</a><a href="#don-hang">Đơn Hàng</a></div>
-  <div class="support-bar">📞 HỖ TRỢ: <a href="https://www.facebook.com/share/1CFAzF9o2r/" target="_blank" style="color:#ffca28">FB Xuân Thành</a> | <a href="https://discord.gg/rscNF8X57" target="_blank" style="color:#ffca28">Discord</a></div>
-  <div class="brand-logo"><h1>🛒 ANNIE GAG2 SHOP</h1></div>
+  <div class="main-nav">
+    <a href="#nap-the">Nạp Thẻ</a>
+    <a href="#nap-bank">Ngân Hàng</a>
+    <a href="#sp">Sản Phẩm</a>
+    <a href="#don">Đơn Hàng</a>
+  </div>
+  <div class="support">📞 Hỗ trợ: <a href="https://www.facebook.com/share/1CFAzF9o2r/" target="_blank">FB Xuân Thành</a> | <a href="https://discord.gg/rscNF8X57" target="_blank">Discord</a></div>
+  <div class="logo"><h1>🛒 ANNIE GAG2 SHOP</h1></div>
 
-  <!-- KHU VỰC ADMIN -->
-  <div id="admin-section" class="card-box admin-box">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
-      <div class="box-title" style="color:#ffcc00;margin:0;">⚙️ KHU VỰC ADMIN</div>
-      <button class="btn-danger" style="font-size:.65rem;" onclick="toggleAdminPanel()">✖ Đóng Khay</button>
+  <div id="ad-pan" class="box admin">
+    <div class="title" style="display:flex;justify-content:space-between">⚙️ QUẢN LÝ <button class="btn b-red" onclick="adShow()">✖</button></div>
+    <form onsubmit="congTien(event)">
+      <h5 style="font-size:.75rem;color:#ffcc00;margin-bottom:4px">💰 CỘNG TIỀN</h5>
+      <input class="ctrl" id="tk-kh" placeholder="Tài khoản khách" required>
+      <input type="number" class="ctrl" id="so-tien" placeholder="Số tiền" required>
+      <button class="btn b-green" style="width:100%">💵 Cộng</button>
+    </form>
+    <div style="margin-bottom:8px">
+      <h5 style="font-size:.75rem;color:#ff9800;margin-bottom:4px">📱 DUYỆT THẺ</h5>
+      <div id="list-the"></div>
     </div>
-    
-    <form onsubmit="handleAdminAddMoney(event)" style="margin-bottom:6px;border-bottom:1px solid #1f334d;padding-bottom:4px">
-      <h5 style="font-size:.75rem;color:#4da6ff">💰 CỘNG TIỀN</h5>
-      <div class="form-group"><input class="form-control" id="m-user" placeholder="Tài khoản web khách" required></div>
-      <div class="form-group"><input type="number" class="form-control" id="m-val" placeholder="Số tiền cộng" required></div>
-      <button class="btn-green" style="width:100%">💵 Cộng Tiền</button>
+    <div style="margin-bottom:8px">
+      <h5 style="font-size:.75rem;color:#4da6ff;margin-bottom:4px">💳 DUYỆT CHUYỂN KHOẢN</h5>
+      <div id="list-bank"></div>
+    </div>
+    <form onsubmit="themSP(event)">
+      <h5 style="font-size:.75rem;color:#ff4081;margin-bottom:4px">🛒 ĐĂNG SẢN PHẨM</h5>
+      <input class="ctrl" id="ten-sp" placeholder="Tên sản phẩm" required>
+      <input class="ctrl" id="gia-sp" placeholder="Giá (VD: 20k)" required>
+      <input class="ctrl" id="anh-sp" placeholder="Link ảnh">
+      <button class="btn b-pink" style="width:100%">➕ Đăng</button>
     </form>
-    
-    <form onsubmit="handleAddProduct(event)" style="margin-bottom:6px;border-bottom:1px solid #1f334d;padding-bottom:4px">
-      <h5 style="font-size:.75rem;color:#ff4081">➕ THÊM DANH MỤC & ĐĂNG SẢN PHẨM</h5>
-      <div class="form-group"><input class="form-control" id="p-name" placeholder="Tên SP" required></div>
-      <div class="form-group"><input class="form-control" id="p-price" placeholder="Giá (VD: 20k)" required></div>
-      <div class="form-group"><input class="form-control" id="p-cat" placeholder="Tên Danh Mục (Ví dụ: Trái ác quỷ, Pet...)" required></div>
-      <div class="form-group">
-        <label style="font-size:.68rem;color:#ffcc00">Chọn ảnh (Bắt buộc <b>DƯỚI 19KB</b>):</label>
-        <input type="file" class="form-control" id="p-img-file" accept="image/*" onchange="handleImageUpload(event)" required>
-      </div>
-      <input type="hidden" id="p-img-base64">
-      <div id="p-img-preview-box" style="display:none;margin-bottom:5px;text-align:center;">
-        <img id="p-img-preview" src="" style="max-height:80px;border-radius:4px;border:1px solid #ff4081;">
-        <div id="img-size-info" style="font-size:.65rem;color:#4da6ff"></div>
-      </div>
-      <button class="btn-pink" style="width:100%">➕ Đăng SP Lên Trang Chủ</button>
-    </form>
-    
-    <div><h5 style="font-size:.75rem;color:#ffcc00">📋 DUYỆT ĐƠN HÀNG</h5><div id="admin-orders-container"></div></div>
   </div>
 
-  <div id="danh-muc" class="card-box"><div class="box-title">📁 SẢN PHẨM & DANH MỤC TRANG CHỦ</div><div id="product-list-container"></div></div>
-  <div id="don-hang" class="card-box"><div class="box-title">📋 ĐƠN HÀNG CỦA BẠN</div><div id="orders-container"></div></div>
+  <div id="nap-the" class="box">
+    <div class="title">📱 NẠP THẺ CÀO <small style="color:#ff9800">(Tối thiểu 20.000đ)</small></div>
+    <form onsubmit="guiThe(event)">
+      <select class="ctrl" id="loai-the"><option>Viettel</option><option>Vinaphone</option><option>Mobifone</option></select>
+      <select class="ctrl" id="menh-gia">
+        <option value="20000">20.000đ</option>
+        <option value="30000">30.000đ</option>
+        <option value="50000">50.000đ</option>
+        <option value="100000">100.000đ</option>
+      </select>
+      <input class="ctrl" placeholder="Mã thẻ" id="ma-the" required>
+      <input class="ctrl" placeholder="Số seri" id="seri-the" required>
+      <button class="btn b-pink" style="width:100%">✅ Gửi Nạp</button>
+    </form>
+  </div>
+
+  <div id="nap-bank" class="box">
+    <div class="title">💳 NẠP NGÂN HÀNG</div>
+    <div class="bank-info">
+      <p>📌 STK: <strong>0985537559</strong></p>
+      <p>📌 CTK: <strong>Nguyễn Xuân Thành</strong></p>
+      <p>📌 Nội dung: <strong style="color:#ffcc00" id="nd-chuyen">NAP + Tên TK</strong></p>
+    </div>
+    <button class="btn b-green" style="width:100%" onclick="guiBank()">💸 Đã Chuyển Khoản</button>
+  </div>
+
+  <div id="sp" class="box"><div class="title">🛒 SẢN PHẨM</div><div id="list-sp"></div></div>
+  <div id="don" class="box"><div class="title">📋 ĐƠN HÀNG</div><div id="list-don"></div></div>
 </div>
 
-<div id="login-modal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeM('login-modal')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="handleLogin(event)"><div class="form-group"><input class="form-control" id="login-user" placeholder="Tài khoản web" required></div><div class="form-group"><input type="password" class="form-control" id="login-pass" placeholder="Mật khẩu" required></div><button class="btn-pink" style="width:100%">Đăng Nhập</button></form></div></div>
-<div id="register-modal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeM('register-modal')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="handleRegister(event)"><div class="form-group"><input class="form-control" id="reg-user" placeholder="Tài khoản mới" required></div><div class="form-group"><input type="password" class="form-control" id="reg-pass" placeholder="Mật khẩu" required></div><button class="btn-pink" style="width:100%;background:#4da6ff">Đăng Ký</button></form></div></div>
-
-<!-- MODAL MUA HÀNG -->
-<div id="buy-modal" class="modal"><div class="modal-content"><span class="close-btn" onclick="closeM('buy-modal')">&times;</span><h4 style="color:#26a69a">🛒 Mua Sản Phẩm</h4><form onsubmit="confirmBuyProduct(event)"><input type="hidden" id="buy-pname"><input type="hidden" id="buy-pprice"><div style="font-size:.8rem;color:#ffcc00" id="buy-info"></div><div class="form-group"><label style="font-size:.7rem;color:#aaa">Tên tài khoản Roblox nhận đồ:</label><input class="form-control" id="buy-roblox-user" placeholder="Nhập tên tài khoản Roblox..." required></div><button class="btn-green" style="width:100%">✅ Xác Nhận Mua</button></form></div></div>
+<div id="login" class="modal"><div class="m-body"><span class="close" onclick="closeM('login')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="nhap(event)"><input class="ctrl" id="tk" placeholder="Tài khoản" required><input type="password" class="ctrl" id="mk" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Vào</button></form></div></div>
+<div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo</button></form></div></div>
+<div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)"><div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div><input class="ctrl" id="tk-rb" placeholder="Tài khoản Roblox" required><button class="btn b-green" style="width:100%">✅ Mua</button></form></div></div>
 
 <script>
-const ADMIN_USER="xuanthanh",ADMIN_PASS="20122014";
-let isAdmin=false, currentUser=null, showAdminPanel=true;
+const AD={u:'xuanthanh',p:'20122014'};
+let ad=false, tk=null, spMua=null;
+const getDB=k=>JSON.parse(localStorage.getItem(k))||[], setDB=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
+const gia=s=>String(s).replace(/[^0-9k]/gi,'').replace('k','000')*1||0;
+const soDu=u=>getDB('tien').find(x=>x.tk===u)?.tien||0;
+const cong=(u,v)=>{let d=getDB('tien');let x=d.find(x=>x.tk===u);x?x.tien+=v:d.push({tk:u,tien:v});setDB('tien',d)};
 
-const defP=[{id:1,name:"Ghost pepper",price:"20k",category:"Ghost pepper",img:"https://via.placeholder.com/100"}];
-
-const getDb=(k,f)=>JSON.parse(localStorage.getItem(k))||f, setDb=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
-function parsePrice(s){let r=String(s).toLowerCase().replace(/[^0-9k]/g,'');return r.includes('k')?parseInt(r.replace('k',''))*1000:(parseInt(r)||0)}
-function getUserBal(u){return(getDb('annie_bal',{}))[u]||0}
-function changeBal(u,a){let b=getDb('annie_bal',{});b[u]=(b[u]||0)+parseInt(a);setDb('annie_bal',b)}
-
-function updateUI(){
-  const e=document.getElementById('u-status');
-  const btnToggle=document.getElementById('btn-toggle-admin');
-  
-  if(isAdmin){
-    e.innerText=`👑 ADMIN: xuanthanh`;
-    btnToggle.style.display='inline-block';
-    document.getElementById('admin-section').style.display=showAdminPanel?'block':'none';
-  } else {
-    btnToggle.style.display='none';
-    document.getElementById('admin-section').style.display='none';
-    if(currentUser) e.innerText=`👤 ${currentUser} | 💰 ${getUserBal(currentUser).toLocaleString('vi-VN')}đ`;
-    else e.innerText=`👤 Khách hàng`;
-  }
+function capNhat(){
+  document.getElementById('u-status').innerText=ad?'👑 ADMIN':tk?`👤 ${tk} | 💰 ${soDu(tk).toLocaleString()}đ`:'👤 Khách';
+  document.getElementById('btn-ad').style.display=ad?'inline':'none';
+  document.getElementById('ad-pan').style.display=ad?'block':'none';
+  document.getElementById('btn-reg').style.display=document.getElementById('btn-log').style.display=tk?'none':'inline';
+  document.getElementById('btn-out').style.display=tk?'inline':'none';
+  document.getElementById('nd-chuyen').innerText=`NAP ${tk||'TÊN_TK'}`;
+  hienSP();hienDon();hienBank();hienThe();
 }
+function adShow(){document.getElementById('ad-pan').style.display=ad?'block':'none'}
+function openM(i){document.getElementById(i).style.display='flex'}
+function closeM(i){document.getElementById(i).style.display='none'}
 
-function toggleAdminPanel(){
-  showAdminPanel = !showAdminPanel;
-  updateUI();
-}
+function guiThe(e){e.preventDefault();if(!tk)return openM('login');let d=getDB('the');d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});setDB('the',d);e.target.reset();alert('✅ Đã gửi thẻ! Chờ Admin duyệt.')}
+function hienThe(){if(!ad)return;let d=getDB('the').filter(x=>x.tt==='cho');document.getElementById('list-the').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>'}
+function duyetThe(i){let d=getDB('the');let x=d.find(a=>a.id===i);x.tt='ok';cong(x.tk,x.gia);setDB('the',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
+function huyThe(i){let d=getDB('the');let x=d.find(a=>a.id===i);x.tt='huy';setDB('the',d);hienThe();alert('❌ Đã hủy!')}
 
-function handleImageUpload(e){
-  const file=e.target.files[0];
-  if(!file)return;
-  
-  // Kiểm tra kích thước BẮT BUỘC DƯỚI 19KB (19456 bytes)
-  if(file.size > 19456){
-    alert(`❌ Dung lượng ảnh quá lớn! (${(file.size/1024).toFixed(1)}KB). Vui lòng chọn ảnh DƯỚI 19KB!`);
-    e.target.value='';
-    document.getElementById('p-img-preview-box').style.display='none';
-    return;
-  }
+function guiBank(){if(!tk)return openM('login');let s=prompt('Số tiền chuyển:');let v=parseInt(s);if(!v||v<10000)return alert('Tối thiểu 10.000đ!');let d=getDB('bank');d.push({id:Date.now(),tk:tk,tien:v,trangthai:'cho'});setDB('bank',d);alert('✅ Đã gửi! Chờ duyệt.')}
+function hienBank(){if(!ad)return;let d=getDB('bank').filter(x=>x.trangthai==='cho');document.getElementById('list-bank').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.tien.toLocaleString()}đ</div><div><button class="btn b-green" onclick="duyetBank(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyBank(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có yêu cầu</div>'}
+function duyetBank(i){let d=getDB('bank');let x=d.find(a=>a.id===i);x.trangthai='ok';cong(x.tk,x.tien);setDB('bank',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
+function huyBank(i){let d=getDB('bank');let x=d.find(a=>a.id===i);x.trangthai='huy';setDB('bank',d);hienBank();alert('❌ Đã hủy!')}
 
-  const reader=new FileReader();
-  reader.onload=function(event){
-    const base64Str=event.target.result;
-    document.getElementById('p-img-base64').value=base64Str;
-    const img=document.getElementById('p-img-preview');
-    img.src=base64Str;
-    document.getElementById('img-size-info').innerText=`Dung lượng: ${(file.size/1024).toFixed(1)}KB (Đạt chuẩn < 19KB)`;
-    document.getElementById('p-img-preview-box').style.display='block';
-  };
-  reader.readAsDataURL(file);
-}
+function hienSP(){let d=getDB('sp');document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh||'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️</button>`:''}</div></div></div>`).join(''):'<div class="empty">Chưa có sản phẩm</div>'}
+function xoaSP(i){if(confirm('Xóa?')){let d=getDB('sp');d.splice(i,1);setDB('sp',d);hienSP()}}
+function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,a=document.getElementById('anh-sp').value;if(t&&g){let d=getDB('sp');d.push({ten:t,gia:g,anh:a});setDB('sp',d);e.target.reset();hienSP();alert('✅ Đã thêm!')}}
 
-function renderProducts(){
-  const l=getDb('annie_prods',defP);
-  document.getElementById('product-list-container').innerHTML=l.length?l.map(p=>`
-    <div class="product-item">
-      <img class="product-img" src="${p.img || 'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'">
-      <div class="product-info">
-        <div style="font-weight:bold">${p.name} - <span style="color:#ffcc00">${p.price}</span></div>
-        <div style="font-size:.72rem;color:#4da6ff;font-weight:bold;margin-top:2px;">📁 Danh mục: ${p.category}</div>
-        <div style="margin-top:4px;">
-          <button class="btn-green" onclick="openBuyModal('${p.name}','${p.price}')">🛒 Mua</button>
-          ${isAdmin?`<button class="btn-danger" onclick="delProd(${p.id})">🗑️ Xóa</button>`:''}
-        </div>
-      </div>
-    </div>`).join(''):'<div class="empty-state">Chưa có sản phẩm nào</div>';
-}
+function hienDon(){let d=getDB('don').filter(x=>ad||x.tk===tk);document.getElementById('list-don').innerHTML=d.length?d.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn</div>'}
 
-function renderOrders(){
-  const o=getDb('annie_ords',[]), my=isAdmin?o:o.filter(x=>x.user===currentUser);
-  document.getElementById('orders-container').innerHTML=my.length?my.map(x=>{
-    let s='<span class="tag tag-wait">⏳ Chờ</span>';if(x.status==='done')s='<span class="tag tag-ok">✅ Duyệt</span>';if(x.status==='rejected')s=`<span class="tag tag-err">❌ Hủy</span>`;
-    return `<div class="order-item"><div><strong style="color:#ffcc00">🛒 ${x.pName} (${x.price})</strong><br><small style="color:#4da6ff">Roblox: <b>${x.robloxUser||'---'}</b></small> | <small style="color:#9ca3af">Web: ${x.user}</small></div><div>${s}</div></div>`;
-  }).join(''):'<div class="empty-state">Chưa có đơn</div>';
-}
+function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();ad=(t===AD.u&&m===AD.p);tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ OK!')}
+function tao(e){e.preventDefault();alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
+function out(){ad=false;tk=null;capNhat()}
+function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ!`);capNhat()}}
+function mua(i){if(!tk)return openM('login');spMua=getDB('sp')[i];if(soDu(tk)<gia(spMua.gia))return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`;openM('mua')}
+function xacNhan(e){e.preventDefault();let rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');cong(tk,-gia(spMua.gia));let d=getDB('don');d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});setDB('don',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK!')}
 
-function renderAdminOrders(){
-  if(!isAdmin)return;
-  const o=getDb('annie_ords',[]).filter(x=>x.status==='pending');
-  document.getElementById('admin-orders-container').innerHTML=o.length?o.map(x=>`<div class="order-item" style="flex-direction:column;align-items:flex-start"><div>Đơn: <strong style="color:#ffcc00">${x.pName}</strong> (${x.price})</div><div>Nick Roblox: <strong style="color:#ff4081">${x.robloxUser||'Chưa nhập'}</strong> | Web: ${x.user}</div><div style="display:flex;gap:3px;width:100%;margin-top:2px"><button class="btn-green" style="flex:1" onclick="procOrd(${x.id},'done')">✅ Duyệt</button><button class="btn-danger" style="flex:1" onclick="procOrd(${x.id},'rejected')">❌ Hủy</button></div></div>`).join(''):'<div class="empty-state">Không có đơn chờ</div>';
-}
-
-const openM=i=>document.getElementById(i).style.display='flex', closeM=i=>document.getElementById(i).style.display='none';
-
-function handleLogin(e){
-  e.preventDefault();const u=document.getElementById('login-user').value.trim(),p=document.getElementById('login-pass').value.trim();
-  isAdmin=(u.toLowerCase()===ADMIN_USER&&p===ADMIN_PASS);currentUser=isAdmin?"xuanthanh":u;
-  document.getElementById('btn-reg').style.display=document.getElementById('btn-log').style.display='none';
-  document.getElementById('btn-out').style.display='inline';
-  showAdminPanel=true;
-  updateUI();closeM('login-modal');renderProducts();renderOrders();renderAdminOrders();
-}
-
-function handleLogout(){isAdmin=false;currentUser=null;document.getElementById('btn-reg').style.display=document.getElementById('btn-log').style.display='inline';document.getElementById('btn-out').style.display='none';updateUI();renderProducts();renderOrders()}
-function handleRegister(e){e.preventDefault();alert('Đăng ký thành công!');closeM('register-modal');openM('login-modal')}
-function handleAdminAddMoney(e){e.preventDefault();if(!isAdmin)return;const u=document.getElementById('m-user').value.trim(),v=parseInt(document.getElementById('m-val').value)||0;if(u&&v>0){changeBal(u,v);alert(`Cộng +${v.toLocaleString()}đ cho [${u}]!`);updateUI()}}
-function procOrd(i,a){const o=getDb('annie_ords',[]),x=o.find(d=>d.id===i);if(!x)return;if(a==='done'){x.status='done'}else{x.status='rejected';x.reason=prompt("Lý do:","Hoàn tiền")||"Đơn hủy";changeBal(x.user,parsePrice(x.price))}setDb('annie_ords',o);renderAdminOrders();renderOrders();updateUI()}
-
-function handleAddProduct(e){
-  e.preventDefault();if(!isAdmin)return;
-  const imgBase64=document.getElementById('p-img-base64').value;
-  if(!imgBase64)return alert('Vui lòng chọn hình ảnh sản phẩm hợp lệ dưới 19KB!');
-
-  const p=getDb('annie_prods',defP);
-  p.push({
-    id:Date.now(),
-    name:document.getElementById('p-name').value,
-    price:document.getElementById('p-price').value,
-    category:document.getElementById('p-cat').value,
-    img:imgBase64
-  });
-  setDb('annie_prods',p);
-  e.target.reset();
-  document.getElementById('p-img-preview-box').style.display='none';
-  document.getElementById('p-img-base64').value='';
-  renderProducts();
-  alert('Đã thêm sản phẩm kèm danh mục thành công ra ngoài trang chủ!');
-}
-
-function delProd(i){if(isAdmin&&confirm('Xóa sản phẩm này?')){setDb('annie_prods',getDb('annie_prods',[]).filter(p=>p.id!==i));renderProducts()}}
-function openBuyModal(n,p){if(!currentUser)return openM('login-modal');const pN=parsePrice(p),cB=getUserBal(currentUser);if(cB<pN)return alert(`❌ Không đủ tiền! Giá: ${p}`);document.getElementById('buy-pname').value=n;document.getElementById('buy-pprice').value=p;document.getElementById('buy-info').innerText=`Sản phẩm: ${n} (${p})`;document.getElementById('buy-roblox-user').value='';openM('buy-modal')}
-function confirmBuyProduct(e){e.preventDefault();const n=document.getElementById('buy-pname').value,p=document.getElementById('buy-pprice').value,r=document.getElementById('buy-roblox-user').value.trim(),pN=parsePrice(p);if(!r)return alert('Chưa nhập tên Roblox!');changeBal(currentUser,-pN);const o=getDb('annie_ords',[]);o.push({id:Date.now(),pName:n,price:p,user:currentUser,robloxUser:r,status:'pending'});setDb('annie_ords',o);closeM('buy-modal');updateUI();renderOrders();renderAdminOrders();alert('Đã đặt mua! Admin sẽ giao tới Roblox: '+r)}
-
-window.onload=function(){if(!localStorage.getItem('annie_prods'))setDb('annie_prods',defP);updateUI();renderProducts();renderOrders();};
-</script></body></html>
+window.onload=()=>{
+  if(!localStorage.getItem('sp'))setDB('sp',[{ten:'Sản phẩm mẫu',gia:'20k',anh:'https://via.placeholder.com/100'}]);
+  if(!localStorage.getItem('tien'))setDB('tien',[]);
+  if(!localStorage.getItem('bank'))setDB('bank',[]);
+  if(!localStorage.getItem('the'))setDB('the',[]);
+  if(!localStorage.getItem('don'))setDB('don',[]);
+  capNhat();
+};
+</script>
+</body>
+        </html>
+                                                  
