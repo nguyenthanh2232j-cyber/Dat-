@@ -4,7 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>ANNIE GAG2 SHOP</title>
-    <!-- === KẾT NỐI FIREBASE === -->
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
@@ -136,9 +135,12 @@ const AD={u:'xuanthanh',p:'20122014'};
 let ad=false, tk=null, spMua=null;
 const gia=s=>String(s).replace(/[^0-9k]/gi,'').replace('k','000')*1||0;
 
-// === HÀM LƯU & ĐỌC DỮ LIỆU TỪ FIREBASE ===
+// === HÀM LƯU & ĐỌC DỮ LIỆU ===
 const luu = (k,v) => db.ref(k).set(v);
-const doc = async k => (await db.ref(k).once('value')).val() || [];
+const doc = async k => {
+  const s = await db.ref(k).once('value');
+  return s.exists() ? s.val() : [];
+};
 const cong = async (u,v) => {
   let d = await doc('tien');
   let x = d.find(i=>i.tk===u);
@@ -148,10 +150,6 @@ const cong = async (u,v) => {
 const soDu = async u => {
   let d = await doc('tien');
   return d.find(i=>i.tk===u)?.tien || 0;
-};
-const taiKhoanDaTonTai = async u => {
-  let d = await doc('acc');
-  return d.some(i=>i.tk===u);
 };
 
 // === CẬP NHẬT GIAO DIỆN ===
@@ -168,31 +166,37 @@ function adShow(){document.getElementById('ad-pan').style.display=ad?'block':'no
 function openM(i){document.getElementById(i).style.display='flex'}
 function closeM(i){document.getElementById(i).style.display='none'}
 
-// === ĐĂNG KÝ ===
+// === ✅ SỬA LẠI ĐĂNG KÝ HOÀN CHỈNH ===
 async function tao(e){
   e.preventDefault();
   let u=document.getElementById('tk-moi').value.trim(),m=document.getElementById('mk-moi').value.trim();
-  if(!u||!m)return alert('Nhập đầy đủ thông tin!');
-  if(await taiKhoanDaTonTai(u))return alert('❌ Tài khoản đã tồn tại!');
+  if(!u||!m)return alert('⚠️ Nhập đủ tài khoản và mật khẩu!');
   let d = await doc('acc');
+  if(d.some(i=>i.tk===u))return alert('❌ Tài khoản đã tồn tại!');
   d.push({tk:u,mk:m});
-  luu('acc',d);
-  alert('✅ Đăng ký thành công!');
-  closeM('reg');openM('login');
+  await luu('acc',d);
+  alert('✅ Đăng ký thành công! Vui lòng đăng nhập.');
+  closeM('reg');
 }
 
-// === ĐĂNG NHẬP ===
+// === ✅ SỬA LẠI ĐĂNG NHẬP HOÀN CHỈNH ===
 async function nhap(e){
   e.preventDefault();
   let u=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();
-  if(u===AD.u&&m===AD.p){ad=true;tk=AD.u;}
-  else{
-    let d = await doc('acc');
-    let ok = d.some(i=>i.tk===u&&i.mk===m);
-    if(!ok)return alert('❌ Sai tài khoản hoặc chưa đăng ký!');
-    ad=false;tk=u;
+  if(!u||!m)return alert('⚠️ Nhập đủ tài khoản và mật khẩu!');
+  // Tài khoản Admin
+  if(u===AD.u && m===AD.p){
+    ad=true; tk=AD.u;
+    closeM('login'); capNhat();
+    return alert('✅ Đăng nhập ADMIN thành công!');
   }
-  closeM('login');capNhat();alert('✅ Đăng nhập thành công!');
+  // Tài khoản Khách
+  let d = await doc('acc');
+  let ok = d.some(i=>i.tk===u && i.mk===m);
+  if(!ok)return alert('❌ Sai tài khoản/mật khẩu hoặc chưa đăng ký!');
+  ad=false; tk=u;
+  closeM('login'); capNhat();
+  alert('✅ Đăng nhập thành công!');
 }
 
 // === QUẢN LÝ SẢN PHẨM ===
@@ -202,73 +206,59 @@ async function themSP(e){
   if(!t||!g||!a)return alert('Nhập đủ thông tin sản phẩm!');
   let d = await doc('sp');
   d.push({ten:t,gia:g,anh:a});
-  luu('sp',d);
-  e.target.reset();hienSP();
-  alert('✅ Đã đăng! Tất cả khách sẽ thấy sản phẩm này ngay.');
+  luu('sp',d); e.target.reset(); hienSP();
+  alert('✅ Đã đăng sản phẩm!');
 }
 async function hienSP(){
   let d = await doc('sp');
-  document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh}" onerror="this.src='https://via.placeholder.com/100?text=Không+Ảnh'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️ Xóa</button>`:''}</div></div></div>`).join(''):'<div class="empty">🔔 Chưa có sản phẩm nào được đăng</div>';
+  document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh}" onerror="this.src='https://via.placeholder.com/100?text=Không+Ảnh'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️ Xóa</button>`:''}</div></div></div>`).join(''):'<div class="empty">🔔 Chưa có sản phẩm</div>';
 }
 async function xoaSP(i){
   if(confirm('Xóa sản phẩm này?')){
-    let d = await doc('sp');
-    d.splice(i,1);
-    luu('sp',d);
-    hienSP();
+    let d = await doc('sp'); d.splice(i,1); luu('sp',d); hienSP();
   }
 }
 
 // === NẠP THẺ ===
 async function guiThe(e){
-  e.preventDefault();
-  if(!tk)return openM('login');
+  e.preventDefault(); if(!tk)return openM('login');
   let d = await doc('the');
   d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});
-  luu('the',d);
-  e.target.reset();alert('✅ Đã gửi thẻ!');
+  luu('the',d); e.target.reset(); alert('✅ Đã gửi thẻ chờ duyệt!');
 }
 async function hienThe(){
   if(!ad)return;
-  let d = await doc('the');
-  let cho = d.filter(x=>x.tt==='cho');
+  let d = await doc('the'); let cho = d.filter(x=>x.tt==='cho');
   document.getElementById('list-the').innerHTML=cho.length?cho.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>';
 }
 async function duyetThe(i){
-  let d = await doc('the');
-  let x = d.find(a=>a.id===i);
+  let d = await doc('the'); let x = d.find(a=>a.id===i);
   x.tt='ok'; cong(x.tk,x.gia); luu('the',d); capNhat(); alert('✅ Đã duyệt & cộng tiền!');
 }
 async function huyThe(i){
-  let d = await doc('the');
-  let x = d.find(a=>a.id===i);
+  let d = await doc('the'); let x = d.find(a=>a.id===i);
   x.tt='huy'; luu('the',d); hienThe(); alert('❌ Đã hủy!');
 }
 
 // === NẠP NGÂN HÀNG ===
 async function guiBank(){
   if(!tk)return openM('login');
-  let s=prompt('Số tiền chuyển:');
-  let v=parseInt(s);
+  let s=prompt('Số tiền chuyển:'); let v=parseInt(s);
   if(!v||v<10000)return alert('Tối thiểu 10.000đ!');
-  let d = await doc('bank');
-  d.push({id:Date.now(),tk:tk,tien:v,trangthai:'cho'});
-  luu('bank',d); alert('✅ Đã gửi!');
+  let d = await doc('bank'); d.push({id:Date.now(),tk:tk,tien:v,trangthai:'cho'});
+  luu('bank',d); alert('✅ Đã gửi chờ duyệt!');
 }
 async function hienBank(){
   if(!ad)return;
-  let d = await doc('bank');
-  let cho = d.filter(x=>x.trangthai==='cho');
+  let d = await doc('bank'); let cho = d.filter(x=>x.trangthai==='cho');
   document.getElementById('list-bank').innerHTML=cho.length?cho.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.tien.toLocaleString()}đ</div><div><button class="btn b-green" onclick="duyetBank(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyBank(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có yêu cầu</div>';
 }
 async function duyetBank(i){
-  let d = await doc('bank');
-  let x = d.find(a=>a.id===i);
+  let d = await doc('bank'); let x = d.find(a=>a.id===i);
   x.trangthai='ok'; cong(x.tk,x.tien); luu('bank',d); capNhat(); alert('✅ Đã duyệt & cộng tiền!');
 }
 async function huyBank(i){
-  let d = await doc('bank');
-  let x = d.find(a=>a.id===i);
+  let d = await doc('bank'); let x = d.find(a=>a.id===i);
   x.trangthai='huy'; luu('bank',d); hienBank(); alert('❌ Đã hủy!');
 }
 
@@ -276,46 +266,36 @@ async function huyBank(i){
 async function hienDon(){
   let d = await doc('don');
   let loc = ad ? d : d.filter(x=>x.tk===tk);
-  document.getElementById('list-don').innerHTML=loc.length?loc.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn</div>';
+  document.getElementById('list-don').innerHTML=loc.length?loc.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn hàng</div>';
 }
 
 // === CHUNG ===
 function out(){ad=false;tk=null;capNhat()}
 async function congTien(e){
-  e.preventDefault();
-  let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;
+  e.preventDefault(); let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;
   if(u&&v>0){await cong(u,v); alert(`✅ Cộng +${v.toLocaleString()}đ!`); capNhat();}
 }
 async function mua(i){
   if(!tk)return openM('login');
-  let d = await doc('sp');
-  spMua = d[i];
+  let d = await doc('sp'); spMua = d[i];
   if((await soDu(tk)) < gia(spMua.gia)) return alert('❌ Không đủ tiền!');
-  document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`;
-  openM('mua');
+  document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`; openM('mua');
 }
 async function xacNhan(e){
-  e.preventDefault();
-  let rb=document.getElementById('tk-rb').value.trim();
+  e.preventDefault(); let rb=document.getElementById('tk-rb').value.trim();
   if(!rb)return alert('Nhập tài khoản Roblox!');
   await cong(tk,-gia(spMua.gia));
-  let d = await doc('don');
-  d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});
-  luu('don',d);
-  closeM('mua');capNhat();alert('✅ Đặt hàng thành công!');
+  let d = await doc('don'); d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});
+  luu('don',d); closeM('mua');capNhat();alert('✅ Đặt hàng thành công!');
 }
 
 window.onload=()=>{
-  // Khởi tạo dữ liệu trống nếu chưa có
-  db.ref('sp').once('value').then(s=>{if(!s.exists())luu('sp',[])});
-  db.ref('tien').once('value').then(s=>{if(!s.exists())luu('tien',[])});
-  db.ref('acc').once('value').then(s=>{if(!s.exists())luu('acc',[])});
-  db.ref('bank').once('value').then(s=>{if(!s.exists())luu('bank',[])});
-  db.ref('the').once('value').then(s=>{if(!s.exists())luu('the',[])});
-  db.ref('don').once('value').then(s=>{if(!s.exists())luu('don',[])});
+  // Khởi tạo dữ liệu trống
+  const ds = ['sp','tien','acc','bank','the','don'];
+  ds.forEach(k=>db.ref(k).once('value').then(s=>{if(!s.exists())luu(k,[])}));
   capNhat();
 };
 </script>
 </body>
-                                                                                                                              </html>
+    </html>
     
