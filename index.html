@@ -1,264 +1,61 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>ANNIE GAG2 SHOP</title>
   <style>
-    * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
-    
-    body {
-      background-color: #0d1627;
-      color: #ffffff;
-      padding-bottom: 50px;
-    }
-
-    .container {
-      max-width: 600px;
-      margin: 0 auto;
-      padding: 15px;
-    }
-
-    /* Top Navigation Links */
-    .top-nav {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      padding: 10px 0;
-      font-size: 0.95rem;
-    }
-    .top-nav .user-status {
-      font-weight: bold;
-      color: #ffcc00;
-    }
-    .top-nav .nav-actions {
-      display: flex;
-      gap: 12px;
-    }
-    .top-nav a {
-      color: #4da6ff;
-      text-decoration: none;
-      font-weight: 600;
-      cursor: pointer;
-    }
-
-    /* Main Navigation Bar */
-    .main-nav {
-      display: flex;
-      justify-content: space-around;
-      padding: 15px 0;
-      font-size: 1.05rem;
-      border-bottom: 1px solid #1a283d;
-      margin-bottom: 15px;
-    }
-    .main-nav a {
-      color: #4da6ff;
-      text-decoration: none;
-      font-weight: 600;
-    }
-
-    /* Support Bar */
-    .support-bar {
-      background-color: #132238;
-      border-radius: 8px;
-      padding: 12px 15px;
-      margin-bottom: 25px;
-      font-size: 0.9rem;
-      border: 1px solid #1e324d;
-    }
-    .support-title { font-weight: bold; color: #fff; margin-bottom: 5px; }
-    .support-links { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px; }
-    .support-links a { color: #ffca28; text-decoration: none; font-weight: 600; }
-    .support-links a:hover { text-decoration: underline; }
-
-    /* Logo Brand */
-    .brand-logo {
-      text-align: center;
-      margin: 20px 0 30px;
-    }
-    .brand-logo h1 {
-      color: #ffcc00;
-      font-size: 2.2rem;
-      font-weight: 900;
-      letter-spacing: 1px;
-    }
-
-    /* Section Boxes */
-    .card-box {
-      background-color: #132238;
-      border: 1px solid #1e3250;
-      border-radius: 12px;
-      padding: 20px;
-      margin-bottom: 25px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.3);
-    }
-
-    .box-title {
-      font-size: 1.2rem;
-      font-weight: bold;
-      color: #ff4081;
-      margin-bottom: 15px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-transform: uppercase;
-    }
-
-    /* Form Inputs */
-    .form-group { margin-bottom: 12px; }
-    .form-control {
-      width: 100%;
-      padding: 12px 15px;
-      background-color: #0b1320;
-      border: 1px solid #1f334d;
-      border-radius: 8px;
-      color: #fff;
-      font-size: 0.95rem;
-      outline: none;
-    }
-    .form-control:focus { border-color: #ff4081; }
-
-    select.form-control {
-      appearance: none;
-      background-image: url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");
-      background-repeat: no-repeat;
-      background-position: right 10px center;
-      background-size: 20px;
-    }
-
-    /* Buttons */
-    .btn-pink {
-      background-color: #ff4081;
-      color: #fff;
-      border: none;
-      border-radius: 8px;
-      padding: 10px 20px;
-      font-weight: bold;
-      font-size: 0.95rem;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 6px;
-    }
-    .btn-green {
-      background-color: #26a69a;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 8px 16px;
-      font-weight: bold;
-      font-size: 0.9rem;
-      cursor: pointer;
-    }
-    .btn-danger {
-      background-color: #e53935;
-      color: #fff;
-      border: none;
-      border-radius: 6px;
-      padding: 6px 12px;
-      font-size: 0.85rem;
-      cursor: pointer;
-      margin-left: 8px;
-    }
-
-    /* Bank Info Inner Box */
-    .bank-inner-box {
-      background-color: #1a2c42;
-      border-radius: 8px;
-      padding: 15px;
-      margin-bottom: 15px;
-      font-size: 0.95rem;
-      line-height: 1.8;
-      color: #d1d5db;
-    }
-    .bank-inner-box strong { color: #fff; }
-
-    /* Product Item Box */
-    .product-item {
-      display: flex;
-      gap: 15px;
-      padding: 15px 0;
-      border-bottom: 1px solid #1a2c42;
-      align-items: center;
-    }
-    .product-item:last-child { border-bottom: none; }
-
-    .product-img {
-      width: 90px;
-      height: 90px;
-      border-radius: 8px;
-      object-fit: cover;
-      background-color: #1a2c42;
-      border: 1px solid #ff4081;
-    }
-
-    .product-info { flex: 1; }
-    .product-title { font-size: 1.05rem; font-weight: bold; color: #fff; margin-bottom: 5px; }
-    .product-meta { font-size: 0.85rem; color: #9ca3af; margin-bottom: 10px; }
-
-    .empty-state {
-      text-align: center;
-      color: #9ca3af;
-      padding: 20px 0;
-      font-size: 1rem;
-    }
-
-    /* Order Item */
-    .order-item {
-      background-color: #1a2c42;
-      border-radius: 8px;
-      padding: 12px;
-      margin-bottom: 10px;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-    }
-
-    /* Modals */
-    .modal {
-      display: none;
-      position: fixed;
-      top:0; left:0; width:100%; height:100%;
-      background: rgba(0,0,0,0.7);
-      z-index: 1000;
-      justify-content: center;
-      align-items: center;
-    }
-    .modal-content {
-      background: #132238;
-      border: 1px solid #1e3250;
-      border-radius: 12px;
-      width: 90%;
-      max-width: 450px;
-      padding: 20px;
-      position: relative;
-    }
-    .close-btn {
-      position: absolute;
-      top: 10px; right: 15px;
-      font-size: 1.5rem;
-      color: #aaa;
-      cursor: pointer;
-    }
+    *{box-sizing:border-box;margin:0;padding:0;font-family:system-ui,-apple-system,sans-serif}
+    body{background:#0d1627;color:#fff;padding-bottom:50px}
+    .container{max-width:600px;margin:0 auto;padding:15px}
+    .top-nav,.main-nav,.support-links,.product-item,.order-item{display:flex;align-items:center}
+    .top-nav{justify-content:space-between;padding:10px 0;font-size:.95rem}
+    .top-nav .user-status{font-weight:bold;color:#ffcc00}
+    .top-nav .nav-actions{display:flex;gap:12px}
+    .top-nav a,.main-nav a{color:#4da6ff;text-decoration:none;font-weight:600;cursor:pointer}
+    .main-nav{justify-content:space-around;padding:15px 0;font-size:1.05rem;border-bottom:1px solid #1a283d;margin-bottom:15px}
+    .support-bar{background:#132238;border-radius:8px;padding:12px 15px;margin-bottom:25px;font-size:.9rem;border:1px solid #1e324d}
+    .support-title{font-weight:bold;margin-bottom:5px}
+    .support-links{gap:15px;flex-wrap:wrap;margin-top:5px}
+    .support-links a{color:#ffca28;text-decoration:none;font-weight:600}
+    .brand-logo{text-align:center;margin:20px 0 30px}
+    .brand-logo h1{color:#ffcc00;font-size:2.2rem;font-weight:900;letter-spacing:1px}
+    .card-box{background:#132238;border:1px solid #1e3250;border-radius:12px;padding:20px;margin-bottom:25px;box-shadow:0 4px 15px rgba(0,0,0,.3)}
+    .box-title{font-size:1.2rem;font-weight:bold;color:#ff4081;margin-bottom:15px;text-transform:uppercase}
+    .form-group{margin-bottom:12px}
+    .form-control{width:100%;padding:12px 15px;background:#0b1320;border:1px solid #1f334d;border-radius:8px;color:#fff;font-size:.95rem;outline:none}
+    .form-control:focus{border-color:#ff4081}
+    select.form-control{appearance:none;background-image:url("data:image/svg+xml;charset=UTF-8,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='white'%3e%3cpath d='M7 10l5 5 5-5z'/%3e%3c/svg%3e");background-repeat:no-repeat;background-position:right 10px center;background-size:20px}
+    .btn-pink,.btn-green,.btn-danger{border:none;border-radius:6px;font-weight:bold;cursor:pointer;color:#fff}
+    .btn-pink{background:#ff4081;padding:10px 20px;font-size:.95rem;display:inline-flex;align-items:center;gap:6px;border-radius:8px}
+    .btn-green{background:#26a69a;padding:8px 16px;font-size:.9rem}
+    .btn-danger{background:#e53935;padding:6px 12px;font-size:.85rem;margin-left:8px}
+    .bank-inner-box{background:#1a2c42;border-radius:8px;padding:15px;margin-bottom:15px;font-size:.95rem;line-height:1.8;color:#d1d5db}
+    .product-item{gap:15px;padding:15px 0;border-bottom:1px solid #1a2c42}
+    .product-item:last-child{border-bottom:none}
+    .product-img{width:90px;height:90px;border-radius:8px;object-fit:cover;background:#1a2c42;border:1px solid #ff4081}
+    .product-info{flex:1}
+    .product-title{font-size:1.05rem;font-weight:bold;margin-bottom:5px}
+    .product-meta{font-size:.85rem;color:#9ca3af;margin-bottom:10px}
+    .empty-state{text-align:center;color:#9ca3af;padding:15px 0;font-size:.95rem}
+    .order-item{background:#1a2c42;border-radius:8px;padding:12px;margin-bottom:10px;justify-content:space-between}
+    .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);z-index:1000;justify-content:center;align-items:center}
+    .modal-content{background:#132238;border:1px solid #1e3250;border-radius:12px;width:90%;max-width:450px;padding:20px;position:relative}
+    .close-btn{position:absolute;top:10px;right:15px;font-size:1.5rem;color:#aaa;cursor:pointer}
   </style>
 </head>
 <body>
 
   <div class="container">
-    
-    <!-- Top Nav -->
     <div class="top-nav">
       <div class="user-status" id="user-status-text">👤 Khách hàng</div>
       <div class="nav-actions">
-        <!-- Nút Admin chỉ hiển thị khi đăng nhập tài khoản xuanthanh -->
-        <a id="admin-panel-btn" style="display:none; color:#ffcc00; font-weight:bold;" onclick="openModal('admin-modal')">⚙️ Quản Lý Shop (Admin)</a>
+        <a id="admin-panel-btn" style="display:none;color:#ffcc00;font-weight:bold" onclick="openModal('admin-modal')">⚙️ Quản Lý Shop (Admin)</a>
         <a id="register-btn" onclick="openModal('register-modal')">📝 Đăng Ký</a>
         <a id="login-btn" onclick="openModal('login-modal')">🔐 Đăng Nhập</a>
-        <a id="logout-btn" style="display:none; color:#e53935;" onclick="handleLogout()">🚪 Thoát</a>
+        <a id="logout-btn" style="display:none;color:#e53935" onclick="handleLogout()">🚪 Thoát</a>
       </div>
     </div>
 
-    <!-- Main Navigation Bar -->
     <div class="main-nav">
       <a href="#nap-the">Nạp Thẻ</a>
       <a href="#nap-bank">Nạp Ngân Hàng</a>
@@ -266,7 +63,6 @@
       <a href="#don-hang">Đơn Hàng</a>
     </div>
 
-    <!-- Support Bar (Đã cập nhật link FB & Discord chính xác) -->
     <div class="support-bar">
       <div class="support-title">📞 HỖ TRỢ KHÁCH HÀNG:</div>
       <div class="support-links">
@@ -275,12 +71,9 @@
       </div>
     </div>
 
-    <!-- Shop Logo -->
-    <div class="brand-logo">
-      <h1>🛒 ANNIE GAG2 SHOP</h1>
-    </div>
+    <div class="brand-logo"><h1>🛒 ANNIE GAG2 SHOP</h1></div>
 
-    <!-- Section 1: NẠP THỂ CÀO -->
+    <!-- Section 1: NẠP THẺ CÀO -->
     <div id="nap-the" class="card-box">
       <div class="box-title">📱 NẠP THẺ CÀO</div>
       <form onsubmit="handleTopupCard(event)">
@@ -293,18 +86,14 @@
         </div>
         <div class="form-group">
           <select class="form-control" id="card-amount">
-            <option value="10000">10.000đ</option>
-            <option value="20000">20.000đ</option>
-            <option value="50000">50.000đ</option>
-            <option value="100000">100.000đ</option>
+            <option value="10.000đ">10.000đ</option>
+            <option value="20.000đ">20.000đ</option>
+            <option value="50.000đ">50.000đ</option>
+            <option value="100.000đ">100.000đ</option>
           </select>
         </div>
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Mã thẻ" id="card-code" required>
-        </div>
-        <div class="form-group">
-          <input type="text" class="form-control" placeholder="Số seri" id="card-seri" required>
-        </div>
+        <div class="form-group"><input type="text" class="form-control" placeholder="Mã thẻ" id="card-code" required></div>
+        <div class="form-group"><input type="text" class="form-control" placeholder="Số seri" id="card-seri" required></div>
         <button type="submit" class="btn-pink">✅ Nạp Thẻ</button>
       </form>
     </div>
@@ -315,7 +104,7 @@
       <div class="bank-inner-box">
         <p>📌 Số tài khoản: <strong>0985537559</strong></p>
         <p>📌 Chủ tài khoản: <strong>Nguyễn Xuân Thành</strong></p>
-        <p>📌 Nội dung chuyển khoản: <strong style="color:#ffcc00;" id="bank-syntax">NAP + Tên tài khoản shop</strong></p>
+        <p>📌 Nội dung chuyển khoản: <strong style="color:#ffcc00" id="bank-syntax">NAP + Tên tài khoản shop</strong></p>
       </div>
       <button class="btn-pink" onclick="alert('Đã gửi thông báo chuyển khoản! Hệ thống sẽ duyệt tiền ngay.')">💸 Đã Chuyển Khoản</button>
     </div>
@@ -323,17 +112,13 @@
     <!-- Section 3: DANH MỤC SẢN PHẨM -->
     <div id="danh-muc" class="card-box">
       <div class="box-title">📁 DANH MỤC SẢN PHẨM</div>
-      <div id="product-list-container">
-        <!-- Render sản phẩm -->
-      </div>
+      <div id="product-list-container"></div>
     </div>
 
     <!-- Section 4: ĐƠN HÀNG CHỜ DUYỆT -->
     <div id="don-hang" class="card-box">
       <div class="box-title">📋 ĐƠN HÀNG CHỜ DUYỆT</div>
-      <div id="orders-container">
-        <div class="empty-state">Chưa có đơn hàng nào chờ duyệt</div>
-      </div>
+      <div id="orders-container"></div>
     </div>
 
   </div>
@@ -342,15 +127,11 @@
   <div id="login-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('login-modal')">&times;</span>
-      <h3 style="color:#ff4081; margin-bottom:15px;">Đăng Nhập</h3>
+      <h3 style="color:#ff4081;margin-bottom:15px">Đăng Nhập</h3>
       <form onsubmit="handleLogin(event)">
-        <div class="form-group">
-          <input type="text" class="form-control" id="login-user" placeholder="Tên tài khoản" required>
-        </div>
-        <div class="form-group">
-          <input type="password" class="form-control" id="login-pass" placeholder="Mật khẩu" required>
-        </div>
-        <button type="submit" class="btn-pink" style="width:100%; justify-content:center;">Đăng Nhập</button>
+        <div class="form-group"><input type="text" class="form-control" id="login-user" placeholder="Tên tài khoản" required></div>
+        <div class="form-group"><input type="password" class="form-control" id="login-pass" placeholder="Mật khẩu" required></div>
+        <button type="submit" class="btn-pink" style="width:100%;justify-content:center">Đăng Nhập</button>
       </form>
     </div>
   </div>
@@ -359,76 +140,55 @@
   <div id="register-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('register-modal')">&times;</span>
-      <h3 style="color:#4da6ff; margin-bottom:15px;">Đăng Ký Tài Khoản</h3>
+      <h3 style="color:#4da6ff;margin-bottom:15px">Đăng Ký Tài Khoản</h3>
       <form onsubmit="handleRegister(event)">
-        <div class="form-group">
-          <input type="text" class="form-control" id="reg-user" placeholder="Tên tài khoản mới" required>
-        </div>
-        <div class="form-group">
-          <input type="password" class="form-control" id="reg-pass" placeholder="Mật khẩu" required>
-        </div>
-        <button type="submit" class="btn-pink" style="width:100%; justify-content:center; background:#4da6ff;">Đăng Ký</button>
+        <div class="form-group"><input type="text" class="form-control" id="reg-user" placeholder="Tên tài khoản mới" required></div>
+        <div class="form-group"><input type="password" class="form-control" id="reg-pass" placeholder="Mật khẩu" required></div>
+        <button type="submit" class="btn-pink" style="width:100%;justify-content:center;background:#4da6ff">Đăng Ký</button>
       </form>
     </div>
   </div>
 
-  <!-- MODAL BẢNG ĐIỀU KHIỂN ADMIN -->
+  <!-- MODAL ADMIN -->
   <div id="admin-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('admin-modal')">&times;</span>
-      <h3 style="color:#ffcc00; margin-bottom:15px;">⚙️ BẢNG ĐIỀU KHIỂN ADMIN (XUANTHANH)</h3>
+      <h3 style="color:#ffcc00;margin-bottom:15px">⚙️ BẢNG ĐIỀU KHIỂN ADMIN</h3>
       
-      <form onsubmit="handleAddProduct(event)">
-        <h4 style="color:#fff; margin-bottom:10px; font-size:0.95rem;">➕ Thêm sản phẩm mới</h4>
-        <div class="form-group">
-          <input type="text" class="form-control" id="p-name" placeholder="Tên sản phẩm (VD: Ghost pepper)" required>
-        </div>
-        <div class="form-group">
-          <input type="text" class="form-control" id="p-price" placeholder="Giá tiền (VD: 10.000đ)" required>
-        </div>
-        <div class="form-group">
-          <input type="text" class="form-control" id="p-cat" placeholder="Danh mục (VD: Ghost pepper)" required>
-        </div>
-        <div class="form-group">
-          <input type="text" class="form-control" id="p-img" placeholder="Link ảnh sản phẩm" required>
-        </div>
-        <button type="submit" class="btn-pink" style="width:100%; justify-content:center;">➕ Đăng Sản Phẩm Mới</button>
+      <!-- Thêm Sản Phẩm -->
+      <form onsubmit="handleAddProduct(event)" style="margin-bottom:20px;border-bottom:1px solid #1f334d;padding-bottom:15px">
+        <h4 style="margin-bottom:10px;font-size:.95rem">➕ Thêm sản phẩm mới</h4>
+        <div class="form-group"><input type="text" class="form-control" id="p-name" placeholder="Tên sản phẩm" required></div>
+        <div class="form-group"><input type="text" class="form-control" id="p-price" placeholder="Giá tiền" required></div>
+        <div class="form-group"><input type="text" class="form-control" id="p-cat" placeholder="Danh mục" required></div>
+        <div class="form-group"><input type="text" class="form-control" id="p-img" placeholder="Link ảnh sản phẩm" required></div>
+        <button type="submit" class="btn-pink" style="width:100%;justify-content:center">➕ Đăng Sản Phẩm</button>
       </form>
+
+      <!-- Danh Sách Thẻ Cào Chờ Duyệt (Chỉ Admin Thấy) -->
+      <div>
+        <h4 style="margin-bottom:10px;font-size:.95rem;color:#ffcc00">📱 Thẻ Cào Chờ Duyệt</h4>
+        <div id="admin-cards-container"></div>
+      </div>
     </div>
   </div>
 
   <script>
-    const ADMIN_USERNAME = "xuanthanh";
-    const ADMIN_PASSWORD = "20122014";
-
-    let isAdmin = false;
-    let currentUser = null;
+    const ADMIN_USER = "xuanthanh", ADMIN_PASS = "20122014";
+    let isAdmin = false, currentUser = null;
 
     const defaultProducts = [
       { id: 1, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/90/132238/ff4081?text=Ghost" },
       { id: 2, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/90/132238/ff4081?text=Ghost" }
     ];
 
-    function getProducts() {
-      const stored = localStorage.getItem('annie_products');
-      return stored ? JSON.parse(stored) : defaultProducts;
-    }
-
-    function getOrders() {
-      const stored = localStorage.getItem('annie_orders');
-      return stored ? JSON.parse(stored) : [];
-    }
+    const getDb = (key, fallback) => JSON.parse(localStorage.getItem(key)) || fallback;
+    const setDb = (key, val) => localStorage.setItem(key, JSON.stringify(val));
 
     function renderProducts() {
-      const products = getProducts();
-      const container = document.getElementById('product-list-container');
-      
-      if(products.length === 0) {
-        container.innerHTML = '<div class="empty-state">Chưa có sản phẩm nào</div>';
-        return;
-      }
-
-      container.innerHTML = products.map(p => `
+      const list = getDb('annie_products', defaultProducts);
+      const el = document.getElementById('product-list-container');
+      el.innerHTML = list.length ? list.map(p => `
         <div class="product-item">
           <img src="${p.img}" class="product-img" alt="${p.name}">
           <div class="product-info">
@@ -438,151 +198,144 @@
             ${isAdmin ? `<button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️ Xóa</button>` : ''}
           </div>
         </div>
-      `).join('');
+      `).join('') : '<div class="empty-state">Chưa có sản phẩm nào</div>';
     }
 
     function renderOrders() {
-      const orders = getOrders();
-      const container = document.getElementById('orders-container');
-
-      if(orders.length === 0) {
-        container.innerHTML = '<div class="empty-state">Chưa có đơn hàng nào chờ duyệt</div>';
-        return;
-      }
-
-      container.innerHTML = orders.map(o => `
+      const orders = getDb('annie_orders', []);
+      const el = document.getElementById('orders-container');
+      el.innerHTML = orders.length ? orders.map(o => `
         <div class="order-item">
           <div>
-            <div style="font-weight:bold; color:#ffcc00;">🛒 ${o.productName} (${o.price})</div>
-            <div style="font-size:0.85rem; color:#9ca3af;">Khách: <strong>${o.user}</strong> | Lập lúc: ${o.time}</div>
+            <div style="font-weight:bold;color:#ffcc00">🛒 ${o.productName} (${o.price})</div>
+            <div style="font-size:.85rem;color:#9ca3af">Khách: <strong>${o.user}</strong> | Lập lúc: ${o.time}</div>
           </div>
-          ${isAdmin ? `<button class="btn-green" onclick="approveOrder(${o.id})">✅ Duyệt</button>` : '<span style="color:#ff4081; font-size:0.85rem;">Đang chờ duyệt...</span>'}
+          ${isAdmin ? `<button class="btn-green" onclick="approveOrder(${o.id})">✅ Duyệt</button>` : '<span style="color:#ff4081;font-size:.85rem">Đang chờ duyệt...</span>'}
         </div>
-      `).join('');
+      `).join('') : '<div class="empty-state">Chưa có đơn hàng nào chờ duyệt</div>';
     }
 
-    function openModal(id) { document.getElementById(id).style.display = 'flex'; }
-    function closeModal(id) { document.getElementById(id).style.display = 'none'; }
+    function renderAdminCards() {
+      if (!isAdmin) return;
+      const cards = getDb('annie_cards', []);
+      const el = document.getElementById('admin-cards-container');
+      el.innerHTML = cards.length ? cards.map(c => `
+        <div class="order-item" style="font-size:.85rem">
+          <div>
+            <div><strong>${c.type} - ${c.amount}</strong> (Khách: ${c.user})</div>
+            <div>Mã: <span style="color:#ffcc00">${c.code}</span> | Seri: <span style="color:#4da6ff">${c.seri}</span></div>
+          </div>
+          <button class="btn-green" onclick="approveCard(${c.id})">✅ Duyệt</button>
+        </div>
+      `).join('') : '<div class="empty-state">Chưa có thẻ cào nào chờ duyệt</div>';
+    }
+
+    const openModal = id => document.getElementById(id).style.display = 'flex';
+    const closeModal = id => document.getElementById(id).style.display = 'none';
 
     function handleLogin(e) {
       e.preventDefault();
-      const userInput = document.getElementById('login-user').value.trim();
-      const passInput = document.getElementById('login-pass').value.trim();
+      const u = document.getElementById('login-user').value.trim();
+      const p = document.getElementById('login-pass').value.trim();
 
-      if (userInput.toLowerCase() === ADMIN_USERNAME && passInput === ADMIN_PASSWORD) {
-        isAdmin = true;
-        currentUser = "xuanthanh";
-        document.getElementById('user-status-text').innerText = `👑 ADMIN: xuanthanh`;
-        document.getElementById('admin-panel-btn').style.display = 'inline';
-        alert("🔑 XIN CHÀO XUÂN THÀNH! BẠN ĐÃ ĐĂNG NHẬP THÀNH CÔNG VỚI QUYỀN ADMIN!");
-      } else {
-        isAdmin = false;
-        currentUser = userInput;
-        document.getElementById('user-status-text').innerText = `👤 Khách hàng: ${currentUser}`;
-        document.getElementById('admin-panel-btn').style.display = 'none';
-        alert(`Xin chào ${currentUser}, đăng nhập tài khoản thành công!`);
-      }
+      isAdmin = (u.toLowerCase() === ADMIN_USER && p === ADMIN_PASS);
+      currentUser = isAdmin ? "xuanthanh" : u;
 
-      document.getElementById('register-btn').style.display = 'none';
-      document.getElementById('login-btn').style.display = 'none';
+      document.getElementById('user-status-text').innerText = isAdmin ? `👑 ADMIN: xuanthanh` : `👤 Khách hàng: ${currentUser}`;
+      document.getElementById('admin-panel-btn').style.display = isAdmin ? 'inline' : 'none';
+      document.getElementById('register-btn').style.display = document.getElementById('login-btn').style.display = 'none';
       document.getElementById('logout-btn').style.display = 'inline';
       document.getElementById('bank-syntax').innerText = `NAP ${currentUser.toUpperCase()}`;
 
+      alert(isAdmin ? "🔑 ĐĂNG NHẬP ADMIN THÀNH CÔNG!" : `Xin chào ${currentUser}!`);
       closeModal('login-modal');
-      renderProducts();
-      renderOrders();
+      renderProducts(); renderOrders(); renderAdminCards();
     }
 
     function handleLogout() {
-      isAdmin = false;
-      currentUser = null;
+      isAdmin = false; currentUser = null;
       document.getElementById('user-status-text').innerText = "👤 Khách hàng";
       document.getElementById('admin-panel-btn').style.display = 'none';
-      document.getElementById('register-btn').style.display = 'inline';
-      document.getElementById('login-btn').style.display = 'inline';
+      document.getElementById('register-btn').style.display = document.getElementById('login-btn').style.display = 'inline';
       document.getElementById('logout-btn').style.display = 'none';
       document.getElementById('bank-syntax').innerText = `NAP + Tên tài khoản shop`;
-      renderProducts();
-      renderOrders();
+      renderProducts(); renderOrders();
       alert("Đã đăng xuất!");
     }
 
     function handleRegister(e) {
       e.preventDefault();
-      alert('Đăng ký tài khoản thành công! Vui lòng đăng nhập.');
-      closeModal('register-modal');
-      openModal('login-modal');
+      alert('Đăng ký thành công! Vui lòng đăng nhập.');
+      closeModal('register-modal'); openModal('login-modal');
+    }
+
+    function handleTopupCard(e) {
+      e.preventDefault();
+      if (!currentUser) return (alert("Vui lòng đăng nhập trước khi nạp thẻ!"), openModal('login-modal'));
+
+      const type = document.getElementById('card-type').value;
+      const amount = document.getElementById('card-amount').value;
+      const code = document.getElementById('card-code').value.trim();
+      const seri = document.getElementById('card-seri').value.trim();
+
+      const cards = getDb('annie_cards', []);
+      cards.push({ id: Date.now(), user: currentUser, type, amount, code, seri, time: new Date().toLocaleTimeString('vi-VN') });
+      setDb('annie_cards', cards);
+
+      e.target.reset();
+      alert('Đã gửi mã thẻ & seri lên hệ thống! Admin sẽ duyệt tiền cho bạn ngay.');
+    }
+
+    function approveCard(id) {
+      setDb('annie_cards', getDb('annie_cards', []).filter(c => c.id !== id));
+      renderAdminCards();
+      alert('Đã duyệt thẻ cào thành công!');
     }
 
     function handleAddProduct(e) {
       e.preventDefault();
-      if(!isAdmin) return;
-
-      const name = document.getElementById('p-name').value;
-      const price = document.getElementById('p-price').value;
-      const category = document.getElementById('p-cat').value;
-      const img = document.getElementById('p-img').value;
-
-      const products = getProducts();
-      products.push({ id: Date.now(), name, price, code: "---", category, img });
-      localStorage.setItem('annie_products', JSON.stringify(products));
-
-      renderProducts();
-      closeModal('admin-modal');
+      if (!isAdmin) return;
+      const products = getDb('annie_products', defaultProducts);
+      products.push({
+        id: Date.now(),
+        name: document.getElementById('p-name').value,
+        price: document.getElementById('p-price').value,
+        category: document.getElementById('p-cat').value,
+        img: document.getElementById('p-img').value,
+        code: "---"
+      });
+      setDb('annie_products', products);
+      renderProducts(); closeModal('admin-modal');
       alert('Thêm sản phẩm thành công!');
     }
 
     function deleteProduct(id) {
-      if(!isAdmin) return;
-      if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
-        let products = getProducts();
-        products = products.filter(p => p.id !== id);
-        localStorage.setItem('annie_products', JSON.stringify(products));
+      if (isAdmin && confirm('Xóa sản phẩm này?')) {
+        setDb('annie_products', getDb('annie_products', []).filter(p => p.id !== id));
         renderProducts();
       }
     }
 
     function buyProduct(name, price) {
-      if (!currentUser) {
-        alert("Vui lòng đăng nhập tài khoản trước khi mua hàng!");
-        openModal('login-modal');
-        return;
-      }
-
-      const orders = getOrders();
-      orders.push({
-        id: Date.now(),
-        productName: name,
-        price: price,
-        user: currentUser,
-        time: new Date().toLocaleTimeString('vi-VN')
-      });
-      localStorage.setItem('annie_orders', JSON.stringify(orders));
+      if (!currentUser) return (alert("Vui lòng đăng nhập trước khi mua!"), openModal('login-modal'));
+      const orders = getDb('annie_orders', []);
+      orders.push({ id: Date.now(), productName: name, price, user: currentUser, time: new Date().toLocaleTimeString('vi-VN') });
+      setDb('annie_orders', orders);
       renderOrders();
       alert(`Đã gửi đơn hàng "${name}". Vui lòng chờ admin duyệt!`);
     }
 
     function approveOrder(id) {
-      if(!isAdmin) return;
-      let orders = getOrders();
-      orders = orders.filter(o => o.id !== id);
-      localStorage.setItem('annie_orders', JSON.stringify(orders));
+      if (!isAdmin) return;
+      setDb('annie_orders', getDb('annie_orders', []).filter(o => o.id !== id));
       renderOrders();
-      alert('Đã duyệt đơn hàng thành công!');
-    }
-
-    function handleTopupCard(e) {
-      e.preventDefault();
-      alert('Thẻ đã gửi lên hệ thống, vui lòng chờ duyệt!');
+      alert('Đã duyệt đơn hàng!');
     }
 
     window.onload = function() {
-      if (!localStorage.getItem('annie_products')) {
-        localStorage.setItem('annie_products', JSON.stringify(defaultProducts));
-      }
-      renderProducts();
-      renderOrders();
+      if (!localStorage.getItem('annie_products')) setDb('annie_products', defaultProducts);
+      renderProducts(); renderOrders();
     };
   </script>
 </body>
-  </html>
+                                                   </html>
