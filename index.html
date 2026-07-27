@@ -4,8 +4,6 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width,initial-scale=1.0">
     <title>ANNIE GAG2 SHOP</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
         body{background:#0d1627;color:#fff;padding-bottom:20px}
@@ -82,13 +80,13 @@
       <h5 style="font-size:.75rem;color:#ff4081;margin-bottom:4px">🛒 ĐĂNG SẢN PHẨM</h5>
       <input class="ctrl" id="ten-sp" placeholder="Tên sản phẩm" required>
       <input class="ctrl" id="gia-sp" placeholder="Giá (VD: 20k)" required>
-      <input class="ctrl" id="anh-sp" placeholder="Link ảnh sản phẩm" required>
+      <input class="ctrl" id="anh-sp" placeholder="Link ảnh">
       <button class="btn b-pink" style="width:100%">➕ Đăng</button>
     </form>
   </div>
 
   <div id="nap-the" class="box">
-    <div class="title">📱 NẠP THẺ CÀO <small style="color:#ff9800">(Từ 20.000đ - 100.000đ)</small></div>
+    <div class="title">📱 NẠP THẺ CÀO <small style="color:#ff9800">(Tối thiểu 20.000đ)</small></div>
     <form onsubmit="guiThe(event)">
       <select class="ctrl" id="loai-the"><option>Viettel</option><option>Vinaphone</option><option>Mobifone</option></select>
       <select class="ctrl" id="menh-gia">
@@ -118,43 +116,19 @@
 </div>
 
 <div id="login" class="modal"><div class="m-body"><span class="close" onclick="closeM('login')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="nhap(event)"><input class="ctrl" id="tk" placeholder="Tài khoản" required><input type="password" class="ctrl" id="mk" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Vào</button></form></div></div>
-<div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tên tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo</button></form></div></div>
+<div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo</button></form></div></div>
 <div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)"><div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div><input class="ctrl" id="tk-rb" placeholder="Tài khoản Roblox" required><button class="btn b-green" style="width:100%">✅ Mua</button></form></div></div>
 
 <script>
-// ==================================================
-// ✅ DÁN MÃ FIREBASE BẠN VỪA CHÉP VÀO ĐÂY
-const firebaseConfig = {
-  // XÓA DÒNG NÀY VÀ DÁN TOÀN BỘ MÃ CỦA BẠN VÀO
-};
-// ==================================================
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
 const AD={u:'xuanthanh',p:'20122014'};
 let ad=false, tk=null, spMua=null;
+const getDB=k=>JSON.parse(localStorage.getItem(k))||[], setDB=(k,v)=>localStorage.setItem(k,JSON.stringify(v));
 const gia=s=>String(s).replace(/[^0-9k]/gi,'').replace('k','000')*1||0;
+const soDu=u=>getDB('tien').find(x=>x.tk===u)?.tien||0;
+const cong=(u,v)=>{let d=getDB('tien');let x=d.find(x=>x.tk===u);x?x.tien+=v:d.push({tk:u,tien:v});setDB('tien',d)};
 
-// === HÀM LƯU & ĐỌC DỮ LIỆU ===
-const luu = (k,v) => db.ref(k).set(v);
-const doc = async k => {
-  const s = await db.ref(k).once('value');
-  return s.exists() ? s.val() : [];
-};
-const cong = async (u,v) => {
-  let d = await doc('tien');
-  let x = d.find(i=>i.tk===u);
-  x ? x.tien += v : d.push({tk:u,tien:v});
-  luu('tien',d);
-};
-const soDu = async u => {
-  let d = await doc('tien');
-  return d.find(i=>i.tk===u)?.tien || 0;
-};
-
-// === CẬP NHẬT GIAO DIỆN ===
-async function capNhat(){
-  document.getElementById('u-status').innerText=ad?'👑 ADMIN':tk?`👤 ${tk} | 💰 ${(await soDu(tk)).toLocaleString()}đ`:'👤 Khách';
+function capNhat(){
+  document.getElementById('u-status').innerText=ad?'👑 ADMIN':tk?`👤 ${tk} | 💰 ${soDu(tk).toLocaleString()}đ`:'👤 Khách';
   document.getElementById('btn-ad').style.display=ad?'inline':'none';
   document.getElementById('ad-pan').style.display=ad?'block':'none';
   document.getElementById('btn-reg').style.display=document.getElementById('btn-log').style.display=tk?'none':'inline';
@@ -166,136 +140,38 @@ function adShow(){document.getElementById('ad-pan').style.display=ad?'block':'no
 function openM(i){document.getElementById(i).style.display='flex'}
 function closeM(i){document.getElementById(i).style.display='none'}
 
-// === ✅ SỬA LẠI ĐĂNG KÝ HOÀN CHỈNH ===
-async function tao(e){
-  e.preventDefault();
-  let u=document.getElementById('tk-moi').value.trim(),m=document.getElementById('mk-moi').value.trim();
-  if(!u||!m)return alert('⚠️ Nhập đủ tài khoản và mật khẩu!');
-  let d = await doc('acc');
-  if(d.some(i=>i.tk===u))return alert('❌ Tài khoản đã tồn tại!');
-  d.push({tk:u,mk:m});
-  await luu('acc',d);
-  alert('✅ Đăng ký thành công! Vui lòng đăng nhập.');
-  closeM('reg');
-}
+function guiThe(e){e.preventDefault();if(!tk)return openM('login');let d=getDB('the');d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});setDB('the',d);e.target.reset();alert('✅ Đã gửi thẻ! Chờ Admin duyệt.')}
+function hienThe(){if(!ad)return;let d=getDB('the').filter(x=>x.tt==='cho');document.getElementById('list-the').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>'}
+function duyetThe(i){let d=getDB('the');let x=d.find(a=>a.id===i);x.tt='ok';cong(x.tk,x.gia);setDB('the',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
+function huyThe(i){let d=getDB('the');let x=d.find(a=>a.id===i);x.tt='huy';setDB('the',d);hienThe();alert('❌ Đã hủy!')}
 
-// === ✅ SỬA LẠI ĐĂNG NHẬP HOÀN CHỈNH ===
-async function nhap(e){
-  e.preventDefault();
-  let u=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();
-  if(!u||!m)return alert('⚠️ Nhập đủ tài khoản và mật khẩu!');
-  // Tài khoản Admin
-  if(u===AD.u && m===AD.p){
-    ad=true; tk=AD.u;
-    closeM('login'); capNhat();
-    return alert('✅ Đăng nhập ADMIN thành công!');
-  }
-  // Tài khoản Khách
-  let d = await doc('acc');
-  let ok = d.some(i=>i.tk===u && i.mk===m);
-  if(!ok)return alert('❌ Sai tài khoản/mật khẩu hoặc chưa đăng ký!');
-  ad=false; tk=u;
-  closeM('login'); capNhat();
-  alert('✅ Đăng nhập thành công!');
-}
+function guiBank(){if(!tk)return openM('login');let s=prompt('Số tiền chuyển:');let v=parseInt(s);if(!v||v<10000)return alert('Tối thiểu 10.000đ!');let d=getDB('bank');d.push({id:Date.now(),tk:tk,tien:v,trangthai:'cho'});setDB('bank',d);alert('✅ Đã gửi! Chờ duyệt.')}
+function hienBank(){if(!ad)return;let d=getDB('bank').filter(x=>x.trangthai==='cho');document.getElementById('list-bank').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.tien.toLocaleString()}đ</div><div><button class="btn b-green" onclick="duyetBank(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyBank(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có yêu cầu</div>'}
+function duyetBank(i){let d=getDB('bank');let x=d.find(a=>a.id===i);x.trangthai='ok';cong(x.tk,x.tien);setDB('bank',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
+function huyBank(i){let d=getDB('bank');let x=d.find(a=>a.id===i);x.trangthai='huy';setDB('bank',d);hienBank();alert('❌ Đã hủy!')}
 
-// === QUẢN LÝ SẢN PHẨM ===
-async function themSP(e){
-  e.preventDefault();
-  let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,a=document.getElementById('anh-sp').value;
-  if(!t||!g||!a)return alert('Nhập đủ thông tin sản phẩm!');
-  let d = await doc('sp');
-  d.push({ten:t,gia:g,anh:a});
-  luu('sp',d); e.target.reset(); hienSP();
-  alert('✅ Đã đăng sản phẩm!');
-}
-async function hienSP(){
-  let d = await doc('sp');
-  document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh}" onerror="this.src='https://via.placeholder.com/100?text=Không+Ảnh'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️ Xóa</button>`:''}</div></div></div>`).join(''):'<div class="empty">🔔 Chưa có sản phẩm</div>';
-}
-async function xoaSP(i){
-  if(confirm('Xóa sản phẩm này?')){
-    let d = await doc('sp'); d.splice(i,1); luu('sp',d); hienSP();
-  }
-}
+function hienSP(){let d=getDB('sp');document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh||'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️</button>`:''}</div></div></div>`).join(''):'<div class="empty">Chưa có sản phẩm</div>'}
+function xoaSP(i){if(confirm('Xóa?')){let d=getDB('sp');d.splice(i,1);setDB('sp',d);hienSP()}}
+function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,a=document.getElementById('anh-sp').value;if(t&&g){let d=getDB('sp');d.push({ten:t,gia:g,anh:a});setDB('sp',d);e.target.reset();hienSP();alert('✅ Đã thêm!')}}
 
-// === NẠP THẺ ===
-async function guiThe(e){
-  e.preventDefault(); if(!tk)return openM('login');
-  let d = await doc('the');
-  d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});
-  luu('the',d); e.target.reset(); alert('✅ Đã gửi thẻ chờ duyệt!');
-}
-async function hienThe(){
-  if(!ad)return;
-  let d = await doc('the'); let cho = d.filter(x=>x.tt==='cho');
-  document.getElementById('list-the').innerHTML=cho.length?cho.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>';
-}
-async function duyetThe(i){
-  let d = await doc('the'); let x = d.find(a=>a.id===i);
-  x.tt='ok'; cong(x.tk,x.gia); luu('the',d); capNhat(); alert('✅ Đã duyệt & cộng tiền!');
-}
-async function huyThe(i){
-  let d = await doc('the'); let x = d.find(a=>a.id===i);
-  x.tt='huy'; luu('the',d); hienThe(); alert('❌ Đã hủy!');
-}
+function hienDon(){let d=getDB('don').filter(x=>ad||x.tk===tk);document.getElementById('list-don').innerHTML=d.length?d.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn</div>'}
 
-// === NẠP NGÂN HÀNG ===
-async function guiBank(){
-  if(!tk)return openM('login');
-  let s=prompt('Số tiền chuyển:'); let v=parseInt(s);
-  if(!v||v<10000)return alert('Tối thiểu 10.000đ!');
-  let d = await doc('bank'); d.push({id:Date.now(),tk:tk,tien:v,trangthai:'cho'});
-  luu('bank',d); alert('✅ Đã gửi chờ duyệt!');
-}
-async function hienBank(){
-  if(!ad)return;
-  let d = await doc('bank'); let cho = d.filter(x=>x.trangthai==='cho');
-  document.getElementById('list-bank').innerHTML=cho.length?cho.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.tien.toLocaleString()}đ</div><div><button class="btn b-green" onclick="duyetBank(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyBank(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có yêu cầu</div>';
-}
-async function duyetBank(i){
-  let d = await doc('bank'); let x = d.find(a=>a.id===i);
-  x.trangthai='ok'; cong(x.tk,x.tien); luu('bank',d); capNhat(); alert('✅ Đã duyệt & cộng tiền!');
-}
-async function huyBank(i){
-  let d = await doc('bank'); let x = d.find(a=>a.id===i);
-  x.trangthai='huy'; luu('bank',d); hienBank(); alert('❌ Đã hủy!');
-}
-
-// === ĐƠN HÀNG ===
-async function hienDon(){
-  let d = await doc('don');
-  let loc = ad ? d : d.filter(x=>x.tk===tk);
-  document.getElementById('list-don').innerHTML=loc.length?loc.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn hàng</div>';
-}
-
-// === CHUNG ===
+function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();ad=(t===AD.u&&m===AD.p);tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ OK!')}
+function tao(e){e.preventDefault();alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
 function out(){ad=false;tk=null;capNhat()}
-async function congTien(e){
-  e.preventDefault(); let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;
-  if(u&&v>0){await cong(u,v); alert(`✅ Cộng +${v.toLocaleString()}đ!`); capNhat();}
-}
-async function mua(i){
-  if(!tk)return openM('login');
-  let d = await doc('sp'); spMua = d[i];
-  if((await soDu(tk)) < gia(spMua.gia)) return alert('❌ Không đủ tiền!');
-  document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`; openM('mua');
-}
-async function xacNhan(e){
-  e.preventDefault(); let rb=document.getElementById('tk-rb').value.trim();
-  if(!rb)return alert('Nhập tài khoản Roblox!');
-  await cong(tk,-gia(spMua.gia));
-  let d = await doc('don'); d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});
-  luu('don',d); closeM('mua');capNhat();alert('✅ Đặt hàng thành công!');
-}
+function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ!`);capNhat()}}
+function mua(i){if(!tk)return openM('login');spMua=getDB('sp')[i];if(soDu(tk)<gia(spMua.gia))return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia}`;openM('mua')}
+function xacNhan(e){e.preventDefault();let rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');cong(tk,-gia(spMua.gia));let d=getDB('don');d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});setDB('don',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK!')}
 
 window.onload=()=>{
-  // Khởi tạo dữ liệu trống
-  const ds = ['sp','tien','acc','bank','the','don'];
-  ds.forEach(k=>db.ref(k).once('value').then(s=>{if(!s.exists())luu(k,[])}));
+  if(!localStorage.getItem('sp'))setDB('sp',[{ten:'Sản phẩm mẫu',gia:'20k',anh:'https://via.placeholder.com/100'}]);
+  if(!localStorage.getItem('tien'))setDB('tien',[]);
+  if(!localStorage.getItem('bank'))setDB('bank',[]);
+  if(!localStorage.getItem('the'))setDB('the',[]);
+  if(!localStorage.getItem('don'))setDB('don',[]);
   capNhat();
 };
 </script>
 </body>
-    </html>
-    
+                               </html>
+                               
