@@ -55,11 +55,9 @@
 
     <div class="brand-logo"><h1>🛒 ANNIE GAG2 SHOP</h1></div>
 
-    <!-- MỤC QUẢN TRỊ ADMIN -->
     <div id="admin-section" class="card-box admin-box">
       <div class="box-title" style="color:#ffcc00">⚙️ KHU VỰC QUẢN TRỊ ADMIN</div>
       
-      <!-- CỘNG TIỀN KHÁCH -->
       <form onsubmit="handleAdminAddMoney(event)" style="margin-bottom:8px;border-bottom:1px solid #1f334d;padding-bottom:6px">
         <h5 style="margin-bottom:3px;font-size:.75rem;color:#4da6ff">💰 CỘNG TIỀN CHO KHÁCH HÀNG</h5>
         <div class="form-group"><input class="form-control" id="m-user" placeholder="Tên tài khoản web khách" required></div>
@@ -67,7 +65,6 @@
         <button class="btn-green" style="width:100%">💵 Cộng Tiền Ngay</button>
       </form>
 
-      <!-- THÊM SẢN PHẨM -->
       <form onsubmit="handleAddProduct(event)" style="margin-bottom:8px;border-bottom:1px solid #1f334d;padding-bottom:6px">
         <h5 style="margin-bottom:3px;font-size:.75rem;color:#ff4081">➕ ĐĂNG SẢN PHẨM MỚI</h5>
         <div class="form-group"><input class="form-control" id="p-name" placeholder="Tên SP" required></div>
@@ -77,20 +74,17 @@
         <button class="btn-pink" style="width:100%">➕ Đăng Sản Phẩm</button>
       </form>
 
-      <!-- DUYỆT THẺ -->
       <div style="margin-bottom:8px;border-bottom:1px solid #1f334d;padding-bottom:6px">
         <h5 style="margin-bottom:3px;font-size:.75rem;color:#ffcc00">📲 DUYỆT THẺ CÀO KHÁCH HÀNG</h5>
         <div id="admin-cards-container"></div>
       </div>
 
-      <!-- DUYỆT ĐƠN HÀNG -->
       <div>
         <h5 style="margin-bottom:3px;font-size:.75rem;color:#ffcc00">📋 DUYỆT ĐƠN HÀNG CỦA KHÁCH</h5>
         <div id="admin-orders-container"></div>
       </div>
     </div>
 
-    <!-- NẠP THẺ CÀO -->
     <div id="nap-the" class="card-box">
       <div class="box-title">📱 NẠP THẺ CÀO</div>
       <form onsubmit="handleTopupCard(event)">
@@ -110,7 +104,6 @@
       </div>
     </div>
 
-    <!-- NẠP BANK -->
     <div id="nap-bank" class="card-box">
       <div class="box-title">💳 NẠP NGÂN HÀNG</div>
       <div class="bank-inner-box">
@@ -121,20 +114,17 @@
       <button class="btn-pink" onclick="alert('Đã gửi thông báo! Admin sẽ duyệt sớm.')">💸 Đã Chuyển Khoản</button>
     </div>
 
-    <!-- SẢN PHẨM -->
     <div id="danh-muc" class="card-box">
       <div class="box-title">📁 SẢN PHẨM</div>
       <div id="product-list-container"></div>
     </div>
 
-    <!-- ĐƠN HÀNG -->
     <div id="don-hang" class="card-box">
       <div class="box-title">📋 ĐƠN HÀNG CỦA BẠN</div>
       <div id="orders-container"></div>
     </div>
   </div>
 
-  <!-- MODAL ĐĂNG NHẬP -->
   <div id="login-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeM('login-modal')">&times;</span>
@@ -147,7 +137,6 @@
     </div>
   </div>
 
-  <!-- MODAL ĐĂNG KÝ -->
   <div id="register-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeM('register-modal')">&times;</span>
@@ -160,7 +149,7 @@
     </div>
   </div>
 
-  <!-- MODAL MUA HÀNG & NHẬP TÊN ROBLOX -->
+  <!-- BẢNG NHẬP NICK ROBLOX KHI MUA HÀNG -->
   <div id="buy-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeM('buy-modal')">&times;</span>
@@ -171,7 +160,7 @@
         <div style="font-size:.8rem;margin-bottom:6px;color:#ffcc00" id="buy-info"></div>
         <div class="form-group">
           <label style="font-size:.7rem;color:#aaa">Tên tài khoản Roblox nhận vật phẩm:</label>
-          <input class="form-control" id="buy-roblox-user" placeholder="Nhập tên tài khoản Roblox..." required>
+          <input class="form-control" id="buy-roblox-user" placeholder="Nhập tên Roblox của bạn..." required>
         </div>
         <button class="btn-green" style="width:100%">✅ Xác Nhận Mua</button>
       </form>
@@ -344,4 +333,9 @@
       const rUser=document.getElementById('buy-roblox-user').value.trim();
       const pNum=parsePrice(priceStr);
 
-      if(!rUser) return a
+      if(!rUser) return alert('Vui lòng nhập tên Roblox!');
+
+      changeBal(currentUser,-pNum);
+      const o=getDb('annie_ords',[]);
+      o.push({id:Date.now(),pName:name,price:priceStr,user:currentUser,robloxUser:rUser,status:'pending'});
+      setDb('annie_ords',o); closeM('buy-modal'); updateUI(); renderOrde
