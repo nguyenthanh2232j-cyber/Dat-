@@ -7,11 +7,10 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
     
-    /* Dark Theme Chuẩn Ảnh */
     body {
       background-color: #0d1627;
       color: #ffffff;
-      padding-bottom: 40px;
+      padding-bottom: 50px;
     }
 
     .container {
@@ -23,10 +22,18 @@
     /* Top Navigation Links */
     .top-nav {
       display: flex;
-      justify-content: flex-end;
-      gap: 15px;
+      justify-content: space-between;
+      align-items: center;
       padding: 10px 0;
       font-size: 0.95rem;
+    }
+    .top-nav .user-status {
+      font-weight: bold;
+      color: #ffcc00;
+    }
+    .top-nav .nav-actions {
+      display: flex;
+      gap: 12px;
     }
     .top-nav a {
       color: #4da6ff;
@@ -35,6 +42,7 @@
       cursor: pointer;
     }
 
+    /* Main Navigation Bar */
     .main-nav {
       display: flex;
       justify-content: space-around;
@@ -72,12 +80,7 @@
       font-size: 2.2rem;
       font-weight: 900;
       letter-spacing: 1px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
     }
-    .brand-logo h1 span { color: #ffcc00; }
 
     /* Section Boxes */
     .card-box {
@@ -122,7 +125,7 @@
       background-size: 20px;
     }
 
-    /* Action Buttons */
+    /* Buttons */
     .btn-pink {
       background-color: #ff4081;
       color: #fff;
@@ -135,10 +138,7 @@
       display: inline-flex;
       align-items: center;
       gap: 6px;
-      transition: background 0.2s;
     }
-    .btn-pink:hover { background-color: #e0356f; }
-
     .btn-green {
       background-color: #26a69a;
       color: #fff;
@@ -148,9 +148,16 @@
       font-weight: bold;
       font-size: 0.9rem;
       cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 5px;
+    }
+    .btn-danger {
+      background-color: #e53935;
+      color: #fff;
+      border: none;
+      border-radius: 6px;
+      padding: 6px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      margin-left: 8px;
     }
 
     /* Bank Info Inner Box */
@@ -195,6 +202,17 @@
       font-size: 1rem;
     }
 
+    /* Order Item */
+    .order-item {
+      background-color: #1a2c42;
+      border-radius: 8px;
+      padding: 12px;
+      margin-bottom: 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
     /* Modals */
     .modal {
       display: none;
@@ -210,7 +228,7 @@
       border: 1px solid #1e3250;
       border-radius: 12px;
       width: 90%;
-      max-width: 400px;
+      max-width: 450px;
       padding: 20px;
       position: relative;
     }
@@ -227,11 +245,16 @@
 
   <div class="container">
     
-    <!-- Header Authentication Nav -->
+    <!-- Top Nav (Tự động hiển thị theo trạng thái Admin / Khách) -->
     <div class="top-nav">
-      <a onclick="openModal('register-modal')">📝 Đăng Ký</a>
-      <a onclick="openModal('login-modal')">🔐 Đăng Nhập</a>
-      <a id="admin-nav-btn" style="display:none; color:#ff4081;" onclick="openModal('admin-modal')">⚙️ Admin Panel</a>
+      <div class="user-status" id="user-status-text">👤 Khách hàng</div>
+      <div class="nav-actions">
+        <!-- Nút Admin Ẩn chỉ hiện khi nhập đúng Mật khẩu Admin -->
+        <a id="admin-panel-btn" style="display:none; color:#ffcc00; font-weight:bold;" onclick="openModal('admin-modal')">⚙️ Quản Lý Shop (Admin)</a>
+        <a id="register-btn" onclick="openModal('register-modal')">📝 Đăng Ký</a>
+        <a id="login-btn" onclick="openModal('login-modal')">🔐 Đăng Nhập</a>
+        <a id="logout-btn" style="display:none; color:#e53935;" onclick="handleLogout()">🚪 Thoát</a>
+      </div>
     </div>
 
     <!-- Main Navigation Bar -->
@@ -256,7 +279,7 @@
       <h1>🛒 ANNIE GAG2 SHOP</h1>
     </div>
 
-    <!-- Section 1: NẠP THỂ CÀO -->
+    <!-- Section 1: NẠP THẺ CÀO -->
     <div id="nap-the" class="card-box">
       <div class="box-title">📱 NẠP THẺ CÀO</div>
       <form onsubmit="handleTopupCard(event)">
@@ -293,28 +316,28 @@
         <p>📌 Chủ tài khoản: <strong>Nguyễn Xuân Thành</strong></p>
         <p>📌 Nội dung chuyển khoản: <strong style="color:#ffcc00;" id="bank-syntax">NAP + Tên tài khoản shop</strong></p>
       </div>
-      <button class="btn-pink" onclick="alert('Đã ghi nhận yêu cầu! Hệ thống sẽ duyệt tiền trong 1-3 phút.')">💸 Đã Chuyển Khoản</button>
+      <button class="btn-pink" onclick="alert('Đã gửi thông báo chuyển khoản! Hệ thống sẽ duyệt tiền ngay.')">💸 Đã Chuyển Khoản</button>
     </div>
 
     <!-- Section 3: DANH MỤC SẢN PHẨM -->
     <div id="danh-muc" class="card-box">
       <div class="box-title">📁 DANH MỤC SẢN PHẨM</div>
       <div id="product-list-container">
-        <!-- Products Render Here -->
+        <!-- Render sản phẩm ở đây -->
       </div>
     </div>
 
     <!-- Section 4: ĐƠN HÀNG CHỜ DUYỆT -->
     <div id="don-hang" class="card-box">
       <div class="box-title">📋 ĐƠN HÀNG CHỜ DUYỆT</div>
-      <div id="orders-container" class="empty-state">
-        Chưa có đơn hàng nào chờ duyệt
+      <div id="orders-container">
+        <div class="empty-state">Chưa có đơn hàng nào chờ duyệt</div>
       </div>
     </div>
 
   </div>
 
-  <!-- Modal Đăng Nhập -->
+  <!-- MODAL ĐĂNG NHẬP -->
   <div id="login-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('login-modal')">&times;</span>
@@ -331,7 +354,7 @@
     </div>
   </div>
 
-  <!-- Modal Đăng Ký -->
+  <!-- MODAL ĐĂNG KÝ -->
   <div id="register-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('register-modal')">&times;</span>
@@ -348,12 +371,14 @@
     </div>
   </div>
 
-  <!-- Modal Admin (Tự động mở khi nhập pass admin 20122014) -->
+  <!-- MODAL BẢNG ĐIỀU KHIỂN ADMIN (CHỈ ADMIN THẤY) -->
   <div id="admin-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('admin-modal')">&times;</span>
-      <h3 style="color:#ffcc00; margin-bottom:15px;">⚙️ Quản Lý Đăng Sản Phẩm</h3>
+      <h3 style="color:#ffcc00; margin-bottom:15px;">⚙️ BẢNG ĐIỀU KHIỂN ADMIN MASTER</h3>
+      
       <form onsubmit="handleAddProduct(event)">
+        <h4 style="color:#fff; margin-bottom:10px; font-size:0.95rem;">➕ Thêm sản phẩm mới</h4>
         <div class="form-group">
           <input type="text" class="form-control" id="p-name" placeholder="Tên sản phẩm (VD: Ghost pepper)" required>
         </div>
@@ -366,15 +391,19 @@
         <div class="form-group">
           <input type="text" class="form-control" id="p-img" placeholder="Link ảnh sản phẩm" required>
         </div>
-        <button type="submit" class="btn-pink" style="width:100%; justify-content:center;">+ Thêm Sản Phẩm Mới</button>
+        <button type="submit" class="btn-pink" style="width:100%; justify-content:center;">➕ Đăng Sản Phẩm Mới</button>
       </form>
     </div>
   </div>
 
   <script>
-    const ADMIN_PASS = "20122014";
+    // MẬT KHẨU ADMIN BẢO MẬT
+    const ADMIN_PASSWORD = "20122014";
 
-    // Sample Default Products as shown in image
+    let isAdmin = false;
+    let currentUser = null;
+
+    // Danh sách sản phẩm mặc định
     const defaultProducts = [
       { id: 1, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/90/132238/ff4081?text=Ghost" },
       { id: 2, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/90/132238/ff4081?text=Ghost" }
@@ -383,6 +412,11 @@
     function getProducts() {
       const stored = localStorage.getItem('annie_products');
       return stored ? JSON.parse(stored) : defaultProducts;
+    }
+
+    function getOrders() {
+      const stored = localStorage.getItem('annie_orders');
+      return stored ? JSON.parse(stored) : [];
     }
 
     function renderProducts() {
@@ -400,8 +434,29 @@
           <div class="product-info">
             <div class="product-title">${p.name} - ${p.price}</div>
             <div class="product-meta">Mã: ${p.code} | Danh mục: ${p.category}</div>
-            <button class="btn-green" onclick="buyProduct('${p.name}')">🛒 Mua</button>
+            <button class="btn-green" onclick="buyProduct('${p.name}', '${p.price}')">🛒 Mua</button>
+            ${isAdmin ? `<button class="btn-danger" onclick="deleteProduct(${p.id})">🗑️ Xóa</button>` : ''}
           </div>
+        </div>
+      `).join('');
+    }
+
+    function renderOrders() {
+      const orders = getOrders();
+      const container = document.getElementById('orders-container');
+
+      if(orders.length === 0) {
+        container.innerHTML = '<div class="empty-state">Chưa có đơn hàng nào chờ duyệt</div>';
+        return;
+      }
+
+      container.innerHTML = orders.map(o => `
+        <div class="order-item">
+          <div>
+            <div style="font-weight:bold; color:#ffcc00;">🛒 ${o.productName} (${o.price})</div>
+            <div style="font-size:0.85rem; color:#9ca3af;">Khách: <strong>${o.user}</strong> | Lập lúc: ${o.time}</div>
+          </div>
+          ${isAdmin ? `<button class="btn-green" onclick="approveOrder(${o.id})">✅ Duyệt</button>` : '<span style="color:#ff4081; font-size:0.85rem;">Đang chờ duyệt...</span>'}
         </div>
       `).join('');
     }
@@ -409,30 +464,62 @@
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
+    // Xử lý đăng nhập
     function handleLogin(e) {
       e.preventDefault();
-      const user = document.getElementById('login-user').value.trim();
-      const pass = document.getElementById('login-pass').value.trim();
+      const userInput = document.getElementById('login-user').value.trim();
+      const passInput = document.getElementById('login-pass').value.trim();
 
-      if (pass === ADMIN_PASS) {
-        document.getElementById('admin-nav-btn').style.display = 'inline';
-        alert('Đăng nhập thành công với quyền ADMIN!');
+      // Kiểm tra mật khẩu Admin
+      if (passInput === ADMIN_PASSWORD) {
+        isAdmin = true;
+        currentUser = userInput || "Chủ Shop (Admin)";
+        document.getElementById('user-status-text').innerText = `👑 ADMIN: ${currentUser}`;
+        document.getElementById('admin-panel-btn').style.display = 'inline';
+        alert("🔑 BẠN ĐÃ ĐĂNG NHẬP THÀNH CÔNG QUYỀN ADMIN MASTER!");
       } else {
-        alert(`Xin chào ${user}, đăng nhập thành công!`);
+        isAdmin = false;
+        currentUser = userInput;
+        document.getElementById('user-status-text').innerText = `👤 Khách hàng: ${currentUser}`;
+        document.getElementById('admin-panel-btn').style.display = 'none';
+        alert(`Chào mừng ${currentUser} đã đăng nhập thành công!`);
       }
-      document.getElementById('bank-syntax').innerText = `NAP ${user.toUpperCase()}`;
+
+      document.getElementById('register-btn').style.display = 'none';
+      document.getElementById('login-btn').style.display = 'none';
+      document.getElementById('logout-btn').style.display = 'inline';
+      document.getElementById('bank-syntax').innerText = `NAP ${currentUser.toUpperCase()}`;
+
       closeModal('login-modal');
+      renderProducts();
+      renderOrders();
+    }
+
+    function handleLogout() {
+      isAdmin = false;
+      currentUser = null;
+      document.getElementById('user-status-text').innerText = "👤 Khách hàng";
+      document.getElementById('admin-panel-btn').style.display = 'none';
+      document.getElementById('register-btn').style.display = 'inline';
+      document.getElementById('login-btn').style.display = 'inline';
+      document.getElementById('logout-btn').style.display = 'none';
+      document.getElementById('bank-syntax').innerText = `NAP + Tên tài khoản shop`;
+      renderProducts();
+      renderOrders();
+      alert("Đã đăng xuất!");
     }
 
     function handleRegister(e) {
       e.preventDefault();
-      alert('Đăng ký thành công! Hãy đăng nhập.');
+      alert('Đăng ký tài khoản thành công! Vui lòng đăng nhập.');
       closeModal('register-modal');
       openModal('login-modal');
     }
 
     function handleAddProduct(e) {
       e.preventDefault();
+      if(!isAdmin) return;
+
       const name = document.getElementById('p-name').value;
       const price = document.getElementById('p-price').value;
       const category = document.getElementById('p-cat').value;
@@ -447,13 +534,48 @@
       alert('Thêm sản phẩm thành công!');
     }
 
+    function deleteProduct(id) {
+      if(!isAdmin) return;
+      if(confirm('Bạn có chắc chắn muốn xóa sản phẩm này?')) {
+        let products = getProducts();
+        products = products.filter(p => p.id !== id);
+        localStorage.setItem('annie_products', JSON.stringify(products));
+        renderProducts();
+      }
+    }
+
+    function buyProduct(name, price) {
+      if (!currentUser) {
+        alert("Vui lòng đăng nhập tài khoản trước khi mua hàng!");
+        openModal('login-modal');
+        return;
+      }
+
+      const orders = getOrders();
+      orders.push({
+        id: Date.now(),
+        productName: name,
+        price: price,
+        user: currentUser,
+        time: new Date().toLocaleTimeString('vi-VN')
+      });
+      localStorage.setItem('annie_orders', JSON.stringify(orders));
+      renderOrders();
+      alert(`Đã gửi đơn hàng "${name}". Vui lòng chờ admin duyệt!`);
+    }
+
+    function approveOrder(id) {
+      if(!isAdmin) return;
+      let orders = getOrders();
+      orders = orders.filter(o => o.id !== id);
+      localStorage.setItem('annie_orders', JSON.stringify(orders));
+      renderOrders();
+      alert('Đã duyệt đơn hàng thành công!');
+    }
+
     function handleTopupCard(e) {
       e.preventDefault();
       alert('Thẻ đã gửi lên hệ thống, vui lòng chờ duyệt!');
-    }
-
-    function buyProduct(name) {
-      alert(`Bạn đã chọn mua: ${name}. Đơn hàng đã chuyển sang trạng thái chờ duyệt!`);
     }
 
     window.onload = function() {
@@ -461,7 +583,8 @@
         localStorage.setItem('annie_products', JSON.stringify(defaultProducts));
       }
       renderProducts();
+      renderOrders();
     };
   </script>
 </body>
-  </html>
+                                                 </html>
