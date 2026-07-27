@@ -69,6 +69,7 @@
     .support-title { font-weight: bold; color: #fff; margin-bottom: 5px; }
     .support-links { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px; }
     .support-links a { color: #ffca28; text-decoration: none; font-weight: 600; }
+    .support-links a:hover { text-decoration: underline; }
 
     /* Logo Brand */
     .brand-logo {
@@ -245,11 +246,11 @@
 
   <div class="container">
     
-    <!-- Top Nav (Tự động hiển thị theo trạng thái Admin / Khách) -->
+    <!-- Top Nav -->
     <div class="top-nav">
       <div class="user-status" id="user-status-text">👤 Khách hàng</div>
       <div class="nav-actions">
-        <!-- Nút Admin Ẩn chỉ hiện khi nhập đúng Mật khẩu Admin -->
+        <!-- Nút Admin chỉ hiển thị khi đăng nhập tài khoản xuanthanh -->
         <a id="admin-panel-btn" style="display:none; color:#ffcc00; font-weight:bold;" onclick="openModal('admin-modal')">⚙️ Quản Lý Shop (Admin)</a>
         <a id="register-btn" onclick="openModal('register-modal')">📝 Đăng Ký</a>
         <a id="login-btn" onclick="openModal('login-modal')">🔐 Đăng Nhập</a>
@@ -265,12 +266,12 @@
       <a href="#don-hang">Đơn Hàng</a>
     </div>
 
-    <!-- Support Bar -->
+    <!-- Support Bar (Đã cập nhật link FB & Discord chính xác) -->
     <div class="support-bar">
       <div class="support-title">📞 HỖ TRỢ KHÁCH HÀNG:</div>
       <div class="support-links">
-        <a href="#">📘 Facebook Xuân Thành</a>
-        <a href="#">💬 Nhóm Discord</a>
+        <a href="https://www.facebook.com/share/1CFAzF9o2r/" target="_blank">📘 Facebook Xuân Thành</a>
+        <a href="https://discord.gg/rscNF8X57" target="_blank">💬 Nhóm Discord</a>
       </div>
     </div>
 
@@ -279,7 +280,7 @@
       <h1>🛒 ANNIE GAG2 SHOP</h1>
     </div>
 
-    <!-- Section 1: NẠP THẺ CÀO -->
+    <!-- Section 1: NẠP THỂ CÀO -->
     <div id="nap-the" class="card-box">
       <div class="box-title">📱 NẠP THẺ CÀO</div>
       <form onsubmit="handleTopupCard(event)">
@@ -323,7 +324,7 @@
     <div id="danh-muc" class="card-box">
       <div class="box-title">📁 DANH MỤC SẢN PHẨM</div>
       <div id="product-list-container">
-        <!-- Render sản phẩm ở đây -->
+        <!-- Render sản phẩm -->
       </div>
     </div>
 
@@ -371,11 +372,11 @@
     </div>
   </div>
 
-  <!-- MODAL BẢNG ĐIỀU KHIỂN ADMIN (CHỈ ADMIN THẤY) -->
+  <!-- MODAL BẢNG ĐIỀU KHIỂN ADMIN -->
   <div id="admin-modal" class="modal">
     <div class="modal-content">
       <span class="close-btn" onclick="closeModal('admin-modal')">&times;</span>
-      <h3 style="color:#ffcc00; margin-bottom:15px;">⚙️ BẢNG ĐIỀU KHIỂN ADMIN MASTER</h3>
+      <h3 style="color:#ffcc00; margin-bottom:15px;">⚙️ BẢNG ĐIỀU KHIỂN ADMIN (XUANTHANH)</h3>
       
       <form onsubmit="handleAddProduct(event)">
         <h4 style="color:#fff; margin-bottom:10px; font-size:0.95rem;">➕ Thêm sản phẩm mới</h4>
@@ -397,13 +398,12 @@
   </div>
 
   <script>
-    // MẬT KHẨU ADMIN BẢO MẬT
+    const ADMIN_USERNAME = "xuanthanh";
     const ADMIN_PASSWORD = "20122014";
 
     let isAdmin = false;
     let currentUser = null;
 
-    // Danh sách sản phẩm mặc định
     const defaultProducts = [
       { id: 1, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/90/132238/ff4081?text=Ghost" },
       { id: 2, name: "Ghost pepper", price: "10.000đ", code: "---", category: "Ghost pepper", img: "https://via.placeholder.com/90/132238/ff4081?text=Ghost" }
@@ -464,25 +464,23 @@
     function openModal(id) { document.getElementById(id).style.display = 'flex'; }
     function closeModal(id) { document.getElementById(id).style.display = 'none'; }
 
-    // Xử lý đăng nhập
     function handleLogin(e) {
       e.preventDefault();
       const userInput = document.getElementById('login-user').value.trim();
       const passInput = document.getElementById('login-pass').value.trim();
 
-      // Kiểm tra mật khẩu Admin
-      if (passInput === ADMIN_PASSWORD) {
+      if (userInput.toLowerCase() === ADMIN_USERNAME && passInput === ADMIN_PASSWORD) {
         isAdmin = true;
-        currentUser = userInput || "Chủ Shop (Admin)";
-        document.getElementById('user-status-text').innerText = `👑 ADMIN: ${currentUser}`;
+        currentUser = "xuanthanh";
+        document.getElementById('user-status-text').innerText = `👑 ADMIN: xuanthanh`;
         document.getElementById('admin-panel-btn').style.display = 'inline';
-        alert("🔑 BẠN ĐÃ ĐĂNG NHẬP THÀNH CÔNG QUYỀN ADMIN MASTER!");
+        alert("🔑 XIN CHÀO XUÂN THÀNH! BẠN ĐÃ ĐĂNG NHẬP THÀNH CÔNG VỚI QUYỀN ADMIN!");
       } else {
         isAdmin = false;
         currentUser = userInput;
         document.getElementById('user-status-text').innerText = `👤 Khách hàng: ${currentUser}`;
         document.getElementById('admin-panel-btn').style.display = 'none';
-        alert(`Chào mừng ${currentUser} đã đăng nhập thành công!`);
+        alert(`Xin chào ${currentUser}, đăng nhập tài khoản thành công!`);
       }
 
       document.getElementById('register-btn').style.display = 'none';
@@ -587,4 +585,4 @@
     };
   </script>
 </body>
-                                                 </html>
+  </html>
