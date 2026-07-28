@@ -54,8 +54,7 @@
     <div>
       <button id="btn-ad" class="btn b-yellow" style="display:none;margin-right:4px;" onclick="adShow()">⚙️ Admin</button>
       <a id="btn-reg" onclick="openM('reg')">📝 Đăng Ký</a> 
-      <a id="btn-log" onclick="openM('login')">🔐 Đăng Nhập</a>
-      <a id="btn-dmk" class="btn b-pink" style="display:none;margin-right:4px;" onclick="openM('dmk')">🔑 Đổi MK</a>
+      <a id="btn-log" onclick="openM('login')">🔐 Đăng Nhập</a> 
       <a id="btn-out" style="display:none;color:#e53935" onclick="out()">🚪 Thoát</a>
     </div>
   </div>
@@ -64,7 +63,6 @@
     <a href="#nap-bank">Ngân Hàng</a>
     <a href="#sp">Sản Phẩm</a>
     <a href="#don">Đơn Hàng</a>
-    <a href="#ls">Lịch Sử</a>
   </div>
   <div class="support">📞 Hỗ trợ: <a href="https://www.facebook.com/share/1CFAzF9o2r/" target="_blank">FB Xuân Thành</a> | <a href="https://discord.gg/rscNF8X57" target="_blank">Discord</a></div>
   <div class="logo"><h1>🛒 ANNIE GAG2 SHOP</h1></div>
@@ -123,12 +121,10 @@
 
   <div id="sp" class="box"><div class="title">🛒 SẢN PHẨM</div><div id="list-sp"></div></div>
   <div id="don" class="box"><div class="title">📋 ĐƠN HÀNG CHỜ DUYỆT</div><div id="list-don"></div></div>
-  <div id="ls" class="box"><div class="title">📜 LỊCH SỬ MUA HÀNG</div><div id="list-ls"></div></div>
 </div>
 
 <div id="login" class="modal"><div class="m-body"><span class="close" onclick="closeM('login')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="nhap(event)"><input class="ctrl" id="tk" placeholder="Tài khoản" required><input type="password" class="ctrl" id="mk" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Vào</button></form></div></div>
 <div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo</button></form></div></div>
-<div id="dmk" class="modal"><div class="m-body"><span class="close" onclick="closeM('dmk')">&times;</span><h4 style="color:#ffcc00">Đổi Mật Khẩu</h4><form onsubmit="doiMK(event)"><input type="password" class="ctrl" id="mk-cu" placeholder="Mật khẩu cũ" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu mới" required><input type="password" class="ctrl" id="xl-moi" placeholder="Nhập lại mật khẩu mới" required><button class="btn b-pink" style="width:100%">✅ Đổi</button></form></div></div>
 <div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)">
   <div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div>
   <div class="sl-mua">
@@ -176,7 +172,6 @@ function capNhat(){
   document.getElementById('btn-ad').style.display=ad?'inline':'none';
   document.getElementById('ad-pan').style.display=ad?'block':'none';
   document.getElementById('btn-reg').style.display=document.getElementById('btn-log').style.display=tk?'none':'inline';
-  document.getElementById('btn-dmk').style.display=tk?'inline':'none';
   document.getElementById('btn-out').style.display=tk?'inline':'none';
   document.getElementById('nd-chuyen').innerText=`NAP ${tk||'TÊN_TK'}`;
   hienSP();hienDon();hienBank();hienThe();
@@ -195,17 +190,6 @@ function tinhTong(){
   document.getElementById('tong-tien').innerText=`💵 Tổng tiền: ${(donGia*sl).toLocaleString()}đ`;
 }
 
-async function doiMK(e){
-  e.preventDefault();
-  let cu=document.getElementById('mk-cu').value, moi=document.getElementById('mk-moi').value, xl=document.getElementById('xl-moi').value;
-  if(!cu||!moi||moi!==xl) return alert('Kiểm tra lại mật khẩu!');
-  let tkData=await db.ref(`tai_khoan/${tk}`).once('val');
-  if(tkData.val().mk!==cu) return alert('Mật khẩu cũ không đúng!');
-  await db.ref(`tai_khoan/${tk}/mk`).set(moi);
-  alert('✅ Đổi mật khẩu thành công!');
-  closeM('dmk');
-}
-
 async function guiThe(e){e.preventDefault();if(!tk)return openM('login');let d=await docDS('the');d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});luuDS('the',d);e.target.reset();alert('✅ Đã gửi thẻ! Chờ Admin duyệt.')}
 async function hienThe(){if(!ad)return;let d=(await docDS('the')).filter(x=>x.tt==='cho');document.getElementById('list-the').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>'}
 async function duyetThe(i){let d=await docDS('the');let x=d.find(a=>a.id===i);x.tt='ok';await cong(x.tk,x.gia);luuDS('the',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
@@ -222,13 +206,11 @@ async function themSP(e){e.preventDefault();let t=document.getElementById('ten-s
 
 async function hienDon(){
   let d=await docDS('don_hang');
-  let loc=ad?d:d.filter(x=>x.tk===tk);
-  // Đơn chờ duyệt
-  document.getElementById('list-don').innerHTML=loc.filter(x=>x.tt==='cho').length?loc.filter(x=>x.tt==='cho').map((x,i)=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia} | SL: ${x.sl}<br><small>Roblox: ${x.rb}</small></div>
+  // CHỈ HIỆN ĐƠN TRẠNG THÁI "CHỜ" - ĐÃ DUYỆT SẼ TỰ ẨN
+  let loc=(ad?d:d.filter(x=>x.tk===tk)).filter(x=>x.tt==='cho');
+  document.getElementById('list-don').innerHTML=loc.length?loc.map((x,i)=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia} | SL: ${x.sl}<br><small>Roblox: ${x.rb}</small></div>
   ${ad?`<div style="margin-top:4px"><button class="btn b-green" onclick="duyetDon(${d.indexOf(x)})">✅ Đã giao</button><button class="btn b-red" onclick="huyDon(${d.indexOf(x)})">❌ Hủy</button></div>`:''}
   </div>`).join(''):'<div class="empty">Không có đơn hàng chờ</div>';
-  // Lịch sử đã xử lý
-  document.getElementById('list-ls').innerHTML=loc.filter(x=>x.tt!=='cho').length?loc.filter(x=>x.tt!=='cho').map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia} | SL: ${x.sl}<br>Trạng thái: ${x.tt==='ok'?'✅ Đã giao':'❌ Đã hủy'}</div></div>`).join(''):'<div class="empty">Chưa có lịch sử</div>';
 }
 async function duyetDon(i){
   let d=await docDS('don_hang');
@@ -237,7 +219,7 @@ async function duyetDon(i){
   luuDS('don_hang',d);
   capNhat();
   hienThongBao(`✅ Đơn hàng ${don.sp} đã được giao thành công!`);
-  alert('✅ Đã duyệt! Đơn chuyển sang lịch sử.');
+  alert('✅ Đã duyệt! Đơn tự ẩn & khách nhận thông báo.');
 }
 async function huyDon(i){
   let d=await docDS('don_hang');
@@ -251,7 +233,7 @@ async function huyDon(i){
   luuDS('don_hang',d);
   capNhat();
   hienThongBao(`❌ Đơn hàng ${don.sp} đã bị hủy! Đã hoàn trả tiền.`);
-  alert('❌ Đã hủy! Đơn chuyển sang lịch sử + hoàn tiền.');
+  alert('❌ Đã hủy! Đơn tự ẩn + hoàn trả hàng & tiền.');
 }
 
 async function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();let ds=await docDS('tai_khoan');ad=(t===AD.u&&m===AD.p);if(!ad&&(!ds[t]||ds[t].mk!==m))return alert('Sai tài khoản/mật khẩu!');tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ Đăng nhập thành công!')}
@@ -263,4 +245,11 @@ async function xacNhan(e){e.preventDefault();let sl=+document.getElementById('sl
 
 window.onload=()=>{
   Promise.all(['san_pham','tai_khoan','don_hang','the','bank'].map(k=>db.ref(k).once('value'))).then(s=>{
-    s.forEach((x,i)=>{if(!s[i].exists()) luuDS(['san_pham','tai_khoan','don_hang','the','bank'][i],['san_pham'][i]==='san_pham'?[{ten:'Sản phẩm mẫu',gia:'20k',sl:10,anh:'https://via.placeholder.com/100'}]:{}
+    s.forEach((x,i)=>{if(!s[i].exists()) luuDS(['san_pham','tai_khoan','don_hang','the','bank'][i],['san_pham'][i]==='san_pham'?[{ten:'Sản phẩm mẫu',gia:'20k',sl:10,anh:'https://via.placeholder.com/100'}]:{})});
+    capNhat();
+    db.ref('don_hang').on('value',capNhat);
+  })
+};
+</script>
+</body>
+                                  </html>
