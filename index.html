@@ -37,6 +37,10 @@
         .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:1000}
         .m-body{background:#132238;border:1px solid #1e3250;border-radius:6px;width:92%;max-width:360px;padding:10px;position:relative;max-height:85vh;overflow-y:auto}
         .close{position:absolute;top:2px;right:6px;font-size:1.1rem;color:#aaa;cursor:pointer}
+        .tag{padding:1px 3px;border-radius:2px;font-weight:bold;font-size:.65rem}
+        .t-wait{background:#ff9800;color:#000}
+        .t-ok{background:#4caf50;color:#fff}
+        .t-no{background:#e53935;color:#fff}
         .sl-mua{display:flex;gap:8px;align-items:center;margin:6px 0}
         .sl-mua input{width:80px;text-align:center}
         .thongbao{position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#26a69a;color:#fff;padding:10px 20px;border-radius:6px;z-index:9999;display:none;font-weight:bold;box-shadow:0 0 10px rgba(0,0,0,0.5)}
@@ -51,7 +55,6 @@
       <button id="btn-ad" class="btn b-yellow" style="display:none;margin-right:4px;" onclick="adShow()">⚙️ Admin</button>
       <a id="btn-reg" onclick="openM('reg')">📝 Đăng Ký</a> 
       <a id="btn-log" onclick="openM('login')">🔐 Đăng Nhập</a> 
-      <a id="btn-dmk" class="btn b-pink" style="display:none;margin-right:4px;" onclick="openM('dmk')">🔑 Đổi MK</a>
       <a id="btn-out" style="display:none;color:#e53935" onclick="out()">🚪 Thoát</a>
     </div>
   </div>
@@ -60,9 +63,8 @@
     <a href="#nap-bank">Ngân Hàng</a>
     <a href="#sp">Sản Phẩm</a>
     <a href="#don">Đơn Hàng</a>
-    <a href="#lich-su">Lịch Sử</a>
   </div>
-  <div class="support">📞 Hỗ trợ: <a href="https://discord.gg/rscNF8X57" target="_blank">Discord</a></div>
+  <div class="support">📞 Hỗ trợ: <a href="https://www.facebook.com/share/1CFAzF9o2r/" target="_blank">FB Xuân Thành</a> | <a href="https://discord.gg/rscNF8X57" target="_blank">Discord</a></div>
   <div class="logo"><h1>🛒 ANNIE GAG2 SHOP</h1></div>
 
   <div id="ad-pan" class="box admin">
@@ -119,12 +121,10 @@
 
   <div id="sp" class="box"><div class="title">🛒 SẢN PHẨM</div><div id="list-sp"></div></div>
   <div id="don" class="box"><div class="title">📋 ĐƠN HÀNG CHỜ DUYỆT</div><div id="list-don"></div></div>
-  <div id="lich-su" class="box"><div class="title">📜 LỊCH SỬ MUA HÀNG</div><div id="list-ls"></div></div>
 </div>
 
 <div id="login" class="modal"><div class="m-body"><span class="close" onclick="closeM('login')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="nhap(event)"><input class="ctrl" id="tk" placeholder="Tài khoản" required><input type="password" class="ctrl" id="mk" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Vào</button></form></div></div>
 <div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo</button></form></div></div>
-<div id="dmk" class="modal"><div class="m-body"><span class="close" onclick="closeM('dmk')">&times;</span><h4 style="color:#ffcc00">ĐỔI MẬT KHẨU</h4><form onsubmit="doiMK(event)"><input type="password" class="ctrl" id="mk-cu" placeholder="Mật khẩu cũ" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu mới" required><input type="password" class="ctrl" id="xl-mk" placeholder="Nhập lại MK mới" required><button class="btn b-pink" style="width:100%">Đổi</button></form></div></div>
 <div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)">
   <div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div>
   <div class="sl-mua">
@@ -172,9 +172,9 @@ function capNhat(){
   document.getElementById('btn-ad').style.display=ad?'inline':'none';
   document.getElementById('ad-pan').style.display=ad?'block':'none';
   document.getElementById('btn-reg').style.display=document.getElementById('btn-log').style.display=tk?'none':'inline';
-  document.getElementById('btn-dmk').style.display=document.getElementById('btn-out').style.display=tk?'inline':'none';
+  document.getElementById('btn-out').style.display=tk?'inline':'none';
   document.getElementById('nd-chuyen').innerText=`NAP ${tk||'TÊN_TK'}`;
-  hienSP();hienDon();hienBank();hienThe();hienLS();
+  hienSP();hienDon();hienBank();hienThe();
   if(tk) soDu(tk).then(sd=>document.getElementById('u-status').innerText += ` | 💰 ${sd.toLocaleString()}đ`);
 }
 function adShow(){document.getElementById('ad-pan').style.display=ad?'block':'none'}
@@ -206,15 +206,11 @@ async function themSP(e){e.preventDefault();let t=document.getElementById('ten-s
 
 async function hienDon(){
   let d=await docDS('don_hang');
+  // CHỈ HIỆN ĐƠN TRẠNG THÁI "CHỜ" - ĐÃ DUYỆT SẼ TỰ ẨN
   let loc=(ad?d:d.filter(x=>x.tk===tk)).filter(x=>x.tt==='cho');
   document.getElementById('list-don').innerHTML=loc.length?loc.map((x,i)=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia} | SL: ${x.sl}<br><small>Roblox: ${x.rb}</small></div>
   ${ad?`<div style="margin-top:4px"><button class="btn b-green" onclick="duyetDon(${d.indexOf(x)})">✅ Đã giao</button><button class="btn b-red" onclick="huyDon(${d.indexOf(x)})">❌ Hủy</button></div>`:''}
   </div>`).join(''):'<div class="empty">Không có đơn hàng chờ</div>';
-}
-async function hienLS(){
-  let d=await docDS('don_hang');
-  let loc=(ad?d:d.filter(x=>x.tk===tk)).filter(x=>x.tt!=='cho');
-  document.getElementById('list-ls').innerHTML=loc.length?loc.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia} | SL: ${x.sl}<br>Trạng thái: ${x.tt==='ok'?'✅ Đã giao thành công':'❌ Đã hủy & hoàn tiền'}</div></div>`).join(''):'<div class="empty">Chưa có lịch sử mua hàng</div>';
 }
 async function duyetDon(i){
   let d=await docDS('don_hang');
@@ -223,7 +219,7 @@ async function duyetDon(i){
   luuDS('don_hang',d);
   capNhat();
   hienThongBao(`✅ Đơn hàng ${don.sp} đã được giao thành công!`);
-  alert('✅ Đã duyệt! Đơn tự ẩn & khách xem ở Lịch sử.');
+  alert('✅ Đã duyệt! Đơn tự ẩn & khách nhận thông báo.');
 }
 async function huyDon(i){
   let d=await docDS('don_hang');
@@ -242,7 +238,6 @@ async function huyDon(i){
 
 async function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();let ds=await docDS('tai_khoan');ad=(t===AD.u&&m===AD.p);if(!ad&&(!ds[t]||ds[t].mk!==m))return alert('Sai tài khoản/mật khẩu!');tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ Đăng nhập thành công!')}
 async function tao(e){e.preventDefault();let t=document.getElementById('tk-moi').value.trim(),m=document.getElementById('mk-moi').value;if(!t||!m)return alert('Nhập đủ thông tin!');let ds=await docDS('tai_khoan');if(ds[t])return alert('Tài khoản đã tồn tại!');ds[t]={mk:m,tien:0};luuDS('tai_khoan',ds);alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
-async function doiMK(e){e.preventDefault();let c=document.getElementById('mk-cu').value,m1=document.getElementById('mk-moi').value,m2=document.getElementById('xl-mk').value;if(!c||!m1||m1!==m2)return alert('Kiểm tra lại mật khẩu!');if((await docDS('tai_khoan'))[tk].mk!==c)return alert('Mật khẩu cũ không đúng!');let ds=await docDS('tai_khoan');ds[tk].mk=m1;luuDS('tai_khoan',ds);alert('✅ Đổi mật khẩu thành công!');closeM('dmk')}
 function out(){ad=false;tk=null;capNhat()}
 async function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){await cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ thành công!`);capNhat()}}
 async function mua(i){if(!tk)return openM('login');spMua=(await docDS('san_pham'))[i];donGia=gia(spMua.gia);if(spMua.sl<=0)return alert('❌ Hết hàng!');if(await soDu(tk)<donGia)return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia} | Còn ${spMua.sl} sản phẩm`;document.getElementById('sl-mua').value=1;tinhTong();openM('mua')}
@@ -257,5 +252,4 @@ window.onload=()=>{
 };
 </script>
 </body>
-                                                                                           </html>
-    
+    </html>
