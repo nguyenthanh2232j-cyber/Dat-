@@ -41,13 +41,9 @@
         .t-wait{background:#ff9800;color:#000}
         .t-ok{background:#4caf50;color:#fff}
         .t-no{background:#e53935;color:#fff}
-        .sl-mua{display:flex;gap:8px;align-items:center;margin:6px 0}
-        .sl-mua input{width:80px;text-align:center}
-        .thongbao{position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#26a69a;color:#fff;padding:10px 20px;border-radius:6px;z-index:9999;display:none;font-weight:bold;box-shadow:0 0 10px rgba(0,0,0,0.5)}
     </style>
 </head>
 <body>
-<div class="thongbao" id="thongbao"></div>
 <div class="container">
   <div class="top-nav">
     <div id="u-status" style="font-weight:bold;color:#ffcc00">👤 Khách hàng</div>
@@ -120,21 +116,12 @@
   </div>
 
   <div id="sp" class="box"><div class="title">🛒 SẢN PHẨM</div><div id="list-sp"></div></div>
-  <div id="don" class="box"><div class="title">📋 ĐƠN HÀNG CHỜ DUYỆT</div><div id="list-don"></div></div>
+  <div id="don" class="box"><div class="title">📋 ĐƠN HÀNG</div><div id="list-don"></div></div>
 </div>
 
 <div id="login" class="modal"><div class="m-body"><span class="close" onclick="closeM('login')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="nhap(event)"><input class="ctrl" id="tk" placeholder="Tài khoản" required><input type="password" class="ctrl" id="mk" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Vào</button></form></div></div>
 <div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo</button></form></div></div>
-<div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)">
-  <div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div>
-  <div class="sl-mua">
-    <span>Số lượng mua:</span>
-    <input type="number" class="ctrl" id="sl-mua" min="1" value="1" oninput="tinhTong()">
-  </div>
-  <div id="tong-tien" style="font-weight:bold;color:#ff4081;margin-bottom:8px"></div>
-  <input class="ctrl" id="tk-rb" placeholder="Tài khoản Roblox" required>
-  <button class="btn b-green" style="width:100%">✅ Xác Nhận Mua</button>
-</form></div></div>
+<div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)"><div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div><input class="ctrl" id="tk-rb" placeholder="Tài khoản Roblox" required><button class="btn b-green" style="width:100%">✅ Mua</button></form></div></div>
 
 <script>
 const firebaseConfig = {
@@ -151,7 +138,7 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.database();
 
 const AD={u:'xuanthanh',p:'20122014'};
-let ad=false, tk=null, spMua=null, donGia=0;
+let ad=false, tk=null, spMua=null;
 
 const docDS = async ten => (await db.ref(ten).once('value')).val() || [];
 const luuDS = (ten, ds) => db.ref(ten).set(ds);
@@ -159,13 +146,6 @@ const luuDS = (ten, ds) => db.ref(ten).set(ds);
 const gia=s=>String(s).replace(/[^0-9k]/gi,'').replace('k','000')*1||0;
 const soDu=async u=>{let ds=await docDS('tai_khoan');return ds[u]?.tien||0};
 const cong=async(u,v)=>{let ds=await docDS('tai_khoan');if(!ds[u])ds[u]={tien:0};ds[u].tien+=v;luuDS('tai_khoan',ds)};
-
-function hienThongBao(noidung){
-  const tb=document.getElementById('thongbao');
-  tb.innerText=noidung;
-  tb.style.display='block';
-  setTimeout(()=>tb.style.display='none',4000);
-}
 
 function capNhat(){
   document.getElementById('u-status').innerText=ad?'👑 ADMIN':tk?`👤 ${tk}`:'👤 Khách';
@@ -180,15 +160,6 @@ function capNhat(){
 function adShow(){document.getElementById('ad-pan').style.display=ad?'block':'none'}
 function openM(i){document.getElementById(i).style.display='flex'}
 function closeM(i){document.getElementById(i).style.display='none'}
-function tinhTong(){
-  let sl=+document.getElementById('sl-mua').value||1;
-  if(spMua && sl>spMua.sl) {
-    document.getElementById('sl-mua').value=spMua.sl;
-    sl=spMua.sl;
-    alert(`Chỉ còn ${spMua.sl} sản phẩm!`);
-  }
-  document.getElementById('tong-tien').innerText=`💵 Tổng tiền: ${(donGia*sl).toLocaleString()}đ`;
-}
 
 async function guiThe(e){e.preventDefault();if(!tk)return openM('login');let d=await docDS('the');d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});luuDS('the',d);e.target.reset();alert('✅ Đã gửi thẻ! Chờ Admin duyệt.')}
 async function hienThe(){if(!ad)return;let d=(await docDS('the')).filter(x=>x.tt==='cho');document.getElementById('list-the').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>'}
@@ -204,52 +175,23 @@ async function hienSP(){let d=await docDS('san_pham');document.getElementById('l
 async function xoaSP(i){if(confirm('Xóa?')){let d=await docDS('san_pham');d.splice(i,1);luuDS('san_pham',d);hienSP()}}
 async function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,sl=+document.getElementById('sl-sp').value,a=document.getElementById('anh-sp').value;if(t&&g&&sl>0){let d=await docDS('san_pham');d.push({ten:t,gia:g,sl:sl,anh:a});luuDS('san_pham',d);e.target.reset();hienSP();alert('✅ Đã thêm!')}}
 
-async function hienDon(){
-  let d=await docDS('don_hang');
-  // CHỈ HIỆN ĐƠN TRẠNG THÁI "CHỜ" - ĐÃ DUYỆT SẼ TỰ ẨN
-  let loc=(ad?d:d.filter(x=>x.tk===tk)).filter(x=>x.tt==='cho');
-  document.getElementById('list-don').innerHTML=loc.length?loc.map((x,i)=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia} | SL: ${x.sl}<br><small>Roblox: ${x.rb}</small></div>
-  ${ad?`<div style="margin-top:4px"><button class="btn b-green" onclick="duyetDon(${d.indexOf(x)})">✅ Đã giao</button><button class="btn b-red" onclick="huyDon(${d.indexOf(x)})">❌ Hủy</button></div>`:''}
-  </div>`).join(''):'<div class="empty">Không có đơn hàng chờ</div>';
-}
-async function duyetDon(i){
-  let d=await docDS('don_hang');
-  let don=d[i];
-  don.tt='ok';
-  luuDS('don_hang',d);
-  capNhat();
-  hienThongBao(`✅ Đơn hàng ${don.sp} đã được giao thành công!`);
-  alert('✅ Đã duyệt! Đơn tự ẩn & khách nhận thông báo.');
-}
-async function huyDon(i){
-  let d=await docDS('don_hang');
-  let don=d[i], slMua=don.sl||1;
-  don.tt='huy';
-  let dsSP=await docDS('san_pham');
-  let spVT=dsSP.find(x=>x.ten===don.sp);
-  if(spVT) spVT.sl+=slMua;
-  await cong(don.tk, gia(don.gia)*slMua);
-  luuDS('san_pham',dsSP);
-  luuDS('don_hang',d);
-  capNhat();
-  hienThongBao(`❌ Đơn hàng ${don.sp} đã bị hủy! Đã hoàn trả tiền.`);
-  alert('❌ Đã hủy! Đơn tự ẩn + hoàn trả hàng & tiền.');
-}
+async function hienDon(){let d=await docDS('don_hang');let loc=ad?d:d.filter(x=>x.tk===tk);document.getElementById('list-don').innerHTML=loc.length?loc.map(x=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia}<br><small>Roblox: ${x.rb}</small></div><span class="tag ${x.tt=='cho'?'t-wait':x.tt=='ok'?'t-ok':'t-no'}">${x.tt=='cho'?'Chờ':x.tt=='ok'?'Đã giao':'Hủy'}</span></div>`).join(''):'<div class="empty">Chưa có đơn</div>'}
 
-async function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();let ds=await docDS('tai_khoan');ad=(t===AD.u&&m===AD.p);if(!ad&&(!ds[t]||ds[t].mk!==m))return alert('Sai tài khoản/mật khẩu!');tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ Đăng nhập thành công!')}
+async function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();let ds=await docDS('tai_khoan');ad=(t===AD.u&&m===AD.p);if(!ad&&(!ds[t]||ds[t].mk!==m))return alert('Sai tài khoản/mật khẩu!');tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ OK!')}
 async function tao(e){e.preventDefault();let t=document.getElementById('tk-moi').value.trim(),m=document.getElementById('mk-moi').value;if(!t||!m)return alert('Nhập đủ thông tin!');let ds=await docDS('tai_khoan');if(ds[t])return alert('Tài khoản đã tồn tại!');ds[t]={mk:m,tien:0};luuDS('tai_khoan',ds);alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
 function out(){ad=false;tk=null;capNhat()}
-async function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){await cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ thành công!`);capNhat()}}
-async function mua(i){if(!tk)return openM('login');spMua=(await docDS('san_pham'))[i];donGia=gia(spMua.gia);if(spMua.sl<=0)return alert('❌ Hết hàng!');if(await soDu(tk)<donGia)return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia} | Còn ${spMua.sl} sản phẩm`;document.getElementById('sl-mua').value=1;tinhTong();openM('mua')}
-async function xacNhan(e){e.preventDefault();let sl=+document.getElementById('sl-mua').value||1,rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');if(sl>spMua.sl)return alert('Không đủ hàng!');let tongTien=donGia*sl;if(await soDu(tk)<tongTien)return alert('Không đủ tiền!');await cong(tk,-tongTien);spMua.sl-=sl;let dsSP=await docDS('san_pham');dsSP.find(x=>x.ten===spMua.ten).sl=spMua.sl;luuDS('san_pham',dsSP);let d=await docDS('don_hang');d.push({sp:spMua.ten,gia:spMua.gia,sl:sl,tk:tk,rb:rb,tt:'cho'});luuDS('don_hang',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK! Chờ Admin duyệt.');}
+async function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){await cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ!`);capNhat()}}
+async function mua(i){if(!tk)return openM('login');spMua=(await docDS('san_pham'))[i];if(spMua.sl<=0)return alert('❌ Hết hàng!');if(await soDu(tk)<gia(spMua.gia))return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia} | Còn ${spMua.sl} sản phẩm`;openM('mua')}
+async function xacNhan(e){e.preventDefault();let rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');await cong(tk,-gia(spMua.gia));spMua.sl--;let dsSP=await docDS('san_pham');dsSP.find(x=>x.ten===spMua.ten).sl=spMua.sl;luuDS('san_pham',dsSP);let d=await docDS('don_hang');d.push({sp:spMua.ten,gia:spMua.gia,tk:tk,rb:rb,tt:'cho'});luuDS('don_hang',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK!');}
 
 window.onload=()=>{
   Promise.all(['san_pham','tai_khoan','don_hang','the','bank'].map(k=>db.ref(k).once('value'))).then(s=>{
     s.forEach((x,i)=>{if(!s[i].exists()) luuDS(['san_pham','tai_khoan','don_hang','the','bank'][i],['san_pham'][i]==='san_pham'?[{ten:'Sản phẩm mẫu',gia:'20k',sl:10,anh:'https://via.placeholder.com/100'}]:{})});
     capNhat();
-    db.ref('don_hang').on('value',capNhat);
+    db.ref().on('value',capNhat);
   })
 };
 </script>
 </body>
     </html>
+    
