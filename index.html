@@ -220,6 +220,34 @@
             background: #e55555;
         }
 
+        .btn-success {
+            background: #4caf50;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-success:hover {
+            background: #43a047;
+        }
+
+        .btn-warning {
+            background: #ff9800;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-warning:hover {
+            background: #f57c00;
+        }
+
         /* ========== BẢNG ========== */
         .table-wrap {
             overflow-x: auto;
@@ -258,6 +286,14 @@
             display: inline-block;
         }
 
+        .status-badge.active {
+            background: #1b5e3a;
+            color: #81c784;
+        }
+        .status-badge.inactive {
+            background: #5e1b1b;
+            color: #ff6b6b;
+        }
         .status-badge.success {
             background: #1b5e3a;
             color: #81c784;
@@ -306,6 +342,60 @@
             margin-top: 4px;
         }
 
+        /* ========== MODAL ========== */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 999;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-overlay.open {
+            display: flex;
+        }
+
+        .modal {
+            background: #141b24;
+            border: 1px solid #2a3a48;
+            border-radius: 16px;
+            padding: 32px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: fadeUp 0.3s ease;
+        }
+
+        .modal h2 {
+            color: #fff;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .modal h2 i {
+            color: #f7c948;
+        }
+
+        .modal .close-modal {
+            float: right;
+            background: none;
+            border: none;
+            color: #8899aa;
+            font-size: 24px;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .modal .close-modal:hover {
+            color: #fff;
+        }
+
         /* ========== RESPONSIVE ========== */
         @media (max-width: 600px) {
             .header {
@@ -337,6 +427,7 @@
             <div class="user-info">
                 <i class="fas fa-user-cog"></i>
                 <span id="adminName">admin19</span>
+                <span id="adminRole" style="background:#f7c948;color:#0b0e14;padding:2px 12px;border-radius:20px;font-size:12px;font-weight:700;">Super Admin</span>
                 <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
             </div>
         </div>
@@ -348,6 +439,7 @@
             <button data-tab="add-product"><i class="fas fa-plus-circle"></i> Đăng bán</button>
             <button data-tab="recharge"><i class="fas fa-credit-card"></i> Nạp thẻ / Bank</button>
             <button data-tab="history"><i class="fas fa-history"></i> Lịch sử</button>
+            <button data-tab="admins"><i class="fas fa-users-cog"></i> Quản lý Admin</button>
         </div>
 
         <!-- ===== PANEL: TỔNG QUAN ===== -->
@@ -368,6 +460,10 @@
                 <div class="stat-item">
                     <div class="number" id="pendingOrders">0</div>
                     <div class="label"><i class="fas fa-clock"></i> Chờ xử lý</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="totalAdmins">0</div>
+                    <div class="label"><i class="fas fa-users"></i> Quản trị viên</div>
                 </div>
             </div>
             <div class="card">
@@ -522,69 +618,14 @@
             </div>
         </div>
 
-    </div>
-
-    <script>
-        // ============================================================
-        //  DỮ LIỆU MẪU (LƯU TRONG localStorage)
-        // ============================================================
-
-        // Khởi tạo dữ liệu nếu chưa có
-        function initData() {
-            if (!localStorage.getItem('shopProducts')) {
-                const defaultProducts = [
-                    { id: 1, name: 'Áo thun trắng', category: 'áo', price: 250000, image: 'https://picsum.photos/seed/1/400/400',
-                        desc: 'Áo thun chất liệu cotton cao cấp' },
-                    { id: 2, name: 'Quần jean xanh', category: 'quần', price: 450000,
-                        image: 'https://picsum.photos/seed/3/400/400', desc: 'Quần jean ống suông' },
-                    { id: 3, name: 'Mũ lưỡi trai', category: 'phụ kiện', price: 150000,
-                        image: 'https://picsum.photos/seed/5/400/400', desc: 'Mũ vải denim' },
-                ];
-                localStorage.setItem('shopProducts', JSON.stringify(defaultProducts));
-            }
-
-            if (!localStorage.getItem('shopRecharges')) {
-                const defaultRecharges = [
-                    { id: 1, customer: 'Trần Văn B', amount: 200000, method: 'bank', status: 'success',
-                        date: new Date().toLocaleString() },
-                    { id: 2, customer: 'Lê Thị C', amount: 50000, method: 'thẻ cào', status: 'pending',
-                        date: new Date().toLocaleString() },
-                ];
-                localStorage.setItem('shopRecharges', JSON.stringify(defaultRecharges));
-            }
-
-            if (!localStorage.getItem('shopHistory')) {
-                const defaultHistory = [
-                    { time: new Date().toLocaleString(), action: 'Đăng nhập', detail: 'Admin đăng nhập hệ thống',
-                        user: 'admin19' },
-                    { time: new Date().toLocaleString(), action: 'Thêm sản phẩm', detail: 'Thêm áo thun trắng',
-                        user: 'admin19' },
-                ];
-                localStorage.setItem('shopHistory', JSON.stringify(defaultHistory));
-            }
-
-            if (!localStorage.getItem('shopOrders')) {
-                const defaultOrders = [
-                    { id: 1, customer: 'Nguyễn Văn A', product: 'Áo thun trắng', total: 250000, status: 'success',
-                        date: new Date().toLocaleString() },
-                    { id: 2, customer: 'Phạm Thị D', product: 'Quần jean xanh', total: 450000, status: 'pending',
-                        date: new Date().toLocaleString() },
-                ];
-                localStorage.setItem('shopOrders', JSON.stringify(defaultOrders));
-            }
-        }
-        initData();
-
-        // ============================================================
-        //  HÀM TIỆN ÍCH
-        // ============================================================
-
-        function getData(key) {
-            return JSON.parse(localStorage.getItem(key)) || [];
-        }
-
-        function setData(key, data) {
-            localStorage.setItem(key, JSON.stringify(data));
-        }
-
-        function formatPr
+        <!-- ===== PANEL: QUẢN LÝ ADMIN ===== -->
+        <div class="panel" id="panel-admins">
+            <div class="card">
+                <h2><i class="fas fa-user-plus"></i> Thêm Admin mới</h2>
+                <form id="adminForm">
+                    <div class="form-group">
+                        <label>
+                            Tên đăng nhập
+                            <input type="text" id="aUsername" placeholder="admin01" required />
+                        </label>
+                     
