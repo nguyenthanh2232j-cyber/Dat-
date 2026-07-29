@@ -1,297 +1,395 @@
+const express = require('express');
+const sqlite3 = require('sqlite3').verbose();
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+const cors = require('cors');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+const JWT_SECRET = 'secret_key_123';
+
+app.use(cors());
+app.use(express.json());
+
+// ================= 1. THIẾT LẬP DATABASE SQLITE =================
+const db = new sqlite3.Database('./gameshop.db');
+
+// Hàm hỗ trợ Promise cho SQLite
+const dbRun = (sql, params = []) => new Promise((resolve, reject) => {
+    db.run(sql, params, function(err) { if (err) reject(err); else resolve(this); });
+});
+const dbGet = (sql, params = []) => new Promise((resolve, reject) => {
+    db.get(sql, params, (err, result) => { if (err) reject(err); else resolve(result); });
+});
+const dbAll = (sql, params = []) => new Promise((resolve, reject) => {
+    db.all(sql, params, (err, rows) => { if (err) reject(err); else resolve(rows); });
+});
+
+// Khởi tạo Database & Dữ liệu mẫu
+async function initDatabase() {
+    await dbRun(`CREATE TABLE IF NOT EXISTS users (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        username TEXT UNIQUE,
+        password_hash TEXT,
+        role TEXT
+    )`);
+    await dbRun(`CREATE TABLE IF NOT EXISTS wallets (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER UNIQUE,
+        balance REAL DEFAULT 0,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )`);
+    await dbRun(`CREATE TABLE IF NOT EXISTS products (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        name TEXT,
+        price REAL,
+        image_url TEXT
+    )`);
+    await dbRun(`CREATE TABLE IF NOT EXISTS orders (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        product_id INTEGER,
+        total_amount REAL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        FOREIGN KEY(user_id) REFERENCES users(id),
+        FOREIGN KEY(product_id) REFERENCES products(id)
+    )`);
+    await dbRun(`CREATE TABLE IF NOT EXISTS transactions (
+        id INTEGER PRIMARY KEY AUTOINCREMENT,
+        user_id INTEGER,
+        amount REAL,
+        type TEXT,
+        FOREIGN KEY(user_id) REFERENCES users(id)
+    )`);
+
+    // Tạo tài khoản mẫu nếu chưa tồn tại
+    const adminExist = await dbGet(`SELECT id FROM users WHERE username = 'admin'`);
+    if (!adminExist) {
+        const hash = await bcrypt.hash('123456', 10);
+        await dbRun(`INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)`, ['admin', hash, 'admin']);
+        const adminId = (await dbGet(`SELECT id FROM users WHERE username = 'admin'`)).id;
+        await dbRun(`INSERT INTO wallets (user_id, balance) VALUES (?, ?)`, [adminId, 5000000]);
+    }
+
+    const userExist = await dbGet(`SELECT id FROM users WHERE username = 'userdemo'`);
+    if (!userExist) {
+        const hash = await bcrypt.hash('123456', 10);
+        await dbRun(`INSERT INTO users (username, password_hash, role) VALUES (?, ?, ?)`, ['userdemo', hash, 'user']);
+        const userId = (await dbGet(`SELECT id FROM users WHERE username = 'userdemo'`)).id;
+        await dbRun(`INSERT INTO wallets (user_id, balance) VALUES (?, ?)`, [userId, 1000000]);
+    }
+
+    // Tạo sản phẩm mẫu
+    const productExist = await dbGet(`SELECT id FROM products LIMIT 1`);
+    if (!productExist) {
+        await dbRun(`INSERT INTO products (name, price, image_url) VALUES (?, ?, ?)`, ['Grow A Garden Token', 15000, 'https://via.placeholder.com/60/2d3748/fff?text=Garden']);
+        await dbRun(`INSERT INTO products (name, price, image_url) VALUES (?, ?, ?)`, ['Robux 100', 20000, 'https://via.placeholder.com/60/1a202c/fff?text=Roblox']);
+    }
+    console.log('✅ Database và dữ liệu mẫu đã được khởi tạo thành công!');
+}
+initDatabase();
+
+// ================= 2. CÁC API (BACKEND) =================
+
+// Xác thực Token
+const authenticate = (req, res, next) => {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ msg: 'Vui lòng đăng nhập' });
+    try {
+        req.user = jwt.verify(token, JWT_SECRET);
+        next();
+    } catch (err) { return res.status(401).json({ msg: 'Token hết hạn' }); }
+};
+
+// Đăng nhập
+app.post('/api/auth/login', async (req, res) => {
+    const { username, password } = req.body;
+    const user = await dbGet(`SELECT * FROM users WHERE username = ?`, [username]);
+    if (!user) return res.status(400).json({ msg: 'Sai tài khoản/mật khẩu' });
+    
+    const valid = await bcrypt.compare(password, user.password_hash);
+    if (!valid) return res.status(400).json({ msg: 'Sai tài khoản/mật khẩu' });
+    
+    const wallet = await dbGet(`SELECT balance FROM wallets WHERE user_id = ?`, [user.id]);
+    const token = jwt.sign({ id: user.id, role: user.role }, JWT_SECRET, { expiresIn: '7d' });
+    res.json({ token, user: { id: user.id, username: user.username, role: user.role, balance: wallet?.balance || 0 } });
+});
+
+// API User: Lấy sản phẩm
+app.get('/api/user/products', async (req, res) => {
+    const products = await dbAll(`SELECT * FROM products`);
+    res.json(products);
+});
+
+// API User: Nạp tiền
+app.post('/api/user/deposit', authenticate, async (req, res) => {
+    const { amount } = req.body;
+    const userId = req.user.id;
+    await dbRun(`UPDATE wallets SET balance = balance + ? WHERE user_id = ?`, [amount, userId]);
+    await dbRun(`INSERT INTO transactions (user_id, amount, type) VALUES (?, ?, ?)`, [userId, amount, 'deposit']);
+    res.json({ msg: `Nạp thành công ${amount.toLocaleString()}đ!` });
+});
+
+// API User: Mua hàng (Dùng Transaction SQLite)
+app.post('/api/user/buy', authenticate, async (req, res) => {
+    const { productId } = req.body;
+    const userId = req.user.id;
+
+    const product = await dbGet(`SELECT price FROM products WHERE id = ?`, [productId]);
+    if (!product) return res.status(404).json({ msg: 'Sản phẩm không tồn tại' });
+    
+    const wallet = await dbGet(`SELECT balance FROM wallets WHERE user_id = ?`, [userId]);
+    if (wallet.balance < product.price) {
+        return res.status(400).json({ msg: 'Số dư không đủ' });
+    }
+
+    // Thực hiện giao dịch tuần tự
+    await dbRun(`UPDATE wallets SET balance = balance - ? WHERE user_id = ?`, [product.price, userId]);
+    await dbRun(`INSERT INTO orders (user_id, product_id, total_amount) VALUES (?, ?, ?)`, [userId, productId, product.price]);
+    await dbRun(`INSERT INTO transactions (user_id, amount, type) VALUES (?, ?, ?)`, [userId, product.price, 'purchase']);
+
+    res.json({ msg: 'Mua hàng thành công!' });
+});
+
+// API User: Lịch sử
+app.get('/api/user/history', authenticate, async (req, res) => {
+    const list = await dbAll(`SELECT * FROM transactions WHERE user_id = ? ORDER BY id DESC`, [req.user.id]);
+    res.json(list);
+});
+
+// API Admin: Thống kê
+app.get('/api/admin/stats', authenticate, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({ msg: 'Cấm truy cập' });
+    const users = (await dbGet(`SELECT COUNT(*) as count FROM users WHERE role = 'user'`)).count;
+    const orders = (await dbGet(`SELECT COUNT(*) as count FROM orders`)).count;
+    const revenue = (await dbGet(`SELECT IFNULL(SUM(total_amount), 0) as sum FROM orders`)).sum;
+    res.json({ users, orders, revenue });
+});
+
+// API Admin: Danh sách User
+app.get('/api/admin/users', authenticate, async (req, res) => {
+    if (req.user.role !== 'admin') return res.status(403).json({ msg: 'Cấm truy cập' });
+    const list = await dbAll(`SELECT u.id, u.username, u.role, w.balance FROM users u LEFT JOIN wallets w ON u.id = w.user_id`);
+    res.json(list);
+});
+
+
+// ================= 3. GIAO DIỆN FRONTEND (HTML NHÚNG) =================
+// Các hàm render HTML gộp luôn vào server
+
+app.get('/', (req, res) => {
+    res.send(`
 <!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>GameShop VN - Nạp game siêu nhanh</title>
-    <!-- Nhúng Tailwind CSS để styling nhanh -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+    <title>GameShop User</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Icon FontAwesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <style>
-        /* Custom styles để giống hình mẫu */
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f3f4f6; padding-bottom: 80px; }
-        .hide { display: none !important; }
-        .active-tab { color: #6d28d9; border-bottom: 3px solid #6d28d9; font-weight: 600; }
-        .glass-card { background: rgba(255, 255, 255, 0.7); backdrop-filter: blur(5px); border: 1px solid rgba(255,255,255,0.3); }
-        
-        /* Bottom Nav Glassmorphism */
-        .bottom-nav { background: rgba(20, 20, 20, 0.95); backdrop-filter: blur(10px); box-shadow: 0 -4px 30px rgba(0,0,0,0.1); }
-        .btn-deposit-glow { box-shadow: 0 4px 15px rgba(139, 92, 246, 0.4); transition: all 0.3s; }
-        .btn-deposit-glow:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(139, 92, 246, 0.6); }
-        
-        /* Auto scroll cho lịch sử */
-        .transaction-list { max-height: 400px; overflow-y: auto; scrollbar-width: thin; }
-    </style>
+    <style>body{background:#f3f4f6;padding-bottom:80px;}.hide{display:none!important}</style>
 </head>
-<body class="text-gray-700">
+<body class="max-w-md mx-auto bg-white min-h-screen relative pb-20 shadow-2xl">
+    <div id="screen-login" class="p-6 flex flex-col justify-center h-screen">
+        <div class="text-center mt-10 mb-6">
+            <i class="fas fa-gamepad text-5xl text-gray-600 mb-2"></i>
+            <h1 class="text-3xl font-bold text-gray-800 mt-1">Đăng Nhập</h1>
+        </div>
+        <div class="bg-white p-6 rounded-3xl shadow-sm">
+            <div class="mb-4"><label class="block text-gray-600 font-semibold mb-2 text-sm">Tên đăng nhập</label><input id="login-user" value="userdemo" type="text" class="w-full bg-slate-50 border rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-400"></div>
+            <div class="mb-4"><label class="block text-gray-600 font-semibold mb-2 text-sm">Mật khẩu</label><input id="login-pass" value="123456" type="password" class="w-full bg-slate-50 border rounded-xl px-4 py-3 focus:ring-2 focus:ring-purple-400"></div>
+            <button onclick="handleLogin()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold py-3 rounded-full shadow-md">Đăng Nhập</button>
+            <p id="login-error" class="text-red-500 text-xs text-center mt-2 hide"></p>
+        </div>
+    </div>
 
-    <!-- Container chính giả lập mobile -->
-    <div class="max-w-md mx-auto bg-white min-h-screen relative shadow-2xl pb-20">
+    <div id="screen-user" class="hide p-4">
+        <div class="flex justify-between items-center mb-4">
+            <div id="user-balance" class="bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold"><i class="fas fa-coins mr-1"></i> 0 đ</div>
+            <button onclick="logout()" class="text-red-500 text-sm"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+        <h2 class="text-xl font-bold mb-3">Sản phẩm Game</h2>
+        <div id="product-list" class="space-y-3"></div>
+
+        <div class="fixed bottom-0 w-full max-w-md bg-gray-900 text-white flex justify-around p-3 rounded-t-2xl z-50">
+            <div onclick="showTab('dashboard')" class="flex flex-col items-center cursor-pointer"><i class="fas fa-home"></i><span class="text-[10px]">Home</span></div>
+            <div onclick="showTab('deposit')" class="flex flex-col items-center cursor-pointer bg-purple-600 px-4 py-1 rounded-full"><i class="fas fa-wallet"></i><span class="text-[10px]">Nạp</span></div>
+            <div onclick="showTab('history')" class="flex flex-col items-center cursor-pointer"><i class="fas fa-clock"></i><span class="text-[10px]">Lịch sử</span></div>
+        </div>
+    </div>
+
+    <div id="tab-deposit" class="hide fixed top-0 left-0 w-full h-full bg-white z-40 p-6 pt-10 overscroll-y-auto">
+        <button onclick="showTab('dashboard')" class="mb-4 text-gray-600"><i class="fas fa-arrow-left text-xl"></i> Quay lại</button>
+        <h3 class="font-bold text-lg mb-3">Nạp Tiền</h3>
+        <input id="deposit-amount" type="number" value="100000" class="w-full border p-3 rounded-xl mb-4">
+        <button onclick="handleDeposit()" class="w-full bg-purple-600 text-white py-3 rounded-xl font-bold">Nạp ngay</button>
+        <p id="deposit-msg" class="mt-2 text-center text-green-600 hide font-bold"></p>
+    </div>
+
+    <div id="tab-history" class="hide fixed top-0 left-0 w-full h-full bg-gray-50 z-40 p-6 pt-10">
+        <button onclick="showTab('dashboard')" class="mb-4 text-gray-600"><i class="fas fa-arrow-left text-xl"></i> Quay lại</button>
+        <h3 class="font-bold text-lg mb-3">Lịch sử Giao Dịch</h3>
+        <div id="history-list" class="space-y-2"></div>
+    </div>
+
+    <script>
+        const API = 'http://localhost:${PORT}/api';
+        let token = localStorage.getItem('token');
+        let userBalance = 0;
+
+        function switchScreen(id) {
+            document.getElementById('screen-login').classList.add('hide');
+            document.getElementById('screen-user').classList.add('hide');
+            document.getElementById(id).classList.remove('hide');
+        }
         
-        <!-- ================= MÀN HÌNH 1: ĐĂNG NHẬP ================= -->
-        <div id="screen-login" class="p-6 flex flex-col justify-center h-screen bg-slate-50">
-            <div class="text-center mt-10 mb-6">
-                <i class="fas fa-gamepad text-5xl text-gray-600 mb-2"></i>
-                <div class="text-xs tracking-widest text-indigo-400 font-bold uppercase">GameShop VN</div>
-                <h1 class="text-3xl font-bold text-gray-800 mt-1">Đăng Nhập</h1>
-                <p class="text-gray-500 mt-1">Chào mừng bạn quay lại!</p>
+        async function handleLogin() {
+            const u = document.getElementById('login-user').value;
+            const p = document.getElementById('login-pass').value;
+            const err = document.getElementById('login-error');
+            try {
+                const res = await fetch(API+'/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:u, password:p})});
+                const data = await res.json();
+                if(!res.ok) { err.classList.remove('hide'); err.innerText = data.msg; return; }
+                localStorage.setItem('token', data.token);
+                token = data.token;
+                userBalance = data.user.balance;
+                document.getElementById('user-balance').innerText = userBalance.toLocaleString() + ' đ';
+                switchScreen('screen-user');
+                loadProducts();
+                loadHistory();
+            } catch(e) { alert('Lỗi kết nối Server. Nhớ bật Backend trước!'); }
+        }
+
+        async function loadProducts() {
+            const res = await fetch(API+'/user/products');
+            const list = await res.json();
+            document.getElementById('product-list').innerHTML = list.map(p => \`
+                <div class="bg-white p-4 rounded-xl shadow-sm flex justify-between items-center">
+                    <div class="flex gap-3"><img src="\${p.image_url}" class="w-12 h-12 rounded"><div><div class="font-bold">\${p.name}</div><div class="text-purple-600 font-bold">\${p.price.toLocaleString()}đ</div></div></div>
+                    <button onclick="buyProduct(\${p.id})" class="bg-blue-500 text-white px-3 py-1 rounded-full text-sm">Mua</button>
+                </div>
+            \`).join('');
+        }
+
+        async function buyProduct(id) {
+            if(!confirm('Xác nhận mua?')) return;
+            const res = await fetch(API+'/user/buy', {method:'POST', headers:{'Authorization':'Bearer '+token, 'Content-Type':'application/json'}, body:JSON.stringify({productId: id})});
+            const data = await res.json();
+            if(!res.ok) return alert(data.msg);
+            alert(data.msg);
+            loadProducts();
+            loadHistory();
+            const res2 = await fetch(API+'/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.stringify({username:'userdemo', password:'123456'})});
+            const d2 = await res2.json();
+            userBalance = d2.user.balance;
+            document.getElementById('user-balance').innerText = userBalance.toLocaleString() + ' đ';
+        }
+
+        async function handleDeposit() {
+            const amount = parseInt(document.getElementById('deposit-amount').value);
+            const msg = document.getElementById('deposit-msg');
+            const res = await fetch(API+'/user/deposit', {method:'POST', headers:{'Authorization':'Bearer '+token, 'Content-Type':'application/json'}, body:JSON.stringify({amount})});
+            const data = await res.json();
+            if(!res.ok) return alert(data.msg);
+            msg.classList.remove('hide'); msg.innerText = data.msg;
+            setTimeout(() => msg.classList.add('hide'), 3000);
+            userBalance += amount;
+            document.getElementById('user-balance').innerText = userBalance.toLocaleString() + ' đ';
+            loadHistory();
+        }
+
+        async function loadHistory() {
+            const res = await fetch(API+'/user/history', {headers:{'Authorization':'Bearer '+token}});
+            const list = await res.json();
+            document.getElementById('history-list').innerHTML = list.map(t => \`
+                <div class="flex justify-between bg-white p-3 rounded-xl shadow-sm">
+                    <div><span class="font-bold \${t.type==='deposit'?'text-green-600':'text-red-500'}">\${t.type==='deposit'?'Nạp tiền':'Mua hàng'}</span></div>
+                    <div class="font-bold \${t.type==='deposit'?'text-green-600':'text-red-500'}">\${t.type==='deposit'?'+':'-'}\${t.amount.toLocaleString()}đ</div>
+                </div>
+            \`).join('');
+        }
+
+        function showTab(tab) {
+            const t_dep = document.getElementById('tab-deposit');
+            const t_his = document.getElementById('tab-history');
+            t_dep.classList.add('hide'); t_his.classList.add('hide');
+            if(tab === 'deposit') t_dep.classList.remove('hide');
+            if(tab === 'history') t_his.classList.remove('hide');
+        }
+
+        function logout() {
+            localStorage.removeItem('token'); token = null; switchScreen('screen-login');
+        }
+
+        if(token) { switchScreen('screen-user'); loadProducts(); loadHistory(); }
+        else { switchScreen('screen-login'); }
+    </script>
+</body>
+</html>
+    `);
+});
+
+app.get('/admin', (req, res) => {
+    res.send(`
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Admin Dashboard GameShop</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body class="bg-gray-100 p-6">
+    <div id="login-box" class="max-w-md mx-auto bg-white p-8 rounded-2xl shadow-lg mt-20">
+        <h2 class="text-2xl font-bold text-center mb-6">Đăng nhập Admin</h2>
+        <input id="admin-user" value="admin" class="w-full border p-3 rounded mb-3">
+        <input id="admin-pass" value="123456" type="password" class="w-full border p-3 rounded mb-3">
+        <button onclick="handleAdminLogin()" class="w-full bg-indigo-600 text-white py-3 rounded font-bold">Đăng nhập</button>
+        <p id="admin-error" class="text-red-500 text-center text-sm mt-2 hide"></p>
+    </div>
+
+    <div id="dashboard-box" class="hide max-w-6xl mx-auto">
+        <div class="flex justify-between items-center mb-6">
+            <h1 class="text-2xl font-bold text-gray-800">Bảng Điều Khiển Admin</h1>
+            <button onclick="adminLogout()" class="bg-red-500 text-white px-4 py-2 rounded">Thoát</button>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+            <div class="bg-white p-6 rounded-xl shadow border-l-4 border-blue-500">
+                <p class="text-sm font-bold uppercase text-gray-500">Tổng User</p>
+                <p id="total-users" class="text-2xl font-bold">0</p>
             </div>
-
-            <div class="bg-white p-6 rounded-3xl shadow-sm border border-gray-100">
-                <div class="mb-4">
-                    <label class="block text-gray-600 font-semibold mb-2 text-sm"><i class="fas fa-user mr-2"></i>Tên đăng nhập / Email</label>
-                    <input type="text" placeholder="Nhập tên đăng nhập hoặc email" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                </div>
-                <div class="mb-4 relative">
-                    <label class="block text-gray-600 font-semibold mb-2 text-sm"><i class="fas fa-lock mr-2"></i>Mật khẩu</label>
-                    <div class="relative">
-                        <input type="password" placeholder="Nhập mật khẩu" class="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 pr-10 focus:outline-none focus:ring-2 focus:ring-purple-400">
-                        <i class="fas fa-eye absolute right-3 top-3.5 text-gray-400"></i>
-                    </div>
-                </div>
-                
-                <div class="flex justify-between items-center mb-6 text-sm">
-                    <label class="flex items-center text-gray-500"><input type="checkbox" class="mr-2 rounded"> Nhớ tài khoản</label>
-                    <a href="#" class="text-indigo-600 font-medium">Quên mật khẩu?</a>
-                </div>
-
-                <button onclick="goToHome()" class="w-full bg-gradient-to-r from-purple-500 to-indigo-600 text-white font-bold py-3 rounded-full shadow-md hover:shadow-lg transition duration-200">
-                    <i class="fas fa-sign-in-alt mr-2"></i> Đăng Nhập
-                </button>
-                
-                <div class="flex items-center justify-center my-4 text-gray-400 text-sm">
-                    <span class="mx-2">Hoặc</span>
-                </div>
-                
-                <p class="text-center text-sm">Chưa có tài khoản? <a href="#" class="text-indigo-600 font-bold">Đăng ký ngay</a></p>
+            <div class="bg-white p-6 rounded-xl shadow border-l-4 border-green-500">
+                <p class="text-sm font-bold uppercase text-gray-500">Tổng Đơn Hàng</p>
+                <p id="total-orders" class="text-2xl font-bold">0</p>
+            </div>
+            <div class="bg-white p-6 rounded-xl shadow border-l-4 border-purple-500">
+                <p class="text-sm font-bold uppercase text-gray-500">Doanh Thu</p>
+                <p id="total-revenue" class="text-2xl font-bold text-green-600">0</p>
             </div>
         </div>
 
-        <!-- ================= MÀN HÌNH 2: TRANG CHỦ (HOME) ================= -->
-        <div id="screen-home" class="hide p-4">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-4 pt-2">
-                <div class="flex items-center gap-3">
-                    <img src="https://via.placeholder.com/40x40/111/fff?text=NAT" class="rounded-lg w-10 h-10 object-cover border">
-                    <div class="flex items-center bg-green-100 text-green-700 px-3 py-1 rounded-full text-sm font-bold border border-green-200">
-                        <i class="fas fa-coins mr-1"></i> 0 đ
-                    </div>
-                </div>
-                <div class="flex gap-3 text-gray-600 text-lg">
-                    <i class="fas fa-shopping-cart"></i>
-                    <i class="fas fa-cog"></i>
-                    <i class="fas fa-bell text-gray-400"></i>
-                    <i class="fas fa-user-circle text-xl"></i>
-                </div>
-            </div>
-
-            <!-- Banner -->
-            <div class="bg-white p-5 rounded-3xl shadow-sm mb-6 border border-gray-100">
-                <div class="inline-block bg-indigo-100 text-indigo-600 text-xs font-bold px-3 py-1 rounded-full mb-2">SHOP GAME GIÁ RẺ</div>
-                <h2 class="text-3xl font-black text-indigo-900 leading-tight">Mua Bán & Nạp<br>Tiền <span class="text-purple-500">Game Siêu Nhanh</span></h2>
-                <p class="text-gray-500 text-sm mt-2 leading-relaxed">Nạp tiền tự động qua ngân hàng, MoMo, TheSieuRe và thẻ cào. Xử lý nhanh, an toàn và dễ dùng trên cả điện thoại lẫn máy tính.</p>
-            </div>
-
-            <!-- Feature Grid -->
-            <div class="grid grid-cols-2 gap-3 mb-6">
-                <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center border-t-4 border-purple-400">
-                    <div>
-                        <p class="text-xs text-gray-400 font-semibold uppercase">Ngân hàng hỗ trợ</p>
-                        <p class="text-2xl font-bold text-indigo-600">9+</p>
-                        <p class="text-[10px] text-gray-500">ACB, VTB, TCB...</p>
-                    </div>
-                    <i class="fas fa-university text-2xl text-gray-300"></i>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center border-t-4 border-green-400">
-                    <div>
-                        <p class="text-xs text-gray-400 font-semibold uppercase">Tốc độ xử lý</p>
-                        <p class="text-xl font-bold text-green-600">&lt; 30s</p>
-                        <p class="text-[10px] text-gray-500">Cộng tiền tự động</p>
-                    </div>
-                    <i class="fas fa-bolt text-2xl text-gray-300"></i>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center border-t-4 border-purple-400">
-                    <div>
-                        <p class="text-xs text-gray-400 font-semibold uppercase">Phương thức</p>
-                        <p class="text-2xl font-bold text-purple-500">4</p>
-                        <p class="text-[10px] text-gray-500">Bank, MoMo, Thẻ...</p>
-                    </div>
-                    <i class="fas fa-credit-card text-2xl text-gray-300"></i>
-                </div>
-                <div class="bg-white p-4 rounded-2xl shadow-sm flex justify-between items-center border-t-4 border-yellow-400">
-                    <div>
-                        <p class="text-xs text-gray-400 font-semibold uppercase">Bảo mật</p>
-                        <p class="text-xl font-bold text-yellow-500">100%</p>
-                        <p class="text-[10px] text-gray-500">Mã hóa & idempotency</p>
-                    </div>
-                    <i class="fas fa-shield-alt text-2xl text-gray-300"></i>
-                </div>
-            </div>
-
-            <!-- Dịch Vụ -->
-            <h3 class="font-bold text-lg mb-3">Dịch Vụ Của Chúng Tôi</h3>
-            <div class="space-y-3">
-                <div class="bg-white p-3 rounded-2xl shadow-sm flex items-center justify-between border border-gray-50">
-                    <div class="flex items-center gap-3">
-                        <img src="https://via.placeholder.com/60x60/2d3748/fff?text=Garden" class="w-14 h-14 rounded-xl object-cover">
-                        <div>
-                            <div class="flex items-center gap-2"><i class="fas fa-seedling text-green-500"></i><span class="font-bold text-gray-800">Grow A Garden</span></div>
-                            <p class="text-xs text-gray-400">Hoàn thành đơn từ 15-40p, đơn quá 1h chưa hoàn thành...</p>
-                        </div>
-                    </div>
-                    <div class="bg-orange-400 text-white rounded-full p-2 w-8 h-8 flex items-center justify-center"><i class="fas fa-arrow-right text-xs"></i></div>
-                </div>
-                <div class="bg-white p-3 rounded-2xl shadow-sm flex items-center justify-between border border-gray-50">
-                    <div class="flex items-center gap-3">
-                        <img src="https://via.placeholder.com/60x60/1a202c/fff?text=Roblox" class="w-14 h-14 rounded-xl object-cover">
-                        <div>
-                            <div class="flex items-center gap-2"><i class="fas fa-gamepad text-gray-700"></i><span class="font-bold text-gray-800">Robux chính hãng</span></div>
-                            <p class="text-xs text-gray-400">Hoàn thành đơn từ 15-40p...</p>
-                        </div>
-                    </div>
-                    <div class="bg-orange-400 text-white rounded-full p-2 w-8 h-8 flex items-center justify-center"><i class="fas fa-arrow-right text-xs"></i></div>
-                </div>
-            </div>
+        <div class="bg-white p-6 rounded-xl shadow mb-6">
+            <h3 class="font-bold text-lg mb-4">Danh sách User & Số dư</h3>
+            <div id="user-table" class="overflow-x-auto"></div>
         </div>
+    </div>
 
-        <!-- ================= MÀN HÌNH 3 & 4: LỊCH SỬ NẠP / MUA HÀNG ================= -->
-        <div id="screen-history" class="hide p-4">
-            <h3 class="font-bold text-lg mb-3"><i class="fas fa-clock text-green-500 mr-2"></i>Lịch Sử Giao Dịch</h3>
-            <div class="bg-gray-50 p-2 rounded-2xl space-y-2 transaction-list">
-                <!-- Nạp tiền -->
-                <div class="bg-gray-700 text-white p-3 rounded-2xl flex justify-between items-center shadow-md">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center"><i class="fas fa-university text-yellow-400"></i></div>
-                        <div>
-                            <p class="font-bold text-sm">Ry*** <span class="text-gray-300 text-xs font-normal">nạp thành...</span></p>
-                            <p class="text-[10px] text-gray-400"><i class="far fa-clock mr-1"></i> 41 phút trước</p>
-                        </div>
-                    </div>
-                    <p class="text-green-400 font-bold text-sm">+10,000đ</p>
-                </div>
-                <!-- Mua hàng -->
-                <div class="bg-gray-700 text-white p-3 rounded-2xl flex justify-between items-center shadow-md">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center"><i class="fas fa-shopping-cart text-blue-400"></i></div>
-                        <div>
-                            <p class="font-bold text-sm text-blue-300">Kas*** <span class="text-gray-300 text-xs font-normal">mua</span></p>
-                            <p class="text-[10px] text-gray-400"><i class="far fa-clock mr-1"></i> 22 phút trước</p>
-                        </div>
-                    </div>
-                    <p class="text-red-400 font-bold text-sm">-1,000đ</p>
-                </div>
-                <!-- Thêm vài cái nữa cho đẹp -->
-                <div class="bg-gray-700 text-white p-3 rounded-2xl flex justify-between items-center shadow-md">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center"><i class="fas fa-university text-yellow-400"></i></div>
-                        <div>
-                            <p class="font-bold text-sm">ng*** <span class="text-gray-300 text-xs font-normal">nạp thành...</span></p>
-                            <p class="text-[10px] text-gray-400"><i class="far fa-clock mr-1"></i> 1 giờ trước</p>
-                        </div>
-                    </div>
-                    <p class="text-green-400 font-bold text-sm">+40,000đ</p>
-                </div>
-                <div class="bg-gray-700 text-white p-3 rounded-2xl flex justify-between items-center shadow-md">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center"><i class="fas fa-shopping-cart text-blue-400"></i></div>
-                        <div>
-                            <p class="font-bold text-sm text-blue-300">Rym*** <span class="text-gray-300 text-xs font-normal">mua</span></p>
-                            <p class="text-[10px] text-gray-400"><i class="far fa-clock mr-1"></i> 28 phút trước</p>
-                        </div>
-                    </div>
-                    <p class="text-red-400 font-bold text-sm">-3,000đ</p>
-                </div>
-                 <div class="bg-gray-700 text-white p-3 rounded-2xl flex justify-between items-center shadow-md">
-                    <div class="flex items-center gap-3">
-                        <div class="w-10 h-10 rounded-full bg-gray-600 flex items-center justify-center"><i class="fas fa-university text-yellow-400"></i></div>
-                        <div>
-                            <p class="font-bold text-sm">Tr*** <span class="text-gray-300 text-xs font-normal">nạp thành...</span></p>
-                            <p class="text-[10px] text-gray-400"><i class="far fa-clock mr-1"></i> 1 giờ trước</p>
-                        </div>
-                    </div>
-                    <p class="text-green-400 font-bold text-sm">+40,000đ</p>
-                </div>
-            </div>
-        </div>
+    <script>
+        const API = 'http://localhost:${PORT}/api';
+        let adminToken = localStorage.getItem('adminToken');
+        
+        function switchAdmin(screen) {
+            document.getElementById('login-box').classList.add('hide');
+            document.getElementById('dashboard-box').classList.add('hide');
+            document.getElementById(screen).classList.remove('hide');
+        }
 
-        <!-- ================= MÀN HÌNH 5: TOP NẠP TIỀN ================= -->
-        <div id="screen-leaderboard" class="hide p-4">
-            <h3 class="font-bold text-lg mb-3"><i class="fas fa-trophy text-yellow-500 mr-2"></i>Top Nạp Tiền Tháng 07/2026</h3>
-            
-            <div class="bg-white rounded-3xl p-4 shadow-sm mb-4 border border-yellow-100 relative overflow-hidden">
-                 <div class="absolute top-0 left-0 w-1 h-full bg-yellow-500"></div>
-                 <p class="font-bold text-gray-700">Bảng Xếp Hạng Nạp Tiền Tháng</p>
-                 <p class="text-xs text-gray-400 my-2">Tính từ 01/07/2026 - 31/07/2026 (GMT+7) theo giờ Việt Nam.</p>
-                 <button class="w-full border border-gray-300 text-gray-700 font-bold py-2 rounded-full hover:bg-slate-50 transition"><i class="fas fa-bolt text-yellow-500 mr-2"></i> Nạp tiền ngay</button>
-            </div>
-
-            <!-- BXH -->
-            <div class="space-y-3">
-                <!-- Top 1 -->
-                <div class="bg-gray-100 p-4 rounded-2xl flex justify-between items-center shadow-sm relative">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-yellow-400 rounded-2xl flex items-center justify-center text-white text-xl shadow-md"><i class="fas fa-crown"></i></div>
-                        <div>
-                            <div class="flex items-center gap-2"><p class="font-bold text-gray-800 text-lg">mi***2</p></div>
-                            <div class="flex items-center gap-2 text-[10px] text-gray-500">
-                                <span><i class="far fa-credit-card"></i> 2 giao dịch</span>
-                            </div>
-                            <div class="flex items-center gap-1 text-[10px] text-gray-500 mt-1"><i class="far fa-clock"></i> 29/07 19:07</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-orange-500 font-bold text-xl">800,000đ</p>
-                        <p class="text-[8px] text-gray-400 font-bold uppercase tracking-wider">Thực nhận tháng này</p>
-                    </div>
-                </div>
-                <!-- Top 2 -->
-                <div class="bg-gray-50 p-4 rounded-2xl flex justify-between items-center shadow-sm relative border border-gray-100">
-                    <div class="flex items-center gap-3">
-                        <div class="w-12 h-12 bg-gray-300 rounded-2xl flex items-center justify-center text-gray-500 text-xl"><i class="fas fa-medal"></i></div>
-                        <div>
-                            <div class="flex items-center gap-2"><p class="font-bold text-gray-800 text-lg">lu***u</p></div>
-                            <div class="flex items-center gap-2 text-[10px] text-gray-500">
-                                <span><i class="far fa-credit-card"></i> 2 giao dịch</span>
-                            </div>
-                             <div class="flex items-center gap-1 text-[10px] text-gray-500 mt-1"><i class="far fa-clock"></i> Lần cuối:...</div>
-                        </div>
-                    </div>
-                    <div class="text-right">
-                        <p class="text-orange-500 font-bold text-xl">520,000đ</p>
-                        <p class="text-[8px] text-gray-400 font-bold uppercase tracking-wider">Thực nhận tháng này</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- ================= MÀN HÌNH 6 & 7: NẠP TIỀN & KHUYẾN MÃI ================= -->
-        <div id="screen-deposit" class="hide p-4">
-             <h3 class="font-bold text-lg mb-3"><i class="fas fa-wallet text-purple-500 mr-2"></i>Nạp Tiền</h3>
-             
-             <!-- Phương thức nạp -->
-             <div class="grid grid-cols-2 gap-3 mb-4">
-                 <div class="bg-white p-3 rounded-2xl shadow-sm border-l-4 border-green-500">
-                     <div class="flex justify-between items-center">
-                         <i class="fas fa-university text-blue-600 text-xl"></i>
-                         <span class="bg-green-100 text-green-600 text-[10px] px-2 py-0.5 rounded-full font-bold">AUTO</span>
-                     </div>
-                     <p class="font-bold text-sm mt-1 text-green-600">Chuyển Khoản Ngân Hàng</p>
-                     <p class="text-[10px] text-gray-500">ACB, MB, Techcombank...</p>
-                     <p class="text-[10px] text-gray-500 mt-1">Hỗ trợ quét QR VietQR</p>
-                 </div>
-                 <div class="bg-white p-3 rounded-2xl shadow-sm border-l-4 border-pink-400">
-                     <div class="flex justify-between items-center">
-                         <i class="fas fa-wallet text-pink-500 text-xl"></i>
-                         <span class="bg-pink-100 text-pink-600 text-[10px] px-2 py-0.5 rounded-full font-bold">AUTO</span>
-                     </div>
-                     <p class="font-bold text-sm mt-1 text-pink-600">Ví MoMo</p>
-                     <p class="text-[10px] text-gray-500">Quét QR, Auto cộng</p>
-                     <p class="text-[10px] text-gray-500 flex items-center mt-1"><i class="fas fa-bolt text-pink-400 mr-1"></i> ~2-5 giây</p>
-                 </div>
-             </div>
-
-             <!-- Khuyến Mãi -->
-             <div class="bg-white rounded-2xl p-4 shadow-sm border border-gray-100 mb-4">
-                 <div class="flex items-center gap-2 mb-3 border-b pb-2">
-                    <i class="fas fa-gift text-y
+        async function handleAdminLogin() {
+            const u = document.getElementById('admin-user').value;
+            const p = document.getElementById('admin-pass').value;
+            const err = document.getElementById('admin-error');
+            try {
+                const res = await fetch(API+'/auth/login', {method:'POST', headers:{'Content-Type':'application/json'}, body:JSON.s
