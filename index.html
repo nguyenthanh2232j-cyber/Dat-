@@ -1,427 +1,590 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Đăng Nhập | GameShop</title>
-  <!-- Font Awesome cho icon -->
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-  <style>
-    /* ========== RESET & FONT ========== */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
-    }
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Admin | GameShop</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" />
+    <style>
+        /* ========== RESET & CƠ BẢN ========== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, sans-serif;
+        }
 
-    body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      background: #0b0e14;
-      background-image: radial-gradient(circle at 20% 30%, #1a2634 0%, #0b0e14 80%);
-      padding: 20px;
-    }
+        body {
+            background: #0b0e14;
+            color: #e8edf5;
+            padding: 20px;
+            min-height: 100vh;
+        }
 
-    /* ========== CONTAINER CHÍNH ========== */
-    .login-container {
-      background: #141b24;
-      width: 100%;
-      max-width: 420px;
-      padding: 40px 32px 36px;
-      border-radius: 24px;
-      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03);
-      transition: 0.25s ease;
-    }
+        .container {
+            max-width: 1300px;
+            margin: 0 auto;
+        }
 
-    /* ========== HEADER / LOGO ========== */
-    .shop-header {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      margin-bottom: 28px;
-      color: #b7c9d9;
-    }
+        /* ========== HEADER ========== */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+            padding: 16px 24px;
+            background: #141b24;
+            border-radius: 16px;
+            margin-bottom: 28px;
+            border: 1px solid #1f2a35;
+        }
 
-    .shop-header .logo {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 22px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: 0.5px;
-    }
+        .header .logo {
+            font-size: 24px;
+            font-weight: 700;
+            color: #fff;
+        }
+        .header .logo i {
+            color: #f7c948;
+            margin-right: 10px;
+        }
 
-    .shop-header .logo i {
-      color: #f7c948;
-      font-size: 26px;
-    }
+        .header .user-info {
+            display: flex;
+            align-items: center;
+            gap: 18px;
+            color: #b0c4d8;
+        }
+        .header .user-info i {
+            color: #f7c948;
+        }
+        .header .user-info .logout-btn {
+            background: transparent;
+            border: 1px solid #ff6b6b;
+            color: #ff6b6b;
+            padding: 6px 18px;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: 0.2s;
+            font-weight: 600;
+        }
+        .header .user-info .logout-btn:hover {
+            background: #ff6b6b;
+            color: #fff;
+        }
 
-    .shop-header .badge {
-      background: #f7c948;
-      color: #0b0e14;
-      padding: 4px 12px;
-      border-radius: 40px;
-      font-size: 12px;
-      font-weight: 700;
-      letter-spacing: 0.3px;
-    }
+        /* ========== NAV TABS ========== */
+        .tabs {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 28px;
+        }
+        .tabs button {
+            background: #141b24;
+            border: 1px solid #1f2a35;
+            color: #b0c4d8;
+            padding: 12px 24px;
+            border-radius: 40px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .tabs button:hover {
+            border-color: #f7c948;
+            color: #fff;
+        }
+        .tabs button.active {
+            background: #f7c948;
+            color: #0b0e14;
+            border-color: #f7c948;
+        }
 
-    /* ========== TIÊU ĐỀ FORM ========== */
-    .form-title {
-      margin-bottom: 28px;
-    }
+        /* ========== PANELS ========== */
+        .panel {
+            display: none;
+            animation: fadeUp 0.3s ease;
+        }
+        .panel.active {
+            display: block;
+        }
 
-    .form-title h1 {
-      font-size: 26px;
-      font-weight: 700;
-      color: #ffffff;
-      letter-spacing: -0.3px;
-    }
+        @keyframes fadeUp {
+            from {
+                opacity: 0;
+                transform: translateY(12px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
 
-    .form-title p {
-      color: #8899aa;
-      font-size: 15px;
-      margin-top: 6px;
-    }
+        /* ========== CARD ========== */
+        .card {
+            background: #141b24;
+            border-radius: 16px;
+            padding: 24px;
+            border: 1px solid #1f2a35;
+            margin-bottom: 24px;
+        }
 
-    /* ========== FORM ========== */
-    .login-form .input-group {
-      margin-bottom: 18px;
-      position: relative;
-    }
+        .card h2 {
+            font-size: 20px;
+            margin-bottom: 18px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .card h2 i {
+            color: #f7c948;
+        }
 
-    .login-form .input-group label {
-      display: block;
-      font-size: 13px;
-      font-weight: 600;
-      color: #c8d6e5;
-      margin-bottom: 6px;
-      letter-spacing: 0.3px;
-    }
+        /* ========== FORM ========== */
+        .form-group {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 16px;
+        }
 
-    .login-form .input-group input {
-      width: 100%;
-      padding: 14px 16px;
-      background: #1f2a35;
-      border: 1px solid #2a3a48;
-      border-radius: 14px;
-      color: #ffffff;
-      font-size: 15px;
-      outline: none;
-      transition: 0.2s ease;
-    }
+        .form-group label {
+            font-size: 13px;
+            font-weight: 600;
+            color: #b0c4d8;
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
 
-    .login-form .input-group input:focus {
-      border-color: #f7c948;
-      box-shadow: 0 0 0 3px rgba(247, 201, 72, 0.15);
-      background: #1f2a35;
-    }
+        .form-group input,
+        .form-group select,
+        .form-group textarea {
+            background: #1f2a35;
+            border: 1px solid #2a3a48;
+            border-radius: 10px;
+            padding: 10px 14px;
+            color: #fff;
+            font-size: 14px;
+            outline: none;
+            transition: 0.2s;
+        }
 
-    .login-form .input-group input::placeholder {
-      color: #5f7387;
-      font-weight: 400;
-      font-size: 14px;
-    }
+        .form-group input:focus,
+        .form-group select:focus,
+        .form-group textarea:focus {
+            border-color: #f7c948;
+            box-shadow: 0 0 0 3px rgba(247, 201, 72, 0.1);
+        }
 
-    /* ========== TÙY CHỌN ========== */
-    .form-options {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin: 14px 0 26px;
-      font-size: 14px;
-      color: #b0c4d8;
-    }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 60px;
+        }
 
-    .form-options label {
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      cursor: pointer;
-    }
+        .btn-primary {
+            background: #f7c948;
+            color: #0b0e14;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 40px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: 0.2s;
+            font-size: 15px;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .btn-primary:hover {
+            background: #ffda6b;
+            transform: scale(1.02);
+        }
 
-    .form-options label input[type="checkbox"] {
-      accent-color: #f7c948;
-      width: 17px;
-      height: 17px;
-      cursor: pointer;
-    }
+        .btn-danger {
+            background: #ff6b6b;
+            color: #fff;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 30px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-danger:hover {
+            background: #e55555;
+        }
 
-    .form-options a {
-      color: #f7c948;
-      text-decoration: none;
-      font-weight: 500;
-      transition: 0.2s;
-    }
+        /* ========== BẢNG ========== */
+        .table-wrap {
+            overflow-x: auto;
+        }
 
-    .form-options a:hover {
-      color: #ffda6b;
-      text-decoration: underline;
-    }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+        }
 
-    /* ========== NÚT ĐĂNG NHẬP ========== */
-    .btn-login {
-      width: 100%;
-      padding: 15px;
-      background: #f7c948;
-      border: none;
-      border-radius: 40px;
-      font-size: 17px;
-      font-weight: 700;
-      color: #0b0e14;
-      cursor: pointer;
-      transition: 0.2s ease;
-      letter-spacing: 0.5px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 4px;
-    }
+        table th {
+            text-align: left;
+            padding: 12px 12px;
+            background: #1f2a35;
+            color: #b0c4d8;
+            font-weight: 600;
+            border-bottom: 2px solid #2a3a48;
+        }
 
-    .btn-login:hover {
-      background: #ffd95e;
-      transform: scale(1.01);
-      box-shadow: 0 8px 28px rgba(247, 201, 72, 0.25);
-    }
+        table td {
+            padding: 12px 12px;
+            border-bottom: 1px solid #1f2a35;
+            vertical-align: middle;
+        }
 
-    .btn-login:active {
-      transform: scale(0.97);
-    }
+        table tr:hover td {
+            background: #1a232e;
+        }
 
-    /* ========== HOẶC ========== */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-      margin: 26px 0 22px;
-      color: #4f6479;
-      font-size: 13px;
-      font-weight: 500;
-    }
+        .status-badge {
+            padding: 4px 14px;
+            border-radius: 40px;
+            font-size: 12px;
+            font-weight: 600;
+            display: inline-block;
+        }
 
-    .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: #2a3a48;
-    }
+        .status-badge.success {
+            background: #1b5e3a;
+            color: #81c784;
+        }
+        .status-badge.pending {
+            background: #5e4a1b;
+            color: #ffd54f;
+        }
+        .status-badge.failed {
+            background: #5e1b1b;
+            color: #ff6b6b;
+        }
 
-    /* ========== ĐĂNG KÝ ========== */
-    .register-link {
-      text-align: center;
-      color: #b0c4d8;
-      font-size: 15px;
-    }
+        .product-img {
+            width: 50px;
+            height: 50px;
+            object-fit: cover;
+            border-radius: 8px;
+            background: #1f2a35;
+        }
 
-    .register-link a {
-      color: #f7c948;
-      font-weight: 600;
-      text-decoration: none;
-      margin-left: 4px;
-      transition: 0.2s;
-    }
+        /* ========== THỐNG KÊ ========== */
+        .stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 16px;
+            margin-bottom: 24px;
+        }
 
-    .register-link a:hover {
-      color: #ffda6b;
-      text-decoration: underline;
-    }
+        .stat-item {
+            background: #1f2a35;
+            padding: 18px 20px;
+            border-radius: 14px;
+            border-left: 4px solid #f7c948;
+        }
 
-    /* ========== THÔNG BÁO LỖI ========== */
-    .error-message {
-      background: rgba(255, 70, 70, 0.15);
-      border: 1px solid #ff4646;
-      color: #ff6b6b;
-      padding: 12px 16px;
-      border-radius: 12px;
-      font-size: 14px;
-      margin-bottom: 18px;
-      display: none;
-      align-items: center;
-      gap: 10px;
-    }
+        .stat-item .number {
+            font-size: 28px;
+            font-weight: 700;
+            color: #fff;
+        }
 
-    .error-message.show {
-      display: flex;
-    }
+        .stat-item .label {
+            font-size: 13px;
+            color: #8899aa;
+            margin-top: 4px;
+        }
 
-    .error-message i {
-      font-size: 18px;
-    }
-
-    /* ========== RESPONSIVE ========== */
-    @media (max-width: 460px) {
-      .login-container {
-        padding: 28px 18px 28px;
-      }
-
-      .form-title h1 {
-        font-size: 22px;
-      }
-
-      .shop-header .logo {
-        font-size: 18px;
-      }
-
-      .shop-header .badge {
-        font-size: 10px;
-        padding: 3px 10px;
-      }
-
-      .form-options {
-        flex-wrap: wrap;
-        gap: 10px;
-      }
-    }
-  </style>
+        /* ========== RESPONSIVE ========== */
+        @media (max-width: 600px) {
+            .header {
+                flex-direction: column;
+                align-items: flex-start;
+            }
+            .form-group {
+                grid-template-columns: 1fr;
+            }
+            .tabs button {
+                padding: 8px 16px;
+                font-size: 13px;
+            }
+            .stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="login-container">
 
-    <!-- HEADER: Logo + Badge -->
-    <div class="shop-header">
-      <div class="logo">
-        <i class="fas fa-store-alt"></i>
-        <span>GameShop</span>
-      </div>
-      <span class="badge"><i class="fas fa-gamepad"></i> VIP</span>
+    <div class="container" id="app">
+
+        <!-- ===== HEADER ===== -->
+        <div class="header">
+            <div class="logo">
+                <i class="fas fa-store-alt"></i> GameShop Admin
+            </div>
+            <div class="user-info">
+                <i class="fas fa-user-cog"></i>
+                <span id="adminName">admin19</span>
+                <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> Đăng xuất</button>
+            </div>
+        </div>
+
+        <!-- ===== TABS ===== -->
+        <div class="tabs" id="tabButtons">
+            <button class="active" data-tab="dashboard"><i class="fas fa-chart-pie"></i> Tổng quan</button>
+            <button data-tab="products"><i class="fas fa-box"></i> Sản phẩm</button>
+            <button data-tab="add-product"><i class="fas fa-plus-circle"></i> Đăng bán</button>
+            <button data-tab="recharge"><i class="fas fa-credit-card"></i> Nạp thẻ / Bank</button>
+            <button data-tab="history"><i class="fas fa-history"></i> Lịch sử</button>
+        </div>
+
+        <!-- ===== PANEL: TỔNG QUAN ===== -->
+        <div class="panel active" id="panel-dashboard">
+            <div class="stats" id="statsContainer">
+                <div class="stat-item">
+                    <div class="number" id="totalProducts">0</div>
+                    <div class="label"><i class="fas fa-box"></i> Tổng sản phẩm</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="totalOrders">0</div>
+                    <div class="label"><i class="fas fa-shopping-cart"></i> Đơn hàng</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="totalRevenue">0đ</div>
+                    <div class="label"><i class="fas fa-coins"></i> Doanh thu</div>
+                </div>
+                <div class="stat-item">
+                    <div class="number" id="pendingOrders">0</div>
+                    <div class="label"><i class="fas fa-clock"></i> Chờ xử lý</div>
+                </div>
+            </div>
+            <div class="card">
+                <h2><i class="fas fa-clock"></i> Đơn hàng gần đây</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Mã</th>
+                                <th>Khách hàng</th>
+                                <th>Sản phẩm</th>
+                                <th>Tổng</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody id="recentOrders"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PANEL: SẢN PHẨM ===== -->
+        <div class="panel" id="panel-products">
+            <div class="card">
+                <h2><i class="fas fa-list"></i> Danh sách sản phẩm</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Ảnh</th>
+                                <th>Tên</th>
+                                <th>Danh mục</th>
+                                <th>Giá</th>
+                                <th>Hành động</th>
+                            </tr>
+                        </thead>
+                        <tbody id="productList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PANEL: ĐĂNG BÁN ===== -->
+        <div class="panel" id="panel-add-product">
+            <div class="card">
+                <h2><i class="fas fa-plus-circle"></i> Đăng sản phẩm mới</h2>
+                <form id="productForm">
+                    <div class="form-group">
+                        <label>
+                            Tên sản phẩm
+                            <input type="text" id="pName" placeholder="Áo thun..." required />
+                        </label>
+                        <label>
+                            Danh mục
+                            <select id="pCategory">
+                                <option value="áo">Áo</option>
+                                <option value="quần">Quần</option>
+                                <option value="phụ kiện">Phụ kiện</option>
+                                <option value="khác">Khác</option>
+                            </select>
+                        </label>
+                        <label>
+                            Giá (VNĐ)
+                            <input type="number" id="pPrice" placeholder="250000" required />
+                        </label>
+                        <label>
+                            Ảnh (URL)
+                            <input type="text" id="pImage" placeholder="https://picsum.photos/seed/1/400/400" />
+                        </label>
+                    </div>
+                    <label style="display:block; margin-bottom:12px; color:#b0c4d8; font-weight:600;">
+                        Mô tả
+                        <textarea id="pDesc" rows="2" placeholder="Mô tả sản phẩm..."></textarea>
+                    </label>
+                    <button type="submit" class="btn-primary"><i class="fas fa-save"></i> Đăng sản phẩm</button>
+                </form>
+            </div>
+        </div>
+
+        <!-- ===== PANEL: NẠP THẺ / BANK ===== -->
+        <div class="panel" id="panel-recharge">
+            <div class="card">
+                <h2><i class="fas fa-credit-card"></i> Nạp tiền cho khách</h2>
+                <form id="rechargeForm">
+                    <div class="form-group">
+                        <label>
+                            Tên khách hàng
+                            <input type="text" id="rCustomer" placeholder="Nguyễn Văn A" required />
+                        </label>
+                        <label>
+                            Số tiền (VNĐ)
+                            <input type="number" id="rAmount" placeholder="100000" required />
+                        </label>
+                        <label>
+                            Phương thức
+                            <select id="rMethod">
+                                <option value="thẻ cào">Thẻ cào</option>
+                                <option value="bank">Chuyển khoản Bank</option>
+                                <option value="momo">MoMo</option>
+                            </select>
+                        </label>
+                        <label>
+                            Trạng thái
+                            <select id="rStatus">
+                                <option value="success">Thành công</option>
+                                <option value="pending">Đang xử lý</option>
+                                <option value="failed">Thất bại</option>
+                            </select>
+                        </label>
+                    </div>
+                    <button type="submit" class="btn-primary"><i class="fas fa-plus"></i> Thêm giao dịch</button>
+                </form>
+            </div>
+
+            <div class="card">
+                <h2><i class="fas fa-exchange-alt"></i> Giao dịch gần đây</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Khách hàng</th>
+                                <th>Số tiền</th>
+                                <th>Phương thức</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày</th>
+                            </tr>
+                        </thead>
+                        <tbody id="rechargeList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- ===== PANEL: LỊCH SỬ ===== -->
+        <div class="panel" id="panel-history">
+            <div class="card">
+                <h2><i class="fas fa-history"></i> Lịch sử hoạt động</h2>
+                <div class="table-wrap">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Thời gian</th>
+                                <th>Hành động</th>
+                                <th>Chi tiết</th>
+                                <th>Người thực hiện</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyList"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- TIÊU ĐỀ -->
-    <div class="form-title">
-      <h1>Đăng Nhập</h1>
-      <p>Chào mừng bạn quay lại!</p>
-    </div>
+    <script>
+        // ============================================================
+        //  DỮ LIỆU MẪU (LƯU TRONG localStorage)
+        // ============================================================
 
-    <!-- FORM -->
-    <form class="login-form" id="loginForm">
-      <!-- Thông báo lỗi -->
-      <div class="error-message" id="errorMessage">
-        <i class="fas fa-exclamation-circle"></i>
-        <span id="errorText">Sai tên đăng nhập hoặc mật khẩu</span>
-      </div>
+        // Khởi tạo dữ liệu nếu chưa có
+        function initData() {
+            if (!localStorage.getItem('shopProducts')) {
+                const defaultProducts = [
+                    { id: 1, name: 'Áo thun trắng', category: 'áo', price: 250000, image: 'https://picsum.photos/seed/1/400/400',
+                        desc: 'Áo thun chất liệu cotton cao cấp' },
+                    { id: 2, name: 'Quần jean xanh', category: 'quần', price: 450000,
+                        image: 'https://picsum.photos/seed/3/400/400', desc: 'Quần jean ống suông' },
+                    { id: 3, name: 'Mũ lưỡi trai', category: 'phụ kiện', price: 150000,
+                        image: 'https://picsum.photos/seed/5/400/400', desc: 'Mũ vải denim' },
+                ];
+                localStorage.setItem('shopProducts', JSON.stringify(defaultProducts));
+            }
 
-      <div class="input-group">
-        <label for="username">Tên đăng nhập / Email</label>
-        <input type="text" id="username" placeholder="Nhập tên hoặc email" required>
-      </div>
+            if (!localStorage.getItem('shopRecharges')) {
+                const defaultRecharges = [
+                    { id: 1, customer: 'Trần Văn B', amount: 200000, method: 'bank', status: 'success',
+                        date: new Date().toLocaleString() },
+                    { id: 2, customer: 'Lê Thị C', amount: 50000, method: 'thẻ cào', status: 'pending',
+                        date: new Date().toLocaleString() },
+                ];
+                localStorage.setItem('shopRecharges', JSON.stringify(defaultRecharges));
+            }
 
-      <div class="input-group">
-        <label for="password">Mật khẩu</label>
-        <input type="password" id="password" placeholder="••••••••" required>
-      </div>
+            if (!localStorage.getItem('shopHistory')) {
+                const defaultHistory = [
+                    { time: new Date().toLocaleString(), action: 'Đăng nhập', detail: 'Admin đăng nhập hệ thống',
+                        user: 'admin19' },
+                    { time: new Date().toLocaleString(), action: 'Thêm sản phẩm', detail: 'Thêm áo thun trắng',
+                        user: 'admin19' },
+                ];
+                localStorage.setItem('shopHistory', JSON.stringify(defaultHistory));
+            }
 
-      <!-- Tùy chọn -->
-      <div class="form-options">
-        <label>
-          <input type="checkbox" checked> Nhớ tài khoản
-        </label>
-        <a href="#">Quên mật khẩu?</a>
-      </div>
+            if (!localStorage.getItem('shopOrders')) {
+                const defaultOrders = [
+                    { id: 1, customer: 'Nguyễn Văn A', product: 'Áo thun trắng', total: 250000, status: 'success',
+                        date: new Date().toLocaleString() },
+                    { id: 2, customer: 'Phạm Thị D', product: 'Quần jean xanh', total: 450000, status: 'pending',
+                        date: new Date().toLocaleString() },
+                ];
+                localStorage.setItem('shopOrders', JSON.stringify(defaultOrders));
+            }
+        }
+        initData();
 
-      <!-- Nút đăng nhập -->
-      <button type="submit" class="btn-login">
-        <i class="fas fa-sign-in-alt"></i> Đăng Nhập
-      </button>
-    </form>
+        // ============================================================
+        //  HÀM TIỆN ÍCH
+        // ============================================================
 
-    <!-- HOẶC -->
-    <div class="divider">hoặc</div>
+        function getData(key) {
+            return JSON.parse(localStorage.getItem(key)) || [];
+        }
 
-    <!-- ĐĂNG KÝ -->
-    <div class="register-link">
-      Chưa có tài khoản?
-      <a href="#">Đăng ký ngay</a>
-    </div>
+        function setData(key, data) {
+            localStorage.setItem(key, JSON.stringify(data));
+        }
 
-  </div>
-
-  <script>
-    // ========== TÀI KHOẢN ADMIN ==========
-    const ADMIN_ACCOUNT = {
-      username: 'admin19',
-      password: 'xuanthanh'
-    };
-
-    // ========== XỬ LÝ ĐĂNG NHẬP ==========
-    document.getElementById('loginForm').addEventListener('submit', function(e) {
-      e.preventDefault();
-      
-      const username = document.getElementById('username').value.trim();
-      const password = document.getElementById('password').value.trim();
-      const errorMessage = document.getElementById('errorMessage');
-      const errorText = document.getElementById('errorText');
-
-      // Ẩn thông báo lỗi cũ
-      errorMessage.classList.remove('show');
-
-      // Kiểm tra trống
-      if (!username || !password) {
-        errorText.textContent = 'Vui lòng điền đầy đủ tên đăng nhập và mật khẩu.';
-        errorMessage.classList.add('show');
-        return;
-      }
-
-      // Kiểm tra tài khoản admin
-      if (username === ADMIN_ACCOUNT.username && password === ADMIN_ACCOUNT.password) {
-        // Đăng nhập thành công
-        alert(`✅ Đăng nhập thành công!\nChào mừng Admin ${username} quay lại!`);
-        
-        // Lưu trạng thái đăng nhập (ví dụ: localStorage)
-        localStorage.setItem('isLoggedIn', 'true');
-        localStorage.setItem('username', username);
-        
-        // Chuyển hướng đến trang quản trị (giả lập)
-        // window.location.href = '/admin/dashboard';
-        
-        // Hoặc hiển thị giao diện admin (demo)
-        document.querySelector('.login-container').innerHTML = `
-          <div style="text-align: center; padding: 30px 0;">
-            <i class="fas fa-check-circle" style="font-size: 64px; color: #4caf50;"></i>
-            <h2 style="color: #fff; margin-top: 16px;">Đăng nhập thành công!</h2>
-            <p style="color: #b0c4d8; margin: 8px 0 20px;">Chào mừng <strong style="color: #f7c948;">${username}</strong></p>
-            <button onclick="location.reload()" style="background: #f7c948; border: none; padding: 12px 32px; border-radius: 40px; font-weight: 700; cursor: pointer; font-size: 15px;">
-              <i class="fas fa-sign-out-alt"></i> Đăng xuất
-            </button>
-          </div>
-        `;
-        return;
-      }
-
-      // Sai tài khoản hoặc mật khẩu
-      errorText.textContent = 'Sai tên đăng nhập hoặc mật khẩu. Vui lòng thử lại!';
-      errorMessage.classList.add('show');
-      
-      // Xóa trống trường mật khẩu để nhập lại
-      document.getElementById('password').value = '';
-      document.getElementById('password').focus();
-    });
-
-    // ========== HIỂN THỊ MẬT KHẨU (TÙY CHỌN) ==========
-    // Có thể thêm icon mắt để show/hide password nếu muốn
-    // ========== THÊM PHÍM ENTER ==========
-    document.getElementById('password').addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        document.getElementById('loginForm').dispatchEvent(new Event('submit'));
-      }
-    });
-
-    // ========== KIỂM TRA TRẠNG THÁI ĐĂNG NHẬP ==========
-    window.addEventListener('load', function() {
-      const isLoggedIn = localStorage.getItem('isLoggedIn');
-      const username = localStorage.getItem('username');
-      
-      if (isLoggedIn === 'true' && username) {
-        // Tự động đăng nhập (nếu đã lưu)
-        // Có thể chuyển hướng hoặc hiển thị giao diện admin
-        console.log(`Đã đăng nhập với tài khoản: ${username}`);
-      }
-    });
-  </script>
-</body>
-  </html>
+        function formatPr
