@@ -1,255 +1,345 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width,initial-scale=1.0">
-    <title>ANNIE GAG2 SHOP</title>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-app.js"></script>
-    <script src="https://www.gstatic.com/firebasejs/8.10.0/firebase-database.js"></script>
-    <style>
-        *{box-sizing:border-box;margin:0;padding:0;font-family:sans-serif}
-        body{background:#0d1627;color:#fff;padding-bottom:20px}
-        .container{max-width:500px;margin:0 auto;padding:8px}
-        .top-nav,.main-nav,.item{display:flex;align-items:center;justify-content:space-between}
-        .top-nav{padding:4px 0;font-size:.8rem}
-        .top-nav a{color:#4da6ff;text-decoration:none;font-weight:600;cursor:pointer;margin-left:8px}
-        .main-nav{padding:6px 10px;border-bottom:1px solid #1a283d;margin-bottom:10px;background:#132238;border-radius:6px}
-        .main-nav a{color:#4da6ff;text-decoration:none;font-weight:700;font-size:.8rem}
-        .support{background:#132238;border-radius:5px;padding:5px;margin-bottom:10px;font-size:.72rem}
-        .support a{color:#ffca28;margin:0 4px}
-        .logo{text-align:center;margin:6px 0 10px}
-        .logo h1{color:#ffcc00;font-size:1.5rem}
-        .box{background:#132238;border:1px solid #1e3250;border-radius:6px;padding:8px;margin-bottom:10px}
-        .admin{border:1px solid #ffcc00;background:#18283f;display:none}
-        .title{font-size:.85rem;font-weight:bold;color:#ff4081;margin-bottom:6px}
-        .ctrl{width:100%;padding:5px;background:#0b1320;border:1px solid #1f334d;border-radius:4px;color:#fff;font-size:.78rem;outline:none;margin-bottom:5px}
-        .btn{border:none;border-radius:4px;font-weight:bold;cursor:pointer;color:#fff;padding:4px 6px;font-size:.72rem}
-        .b-pink{background:#ff4081}
-        .b-green{background:#26a69a}
-        .b-red{background:#e53935;margin-left:2px}
-        .b-yellow{background:#f57c00}
-        .bank-info{background:#1a2c42;border-radius:4px;padding:6px;margin-bottom:6px;font-size:.75rem}
-        .prod{gap:8px;padding:6px 0;border-bottom:1px solid #1a2c42;display:flex;align-items:center}
-        .p-img{width:50px;height:50px;border-radius:4px;object-fit:cover;background:#1a2c42;border:1px solid #ff4081;flex-shrink:0}
-        .p-info{flex:1}
-        .p-sl{color:#4caf50;font-weight:bold;font-size:.7rem;margin-top:2px}
-        .empty{text-align:center;color:#9ca3af;padding:4px 0;font-size:.72rem}
-        .modal{display:none;position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,.7);justify-content:center;align-items:center;z-index:1000}
-        .m-body{background:#132238;border:1px solid #1e3250;border-radius:6px;width:92%;max-width:360px;padding:10px;position:relative;max-height:85vh;overflow-y:auto}
-        .close{position:absolute;top:2px;right:6px;font-size:1.1rem;color:#aaa;cursor:pointer}
-        .tag{padding:1px 3px;border-radius:2px;font-weight:bold;font-size:.65rem}
-        .t-wait{background:#ff9800;color:#000}
-        .t-ok{background:#4caf50;color:#fff}
-        .t-no{background:#e53935;color:#fff}
-        .sl-mua{display:flex;gap:8px;align-items:center;margin:6px 0}
-        .sl-mua input{width:80px;text-align:center}
-        .thongbao{position:fixed;top:15px;left:50%;transform:translateX(-50%);background:#26a69a;color:#fff;padding:10px 20px;border-radius:6px;z-index:9999;display:none;font-weight:bold;box-shadow:0 0 10px rgba(0,0,0,0.5)}
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Đăng Nhập | GameShop</title>
+  <!-- Font Awesome cho icon -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    /* ========== RESET & FONT ========== */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      font-family: 'Segoe UI', Roboto, system-ui, sans-serif;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: #0b0e14;
+      background-image: radial-gradient(circle at 20% 30%, #1a2634 0%, #0b0e14 80%);
+      padding: 20px;
+    }
+
+    /* ========== CONTAINER CHÍNH ========== */
+    .login-container {
+      background: #141b24;
+      width: 100%;
+      max-width: 420px;
+      padding: 40px 32px 36px;
+      border-radius: 24px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(255, 255, 255, 0.03);
+      transition: 0.25s ease;
+    }
+
+    /* ========== HEADER / LOGO ========== */
+    .shop-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 28px;
+      color: #b7c9d9;
+    }
+
+    .shop-header .logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 22px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: 0.5px;
+    }
+
+    .shop-header .logo i {
+      color: #f7c948;
+      font-size: 26px;
+    }
+
+    .shop-header .badge {
+      background: #f7c948;
+      color: #0b0e14;
+      padding: 4px 12px;
+      border-radius: 40px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+    }
+
+    /* ========== TIÊU ĐỀ FORM ========== */
+    .form-title {
+      margin-bottom: 28px;
+    }
+
+    .form-title h1 {
+      font-size: 26px;
+      font-weight: 700;
+      color: #ffffff;
+      letter-spacing: -0.3px;
+    }
+
+    .form-title p {
+      color: #8899aa;
+      font-size: 15px;
+      margin-top: 6px;
+    }
+
+    /* ========== FORM ========== */
+    .login-form .input-group {
+      margin-bottom: 18px;
+      position: relative;
+    }
+
+    .login-form .input-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 600;
+      color: #c8d6e5;
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+    }
+
+    .login-form .input-group input {
+      width: 100%;
+      padding: 14px 16px;
+      background: #1f2a35;
+      border: 1px solid #2a3a48;
+      border-radius: 14px;
+      color: #ffffff;
+      font-size: 15px;
+      outline: none;
+      transition: 0.2s ease;
+    }
+
+    .login-form .input-group input:focus {
+      border-color: #f7c948;
+      box-shadow: 0 0 0 3px rgba(247, 201, 72, 0.15);
+      background: #1f2a35;
+    }
+
+    .login-form .input-group input::placeholder {
+      color: #5f7387;
+      font-weight: 400;
+      font-size: 14px;
+    }
+
+    /* ========== TÙY CHỌN ========== */
+    .form-options {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 14px 0 26px;
+      font-size: 14px;
+      color: #b0c4d8;
+    }
+
+    .form-options label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .form-options label input[type="checkbox"] {
+      accent-color: #f7c948;
+      width: 17px;
+      height: 17px;
+      cursor: pointer;
+    }
+
+    .form-options a {
+      color: #f7c948;
+      text-decoration: none;
+      font-weight: 500;
+      transition: 0.2s;
+    }
+
+    .form-options a:hover {
+      color: #ffda6b;
+      text-decoration: underline;
+    }
+
+    /* ========== NÚT ĐĂNG NHẬP ========== */
+    .btn-login {
+      width: 100%;
+      padding: 15px;
+      background: #f7c948;
+      border: none;
+      border-radius: 40px;
+      font-size: 17px;
+      font-weight: 700;
+      color: #0b0e14;
+      cursor: pointer;
+      transition: 0.2s ease;
+      letter-spacing: 0.5px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .btn-login:hover {
+      background: #ffd95e;
+      transform: scale(1.01);
+      box-shadow: 0 8px 28px rgba(247, 201, 72, 0.25);
+    }
+
+    .btn-login:active {
+      transform: scale(0.97);
+    }
+
+    /* ========== HOẶC ========== */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      margin: 26px 0 22px;
+      color: #4f6479;
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .divider::before,
+    .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: #2a3a48;
+    }
+
+    /* ========== ĐĂNG KÝ ========== */
+    .register-link {
+      text-align: center;
+      color: #b0c4d8;
+      font-size: 15px;
+    }
+
+    .register-link a {
+      color: #f7c948;
+      font-weight: 600;
+      text-decoration: none;
+      margin-left: 4px;
+      transition: 0.2s;
+    }
+
+    .register-link a:hover {
+      color: #ffda6b;
+      text-decoration: underline;
+    }
+
+    /* ========== RESPONSIVE ========== */
+    @media (max-width: 460px) {
+      .login-container {
+        padding: 28px 18px 28px;
+      }
+
+      .form-title h1 {
+        font-size: 22px;
+      }
+
+      .shop-header .logo {
+        font-size: 18px;
+      }
+
+      .shop-header .badge {
+        font-size: 10px;
+        padding: 3px 10px;
+      }
+
+      .form-options {
+        flex-wrap: wrap;
+        gap: 10px;
+      }
+    }
+  </style>
 </head>
 <body>
-<div class="thongbao" id="thongbao"></div>
-<div class="container">
-  <div class="top-nav">
-    <div id="u-status" style="font-weight:bold;color:#ffcc00">👤 Khách hàng</div>
-    <div>
-      <button id="btn-ad" class="btn b-yellow" style="display:none;margin-right:4px;" onclick="adShow()">⚙️ Admin</button>
-      <a id="btn-reg" onclick="openM('reg')">📝 Đăng Ký</a> 
-      <a id="btn-log" onclick="openM('login')">🔐 Đăng Nhập</a> 
-      <a id="btn-out" style="display:none;color:#e53935" onclick="out()">🚪 Thoát</a>
-    </div>
-  </div>
-  <div class="main-nav">
-    <a href="#nap-the">Nạp Thẻ</a>
-    <a href="#nap-bank">Ngân Hàng</a>
-    <a href="#sp">Sản Phẩm</a>
-    <a href="#don">Đơn Hàng</a>
-  </div>
-  <div class="support">📞 Hỗ trợ: <a href="https://www.facebook.com/share/1CFAzF9o2r/" target="_blank">FB Xuân Thành</a> | <a href="https://discord.gg/rscNF8X57" target="_blank">Discord</a></div>
-  <div class="logo"><h1>🛒 ANNIE GAG2 SHOP</h1></div>
+  <div class="login-container">
 
-  <div id="ad-pan" class="box admin">
-    <div class="title" style="display:flex;justify-content:space-between">⚙️ QUẢN LÝ <button class="btn b-red" onclick="adShow()">✖</button></div>
-    <form onsubmit="congTien(event)">
-      <h5 style="font-size:.75rem;color:#ffcc00;margin-bottom:4px">💰 CỘNG TIỀN</h5>
-      <input class="ctrl" id="tk-kh" placeholder="Tài khoản khách" required>
-      <input type="number" class="ctrl" id="so-tien" placeholder="Số tiền" required>
-      <button class="btn b-green" style="width:100%">💵 Cộng</button>
+    <!-- HEADER: Logo + Badge -->
+    <div class="shop-header">
+      <div class="logo">
+        <i class="fas fa-store-alt"></i>
+        <span>GameShop</span>
+      </div>
+      <span class="badge"><i class="fas fa-gamepad"></i> VIP</span>
+    </div>
+
+    <!-- TIÊU ĐỀ -->
+    <div class="form-title">
+      <h1>Đăng Nhập</h1>
+      <p>Chào mừng bạn quay lại!</p>
+    </div>
+
+    <!-- FORM -->
+    <form class="login-form" id="loginForm">
+      <div class="input-group">
+        <label for="username">Tên đăng nhập / Email</label>
+        <input type="text" id="username" placeholder="Nhập tên hoặc email" required>
+      </div>
+
+      <div class="input-group">
+        <label for="password">Mật khẩu</label>
+        <input type="password" id="password" placeholder="••••••••" required>
+      </div>
+
+      <!-- Tùy chọn -->
+      <div class="form-options">
+        <label>
+          <input type="checkbox" checked> Nhớ tài khoản
+        </label>
+        <a href="#">Quên mật khẩu?</a>
+      </div>
+
+      <!-- Nút đăng nhập -->
+      <button type="submit" class="btn-login">
+        <i class="fas fa-sign-in-alt"></i> Đăng Nhập
+      </button>
     </form>
-    <div style="margin-bottom:8px">
-      <h5 style="font-size:.75rem;color:#ff9800;margin-bottom:4px">📱 DUYỆT THẺ</h5>
-      <div id="list-the"></div>
+
+    <!-- HOẶC -->
+    <div class="divider">hoặc</div>
+
+    <!-- ĐĂNG KÝ -->
+    <div class="register-link">
+      Chưa có tài khoản?
+      <a href="#">Đăng ký ngay</a>
     </div>
-    <div style="margin-bottom:8px">
-      <h5 style="font-size:.75rem;color:#4da6ff;margin-bottom:4px">💳 DUYỆT CHUYỂN KHOẢN</h5>
-      <div id="list-bank"></div>
-    </div>
-    <form onsubmit="themSP(event)">
-      <h5 style="font-size:.75rem;color:#ff4081;margin-bottom:4px">🛒 ĐĂNG SẢN PHẨM</h5>
-      <input class="ctrl" id="ten-sp" placeholder="Tên sản phẩm" required>
-      <input class="ctrl" id="gia-sp" placeholder="Giá (VD: 20k)" required>
-      <input type="number" class="ctrl" id="sl-sp" placeholder="Số lượng có sẵn" required min="1">
-      <input class="ctrl" id="anh-sp" placeholder="Link ảnh">
-      <button class="btn b-pink" style="width:100%">➕ Đăng</button>
-    </form>
+
   </div>
 
-  <div id="nap-the" class="box">
-    <div class="title">📱 NẠP THẺ CÀO <small style="color:#ff9800">(Tối thiểu 20.000đ)</small></div>
-    <form onsubmit="guiThe(event)">
-      <select class="ctrl" id="loai-the"><option>Viettel</option><option>Vinaphone</option><option>Mobifone</option></select>
-      <select class="ctrl" id="menh-gia">
-        <option value="20000">20.000đ</option>
-        <option value="30000">30.000đ</option>
-        <option value="50000">50.000đ</option>
-        <option value="100000">100.000đ</option>
-      </select>
-      <input class="ctrl" placeholder="Mã thẻ" id="ma-the" required>
-      <input class="ctrl" placeholder="Số seri" id="seri-the" required>
-      <button class="btn b-pink" style="width:100%">✅ Gửi Nạp</button>
-    </form>
-  </div>
+  <script>
+    // Xử lý sự kiện submit form (hiển thị thông báo demo)
+    document.getElementById('loginForm').addEventListener('submit', function(e) {
+      e.preventDefault();
+      const username = document.getElementById('username').value.trim();
+      const password = document.getElementById('password').value.trim();
 
-  <div id="nap-bank" class="box">
-    <div class="title">💳 NẠP NGÂN HÀNG</div>
-    <div class="bank-info">
-      <p>📌 STK: <strong>0985537559</strong></p>
-      <p>📌 CTK: <strong>Nguyễn Xuân Thành</strong></p>
-      <p>📌 Nội dung: <strong style="color:#ffcc00" id="nd-chuyen">NAP + Tên TK</strong></p>
-    </div>
-    <button class="btn b-green" style="width:100%" onclick="guiBank()">💸 Đã Chuyển Khoản</button>
-  </div>
+      if (!username || !password) {
+        alert('⚠️ Vui lòng điền đầy đủ tên đăng nhập và mật khẩu.');
+        return;
+      }
 
-  <div id="sp" class="box"><div class="title">🛒 SẢN PHẨM</div><div id="list-sp"></div></div>
-  <div id="don" class="box"><div class="title">📋 ĐƠN HÀNG CHỜ DUYỆT</div><div id="list-don"></div></div>
-</div>
+      // Giả lập đăng nhập thành công
+      alert(`✅ Đăng nhập thành công!\nChào mừng ${username} quay lại!`);
+      // Ở đây bạn có thể chuyển hướng hoặc gửi dữ liệu lên server
+      // window.location.href = '/dashboard';
+    });
 
-<div id="login" class="modal"><div class="m-body"><span class="close" onclick="closeM('login')">&times;</span><h4 style="color:#ff4081">Đăng Nhập</h4><form onsubmit="nhap(event)"><input class="ctrl" id="tk" placeholder="Tài khoản" required><input type="password" class="ctrl" id="mk" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Vào</button></form></div></div>
-<div id="reg" class="modal"><div class="m-body"><span class="close" onclick="closeM('reg')">&times;</span><h4 style="color:#4da6ff">Đăng Ký</h4><form onsubmit="tao(event)"><input class="ctrl" id="tk-moi" placeholder="Tài khoản mới" required><input type="password" class="ctrl" id="mk-moi" placeholder="Mật khẩu" required><button class="btn b-pink" style="width:100%">Tạo</button></form></div></div>
-<div id="mua" class="modal"><div class="m-body"><span class="close" onclick="closeM('mua')">&times;</span><h4 style="color:#26a69a">Mua Hàng</h4><form onsubmit="xacNhan(event)">
-  <div id="tt-mua" style="font-size:.8rem;color:#ffcc00;margin-bottom:8px"></div>
-  <div class="sl-mua">
-    <span>Số lượng mua:</span>
-    <input type="number" class="ctrl" id="sl-mua" min="1" value="1" oninput="tinhTong()">
-  </div>
-  <div id="tong-tien" style="font-weight:bold;color:#ff4081;margin-bottom:8px"></div>
-  <input class="ctrl" id="tk-rb" placeholder="Tài khoản Roblox" required>
-  <button class="btn b-green" style="width:100%">✅ Xác Nhận Mua</button>
-</form></div></div>
-
-<script>
-const firebaseConfig = {
-  apiKey: "AIzaSyCdmkb-hoRllGGnTp8t1XNlBODtaYTQnWg",
-  authDomain: "annie-gag2-shop.firebaseapp.com",
-  databaseURL: "https://annie-gag2-shop-default-rtdb.asia-southeast1.firebasedatabase.app",
-  projectId: "annie-gag2-shop",
-  storageBucket: "annie-gag2-shop.firebasestorage.app",
-  messagingSenderId: "178028797329",
-  appId: "1:178028797329:web:5b3b8481e753593d8d4e30",
-  measurementId: "G-01RPNSJT9X"
-};
-firebase.initializeApp(firebaseConfig);
-const db = firebase.database();
-
-const AD={u:'xuanthanh',p:'20122014'};
-let ad=false, tk=null, spMua=null, donGia=0;
-
-const docDS = async ten => (await db.ref(ten).once('value')).val() || [];
-const luuDS = (ten, ds) => db.ref(ten).set(ds);
-
-const gia=s=>String(s).replace(/[^0-9k]/gi,'').replace('k','000')*1||0;
-const soDu=async u=>{let ds=await docDS('tai_khoan');return ds[u]?.tien||0};
-const cong=async(u,v)=>{let ds=await docDS('tai_khoan');if(!ds[u])ds[u]={tien:0};ds[u].tien+=v;luuDS('tai_khoan',ds)};
-
-function hienThongBao(noidung){
-  const tb=document.getElementById('thongbao');
-  tb.innerText=noidung;
-  tb.style.display='block';
-  setTimeout(()=>tb.style.display='none',4000);
-}
-
-function capNhat(){
-  document.getElementById('u-status').innerText=ad?'👑 ADMIN':tk?`👤 ${tk}`:'👤 Khách';
-  document.getElementById('btn-ad').style.display=ad?'inline':'none';
-  document.getElementById('ad-pan').style.display=ad?'block':'none';
-  document.getElementById('btn-reg').style.display=document.getElementById('btn-log').style.display=tk?'none':'inline';
-  document.getElementById('btn-out').style.display=tk?'inline':'none';
-  document.getElementById('nd-chuyen').innerText=`NAP ${tk||'TÊN_TK'}`;
-  hienSP();hienDon();hienBank();hienThe();
-  if(tk) soDu(tk).then(sd=>document.getElementById('u-status').innerText += ` | 💰 ${sd.toLocaleString()}đ`);
-}
-function adShow(){document.getElementById('ad-pan').style.display=ad?'block':'none'}
-function openM(i){document.getElementById(i).style.display='flex'}
-function closeM(i){document.getElementById(i).style.display='none'}
-function tinhTong(){
-  let sl=+document.getElementById('sl-mua').value||1;
-  if(spMua && sl>spMua.sl) {
-    document.getElementById('sl-mua').value=spMua.sl;
-    sl=spMua.sl;
-    alert(`Chỉ còn ${spMua.sl} sản phẩm!`);
-  }
-  document.getElementById('tong-tien').innerText=`💵 Tổng tiền: ${(donGia*sl).toLocaleString()}đ`;
-}
-
-async function guiThe(e){e.preventDefault();if(!tk)return openM('login');let d=await docDS('the');d.push({id:Date.now(),tk:tk,loai:document.getElementById('loai-the').value,gia:document.getElementById('menh-gia').value,ma:document.getElementById('ma-the').value,seri:document.getElementById('seri-the').value,tt:'cho'});luuDS('the',d);e.target.reset();alert('✅ Đã gửi thẻ! Chờ Admin duyệt.')}
-async function hienThe(){if(!ad)return;let d=(await docDS('the')).filter(x=>x.tt==='cho');document.getElementById('list-the').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.loai} - ${parseInt(x.gia).toLocaleString()}đ</div><div>Mã: ${x.ma} | Seri: ${x.seri}</div><div><button class="btn b-green" onclick="duyetThe(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyThe(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có thẻ chờ</div>'}
-async function duyetThe(i){let d=await docDS('the');let x=d.find(a=>a.id===i);x.tt='ok';await cong(x.tk,x.gia);luuDS('the',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
-async function huyThe(i){let d=await docDS('the');let x=d.find(a=>a.id===i);x.tt='huy';luuDS('the',d);hienThe();alert('❌ Đã hủy!')}
-
-async function guiBank(){if(!tk)return openM('login');let s=prompt('Số tiền chuyển:');let v=parseInt(s);if(!v||v<10000)return alert('Tối thiểu 10.000đ!');let d=await docDS('bank');d.push({id:Date.now(),tk:tk,tien:v,trangthai:'cho'});luuDS('bank',d);alert('✅ Đã gửi! Chờ duyệt.')}
-async function hienBank(){if(!ad)return;let d=(await docDS('bank')).filter(x=>x.trangthai==='cho');document.getElementById('list-bank').innerHTML=d.length?d.map(x=>`<div class="item" style="padding:4px;background:#1a2c42;border-radius:3px;margin-bottom:3px"><div>Khách: <b>${x.tk}</b> | ${x.tien.toLocaleString()}đ</div><div><button class="btn b-green" onclick="duyetBank(${x.id})">✅ Duyệt</button><button class="btn b-red" onclick="huyBank(${x.id})">❌ Hủy</button></div></div>`).join(''):'<div class="empty">Không có yêu cầu</div>'}
-async function duyetBank(i){let d=await docDS('bank');let x=d.find(a=>a.id===i);x.trangthai='ok';await cong(x.tk,x.tien);luuDS('bank',d);capNhat();alert('✅ Đã duyệt & cộng tiền!')}
-async function huyBank(i){let d=await docDS('bank');let x=d.find(a=>a.id===i);x.trangthai='huy';luuDS('bank',d);hienBank();alert('❌ Đã hủy!')}
-
-async function hienSP(){let d=await docDS('san_pham');document.getElementById('list-sp').innerHTML=d.length?d.map((x,i)=>`<div class="prod"><img class="p-img" src="${x.anh||'https://via.placeholder.com/100'}" onerror="this.src='https://via.placeholder.com/100?text=No+Img'"><div class="p-info"><div><strong>${x.ten}</strong> - <span style="color:#ffcc00">${x.gia}</span></div><div class="p-sl">📦 Còn lại: ${x.sl}</div><div style="margin-top:3px"><button class="btn b-green" onclick="mua(${i})">🛒 Mua</button>${ad?`<button class="btn b-red" onclick="xoaSP(${i})">🗑️</button>`:''}</div></div></div>`).join(''):'<div class="empty">Chưa có sản phẩm</div>'}
-async function xoaSP(i){if(confirm('Xóa?')){let d=await docDS('san_pham');d.splice(i,1);luuDS('san_pham',d);hienSP()}}
-async function themSP(e){e.preventDefault();let t=document.getElementById('ten-sp').value,g=document.getElementById('gia-sp').value,sl=+document.getElementById('sl-sp').value,a=document.getElementById('anh-sp').value;if(t&&g&&sl>0){let d=await docDS('san_pham');d.push({ten:t,gia:g,sl:sl,anh:a});luuDS('san_pham',d);e.target.reset();hienSP();alert('✅ Đã thêm!')}}
-
-async function hienDon(){
-  let d=await docDS('don_hang');
-  // CHỈ HIỆN ĐƠN TRẠNG THÁI "CHỜ" - ĐÃ DUYỆT SẼ TỰ ẨN
-  let loc=(ad?d:d.filter(x=>x.tk===tk)).filter(x=>x.tt==='cho');
-  document.getElementById('list-don').innerHTML=loc.length?loc.map((x,i)=>`<div class="prod"><div><strong>${x.sp}</strong> - ${x.gia} | SL: ${x.sl}<br><small>Roblox: ${x.rb}</small></div>
-  ${ad?`<div style="margin-top:4px"><button class="btn b-green" onclick="duyetDon(${d.indexOf(x)})">✅ Đã giao</button><button class="btn b-red" onclick="huyDon(${d.indexOf(x)})">❌ Hủy</button></div>`:''}
-  </div>`).join(''):'<div class="empty">Không có đơn hàng chờ</div>';
-}
-async function duyetDon(i){
-  let d=await docDS('don_hang');
-  let don=d[i];
-  don.tt='ok';
-  luuDS('don_hang',d);
-  capNhat();
-  hienThongBao(`✅ Đơn hàng ${don.sp} đã được giao thành công!`);
-  alert('✅ Đã duyệt! Đơn tự ẩn & khách nhận thông báo.');
-}
-async function huyDon(i){
-  let d=await docDS('don_hang');
-  let don=d[i], slMua=don.sl||1;
-  don.tt='huy';
-  let dsSP=await docDS('san_pham');
-  let spVT=dsSP.find(x=>x.ten===don.sp);
-  if(spVT) spVT.sl+=slMua;
-  await cong(don.tk, gia(don.gia)*slMua);
-  luuDS('san_pham',dsSP);
-  luuDS('don_hang',d);
-  capNhat();
-  hienThongBao(`❌ Đơn hàng ${don.sp} đã bị hủy! Đã hoàn trả tiền.`);
-  alert('❌ Đã hủy! Đơn tự ẩn + hoàn trả hàng & tiền.');
-}
-
-async function nhap(e){e.preventDefault();let t=document.getElementById('tk').value.trim(),m=document.getElementById('mk').value.trim();let ds=await docDS('tai_khoan');ad=(t===AD.u&&m===AD.p);if(!ad&&(!ds[t]||ds[t].mk!==m))return alert('Sai tài khoản/mật khẩu!');tk=ad?AD.u:t;closeM('login');capNhat();alert('✅ Đăng nhập thành công!')}
-async function tao(e){e.preventDefault();let t=document.getElementById('tk-moi').value.trim(),m=document.getElementById('mk-moi').value;if(!t||!m)return alert('Nhập đủ thông tin!');let ds=await docDS('tai_khoan');if(ds[t])return alert('Tài khoản đã tồn tại!');ds[t]={mk:m,tien:0};luuDS('tai_khoan',ds);alert('✅ Đăng ký xong! Đăng nhập nhé.');closeM('reg');openM('login')}
-function out(){ad=false;tk=null;capNhat()}
-async function congTien(e){e.preventDefault();let u=document.getElementById('tk-kh').value,v=+document.getElementById('so-tien').value;if(u&&v>0){await cong(u,v);alert(`✅ Cộng +${v.toLocaleString()}đ thành công!`);capNhat()}}
-async function mua(i){if(!tk)return openM('login');spMua=(await docDS('san_pham'))[i];donGia=gia(spMua.gia);if(spMua.sl<=0)return alert('❌ Hết hàng!');if(await soDu(tk)<donGia)return alert('❌ Không đủ tiền!');document.getElementById('tt-mua').innerText=`${spMua.ten} - ${spMua.gia} | Còn ${spMua.sl} sản phẩm`;document.getElementById('sl-mua').value=1;tinhTong();openM('mua')}
-async function xacNhan(e){e.preventDefault();let sl=+document.getElementById('sl-mua').value||1,rb=document.getElementById('tk-rb').value.trim();if(!rb)return alert('Nhập tài khoản Roblox!');if(sl>spMua.sl)return alert('Không đủ hàng!');let tongTien=donGia*sl;if(await soDu(tk)<tongTien)return alert('Không đủ tiền!');await cong(tk,-tongTien);spMua.sl-=sl;let dsSP=await docDS('san_pham');dsSP.find(x=>x.ten===spMua.ten).sl=spMua.sl;luuDS('san_pham',dsSP);let d=await docDS('don_hang');d.push({sp:spMua.ten,gia:spMua.gia,sl:sl,tk:tk,rb:rb,tt:'cho'});luuDS('don_hang',d);closeM('mua');capNhat();alert('✅ Đặt hàng OK! Chờ Admin duyệt.');}
-
-window.onload=()=>{
-  Promise.all(['san_pham','tai_khoan','don_hang','the','bank'].map(k=>db.ref(k).once('value'))).then(s=>{
-    s.forEach((x,i)=>{if(!s[i].exists()) luuDS(['san_pham','tai_khoan','don_hang','the','bank'][i],['san_pham'][i]==='san_pham'?[{ten:'Sản phẩm mẫu',gia:'20k',sl:10,anh:'https://via.placeholder.com/100'}]:{})});
-    capNhat();
-    db.ref('don_hang').on('value',capNhat);
-  })
-};
-</script>
+    // (Tùy chọn) hiệu ứng focus cho input
+    document.querySelectorAll('.input-group input').forEach(input => {
+      input.addEventListener('focus', function() {
+        this.closest('.input-group').style.transform = 'scale(1.01)';
+      });
+      input.addEventListener('blur', function() {
+        this.closest('.input-group').style.transform = 'scale(1)';
+      });
+    });
+  </script>
 </body>
-                                </html>
+      </html>
