@@ -18,14 +18,20 @@
     --magenta: #ff4d7d;
     --lime: #8ef58a;
     --sky: #6fd8ff;
+    --violet: #b98bff;
     --shadow: 0 10px 30px rgba(0,0,0,.35);
+    --glow-amber: 0 0 18px rgba(255,199,56,.35);
+    --glow-magenta: 0 0 18px rgba(255,77,125,.35);
+    --glow-sky: 0 0 18px rgba(111,216,255,.35);
+    --glow-lime: 0 0 18px rgba(142,245,138,.35);
   }
   *{box-sizing:border-box; margin:0; padding:0;}
   html{scroll-behavior:smooth;}
   body{
     background:
-      radial-gradient(circle at 12% -5%, #33205c 0%, transparent 42%),
-      radial-gradient(circle at 88% 6%, #24123f 0%, transparent 38%),
+      radial-gradient(circle at 12% -5%, #3d2470 0%, transparent 42%),
+      radial-gradient(circle at 88% 6%, #5c1f4a 0%, transparent 38%),
+      radial-gradient(circle at 50% 100%, #16324f 0%, transparent 45%),
       var(--bg);
     color:var(--ink);
     font-family:'Space Grotesk', sans-serif;
@@ -43,6 +49,13 @@
     );
     pointer-events:none; z-index:1;
   }
+  .rainbow-bar{
+    position:sticky; top:0; z-index:60; height:4px; width:100%;
+    background:linear-gradient(90deg, var(--amber), var(--magenta), var(--violet), var(--sky), var(--lime), var(--amber));
+    background-size:300% 100%;
+    animation:rainbowMove 6s linear infinite;
+  }
+  @keyframes rainbowMove{0%{background-position:0% 0;}100%{background-position:300% 0;}}
   .display{font-family:'Press Start 2P', monospace; letter-spacing:.5px;}
   a{color:inherit; text-decoration:none;}
   button{font-family:inherit; cursor:pointer; border:none;}
@@ -66,7 +79,7 @@
   }
 
   header{
-    position:sticky; top:0; z-index:50;
+    position:sticky; top:4px; z-index:50;
     background:rgba(15,8,27,0.88);
     backdrop-filter:blur(8px);
     border-bottom:2px solid var(--line);
@@ -77,10 +90,10 @@
   }
   .logo{display:flex; align-items:center; gap:11px; font-size:15px;}
   .logo-mark{
-    width:36px; height:36px; background:var(--amber);
+    width:36px; height:36px; background:linear-gradient(135deg,var(--amber),#ff9f3f);
     display:flex; align-items:center; justify-content:center;
     font-family:'Press Start 2P'; font-size:15px; color:#1c1030;
-    box-shadow:0 0 0 3px rgba(255,199,56,.15);
+    box-shadow:var(--glow-amber);
   }
   .logo span{color:var(--magenta);}
   nav{display:flex; gap:26px; margin-left:8px; flex:1;}
@@ -90,6 +103,7 @@
     padding:9px 2px; border-bottom:2px solid transparent; transition:.15s;
   }
   nav .navlink:hover{color:var(--ink); border-color:var(--amber);}
+  nav .navlink.current{color:var(--amber); border-color:var(--amber);}
   .dd-menu{
     display:none; position:absolute; top:38px; left:0; min-width:230px;
     background:var(--surface-2); border:2px solid var(--line); padding:6px;
@@ -108,20 +122,27 @@
   .badge{
     position:absolute; top:-6px; right:-6px; background:var(--magenta); color:#fff;
     font-size:10px; width:16px; height:16px; display:flex; align-items:center; justify-content:center;
+    box-shadow:var(--glow-magenta);
   }
+  .badge.hide{display:none;}
   .btn{
     display:inline-flex; align-items:center; justify-content:center; gap:8px;
     padding:12px 20px; font-size:13px; font-weight:700; border:2px solid transparent;
     transition:.15s;
   }
-  .btn-primary{background:var(--amber); color:#1c1030; box-shadow:0 4px 0 #b8860b22;}
-  .btn-primary:hover{background:#ffd766; transform:translateY(-1px);}
+  .btn-primary{background:linear-gradient(135deg,var(--amber),#ff9f3f); color:#1c1030; box-shadow:0 4px 0 #a8720022;}
+  .btn-primary:hover{filter:brightness(1.08); transform:translateY(-1px); box-shadow:var(--glow-amber);}
   .btn-ghost{background:transparent; border-color:var(--line); color:var(--ink);}
   .btn-ghost:hover{border-color:var(--amber); color:var(--amber);}
   .btn-danger{background:transparent; border-color:var(--magenta); color:var(--magenta);}
   .btn-danger:hover{background:rgba(255,77,125,.1);}
+  .btn-lime{background:linear-gradient(135deg,var(--lime),#54c95a); color:#0e2a10;}
+  .btn-lime:hover{box-shadow:var(--glow-lime); transform:translateY(-1px);}
+  .btn-sky{background:linear-gradient(135deg,var(--sky),#3f9fe0); color:#082333;}
+  .btn-sky:hover{box-shadow:var(--glow-sky); transform:translateY(-1px);}
   .btn-sm{padding:8px 14px; font-size:12px;}
   .btn-block{width:100%;}
+  .btn:disabled{opacity:.45; cursor:not-allowed; transform:none !important; box-shadow:none !important;}
 
   main{position:relative; z-index:2;}
   .view{display:none;}
@@ -137,9 +158,10 @@
     background:rgba(142,245,138,0.08); border:1px solid rgba(142,245,138,0.35);
     padding:7px 14px; margin-bottom:22px;
   }
-  .eyebrow::before{content:"●"; font-size:8px;}
+  .eyebrow::before{content:"●"; font-size:8px; animation:blink 1.4s ease infinite;}
+  @keyframes blink{0%,100%{opacity:1;}50%{opacity:.25;}}
   .hero h1{font-size:32px; line-height:1.55; margin-bottom:20px;}
-  .hero h1 em{font-style:normal; color:var(--amber);}
+  .hero h1 em{font-style:normal; background:linear-gradient(90deg,var(--amber),var(--magenta)); -webkit-background-clip:text; background-clip:text; color:transparent;}
   .hero p{color:var(--ink-dim); font-size:15px; line-height:1.75; margin-bottom:28px; max-width:480px;}
   .hero-actions{display:flex; gap:12px; flex-wrap:wrap;}
   .marquee{background:var(--surface); border:2px solid var(--line); padding:28px; box-shadow:var(--shadow);}
@@ -147,7 +169,7 @@
   .marquee-row:last-child{border-bottom:none;}
   .marquee-row b{color:var(--amber); font-family:'Press Start 2P'; font-size:11px;}
   .marquee-top{display:flex; justify-content:space-between; margin-bottom:8px;}
-  .dot-row span{width:10px; height:10px; display:inline-block; margin-left:6px; box-shadow:0 0 8px var(--lime);}
+  .dot-row span{width:10px; height:10px; display:inline-block; margin-left:6px; box-shadow:0 0 8px var(--lime); background:var(--lime); border-radius:50%;}
 
   section{max-width:1200px; margin:0 auto; padding:44px 28px;}
   .section-head{display:flex; justify-content:space-between; align-items:end; margin-bottom:24px; gap:12px; flex-wrap:wrap;}
@@ -156,24 +178,35 @@
 
   .game-grid{display:grid; grid-template-columns:repeat(5,1fr); gap:16px;}
   .game-card{background:var(--surface); border:2px solid var(--line); padding:20px 14px; text-align:center; transition:.18s; cursor:pointer;}
-  .game-card:hover{border-color:var(--amber); transform:translateY(-5px); box-shadow:var(--shadow);}
+  .game-card:hover{border-color:var(--amber); transform:translateY(-5px); box-shadow:var(--glow-amber);}
   .game-card .g-icon{font-size:28px; margin-bottom:11px;}
   .game-card .g-name{font-size:12px; font-weight:600;}
   .game-card .g-count{font-size:11px; color:var(--ink-dim); margin-top:5px;}
 
   .item-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:18px;}
-  .item-card{background:var(--surface); border:2px solid var(--line); display:flex; flex-direction:column; overflow:hidden; transition:.18s;}
-  .item-card:hover{border-color:var(--sky); box-shadow:var(--shadow); transform:translateY(-3px);}
-  .item-thumb{height:112px; display:flex; align-items:center; justify-content:center; font-size:36px; background:var(--surface-2); border-bottom:2px dashed var(--line);}
+  .item-card{background:var(--surface); border:2px solid var(--line); display:flex; flex-direction:column; overflow:hidden; transition:.18s; position:relative;}
+  .item-card:hover{border-color:var(--sky); box-shadow:var(--glow-sky); transform:translateY(-3px);}
+  .item-thumb{height:112px; display:flex; align-items:center; justify-content:center; font-size:36px; background:var(--surface-2); border-bottom:2px dashed var(--line); position:relative;}
+  .rarity-flag{position:absolute; top:8px; left:8px; font-size:9px; padding:4px 8px; font-weight:700; text-transform:uppercase; letter-spacing:.5px;}
+  .rarity-common{background:rgba(182,168,217,.15); color:var(--ink-dim);}
+  .rarity-hiem{background:rgba(111,216,255,.15); color:var(--sky);}
+  .rarity-huyenthoai{background:rgba(255,199,56,.15); color:var(--amber);}
+  .rarity-bimat{background:rgba(255,77,125,.15); color:var(--magenta);}
   .item-body{padding:16px; display:flex; flex-direction:column; gap:9px; flex:1;}
   .item-tag{font-size:10px; color:var(--lime); text-transform:uppercase; letter-spacing:1px;}
   .item-name{font-size:14px; font-weight:700;}
   .item-price{font-size:15px; color:var(--amber); font-family:'Press Start 2P'; margin-top:auto;}
   .item-buy{margin-top:8px;}
+  .item-stock{font-size:11px; color:var(--ink-dim);}
+
+  .game-filter-row{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:26px;}
+  .filter-chip{padding:9px 16px; font-size:12px; font-weight:600; background:var(--surface); border:2px solid var(--line); color:var(--ink-dim);}
+  .filter-chip:hover{border-color:var(--sky); color:var(--sky);}
+  .filter-chip.active{border-color:var(--amber); color:var(--amber); background:var(--surface-2);}
 
   .steps{display:grid; grid-template-columns:repeat(3,1fr); gap:18px;}
   .step{background:var(--surface); border:2px solid var(--line); padding:24px; transition:.18s;}
-  .step:hover{border-color:var(--magenta);}
+  .step:hover{border-color:var(--magenta); box-shadow:var(--glow-magenta);}
   .step-num{font-family:'Press Start 2P'; color:var(--magenta); font-size:16px; margin-bottom:13px;}
   .step h3{font-size:14px; margin-bottom:9px;}
   .step p{font-size:13px; color:var(--ink-dim); line-height:1.65;}
@@ -186,14 +219,14 @@
 
   .auth-wrap{max-width:430px; margin:64px auto 100px; padding:0 28px;}
   .auth-card{background:var(--surface); border:2px solid var(--line); padding:36px 30px; box-shadow:var(--shadow);}
-  .auth-icon{width:54px; height:54px; background:var(--amber); color:#1c1030; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:20px;}
-  .auth-icon.alt{background:var(--sky);}
+  .auth-icon{width:54px; height:54px; background:linear-gradient(135deg,var(--amber),#ff9f3f); color:#1c1030; display:flex; align-items:center; justify-content:center; font-size:22px; margin-bottom:20px;}
+  .auth-icon.alt{background:linear-gradient(135deg,var(--sky),#3f9fe0); color:#082333;}
   .auth-card h2{font-size:20px; margin-bottom:7px;}
   .auth-card > p{color:var(--ink-dim); font-size:13px; margin-bottom:26px;}
   .field{margin-bottom:17px;}
   .field label{display:block; font-size:12px; color:var(--ink-dim); margin-bottom:8px;}
-  .field input{width:100%; background:var(--surface-2); border:2px solid var(--line); color:var(--ink); padding:12px 13px; font-size:14px; font-family:inherit; transition:.15s;}
-  .field input:focus{outline:none; border-color:var(--amber);}
+  .field input, .field select{width:100%; background:var(--surface-2); border:2px solid var(--line); color:var(--ink); padding:12px 13px; font-size:14px; font-family:inherit; transition:.15s;}
+  .field input:focus, .field select:focus{outline:none; border-color:var(--amber);}
   .field-row{display:flex; justify-content:space-between; align-items:center; font-size:12px; color:var(--ink-dim); margin-bottom:22px;}
   .field-row label{display:flex; align-items:center; gap:6px;}
   .field-row a:hover{color:var(--amber);}
@@ -220,18 +253,24 @@
   .recharge-wrap{max-width:760px; margin:0 auto; padding:54px 28px 100px;}
   .tabs{display:flex; gap:8px; margin-bottom:24px;}
   .tab-btn{flex:1; padding:13px; background:var(--surface); border:2px solid var(--line); color:var(--ink-dim); font-weight:700; font-size:13px;}
-  .tab-btn.active{border-color:var(--amber); color:var(--amber); background:var(--surface-2);}
+  .tab-btn.active{border-color:var(--amber); color:var(--amber); background:var(--surface-2); box-shadow:var(--glow-amber);}
   .tab-panel{display:none;}
   .tab-panel.active{display:block;}
   .card-panel{background:var(--surface); border:2px solid var(--line); padding:26px; box-shadow:var(--shadow);}
   .grid-2{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
-  .bank-box{background:var(--surface-2); border:1px dashed var(--line); padding:18px; margin-bottom:20px;}
-  .bank-row{display:flex; justify-content:space-between; padding:9px 0; font-size:13px; border-bottom:1px solid var(--line);}
+  .bank-box{background:var(--surface-2); border:1px dashed var(--sky); padding:18px; margin-bottom:20px;}
+  .bank-row{display:flex; justify-content:space-between; padding:9px 0; font-size:13px; border-bottom:1px solid var(--line); gap:12px;}
   .bank-row:last-child{border-bottom:none;}
-  .bank-row b{color:var(--amber); font-family:'Press Start 2P'; font-size:11px;}
+  .bank-row b{color:var(--sky); font-family:'Press Start 2P'; font-size:10px; word-break:break-all; text-align:right;}
+  .copy-btn{font-size:10px; color:var(--ink-dim); background:var(--surface); border:1px solid var(--line); padding:3px 7px; margin-left:8px;}
+  .copy-btn:hover{color:var(--amber); border-color:var(--amber);}
+  .qr-box{width:140px; height:140px; margin:0 auto 18px; background:repeating-conic-gradient(#1c1030 0% 25%, #251540 0% 50%) 0/16px 16px; border:2px solid var(--sky); display:flex; align-items:center; justify-content:center; font-size:11px; color:var(--ink-dim); text-align:center;}
+  .card-provider-grid{display:grid; grid-template-columns:repeat(3,1fr); gap:10px; margin-bottom:18px;}
+  .provider-chip{padding:12px; text-align:center; font-size:11px; font-weight:700; background:var(--surface-2); border:2px solid var(--line); color:var(--ink-dim);}
+  .provider-chip.active{border-color:var(--magenta); color:var(--magenta); box-shadow:var(--glow-magenta);}
 
   /* history / admin tables */
-  .table-wrap{background:var(--surface); border:2px solid var(--line); overflow-x:auto; box-shadow:var(--shadow);}
+  .table-wrap{background:var(--surface); border:2px solid var(--line); overflow-x:auto; box-shadow:var(--shadow); margin-bottom:26px;}
   table{width:100%; border-collapse:collapse; font-size:13px; min-width:640px;}
   th, td{text-align:left; padding:13px 16px; border-bottom:1px solid var(--line);}
   th{color:var(--ink-dim); font-size:11px; text-transform:uppercase; letter-spacing:.5px; background:var(--surface-2);}
@@ -239,6 +278,7 @@
   .status{display:inline-block; padding:4px 10px; font-size:11px; font-weight:700;}
   .status.pending{background:rgba(255,199,56,.12); color:var(--amber);}
   .status.done{background:rgba(142,245,138,.12); color:var(--lime);}
+  .status.rejected{background:rgba(255,77,125,.12); color:var(--magenta);}
 
   .admin-wrap{max-width:1080px; margin:0 auto; padding:44px 28px 100px;}
   .admin-head{display:flex; justify-content:space-between; align-items:center; margin-bottom:8px; flex-wrap:wrap; gap:12px;}
@@ -251,8 +291,33 @@
   .kpi{background:var(--surface); border:2px solid var(--line); padding:18px;}
   .kpi .n{font-family:'Press Start 2P'; font-size:18px; color:var(--amber);}
   .kpi .l{font-size:11px; color:var(--ink-dim); margin-top:8px;}
+  .row-actions{display:flex; gap:8px;}
 
   .hidden-link{position:fixed; bottom:-100px;}
+
+  /* notifications dropdown */
+  .notif-menu{
+    display:none; position:absolute; top:52px; right:0; width:340px; max-height:420px; overflow-y:auto;
+    background:var(--surface-2); border:2px solid var(--line); z-index:70; box-shadow:var(--shadow);
+  }
+  .notif-menu.open{display:block;}
+  .notif-head{padding:14px 16px; border-bottom:1px solid var(--line); font-size:12px; font-weight:700; color:var(--ink-dim); text-transform:uppercase; letter-spacing:.5px;}
+  .notif-item{padding:14px 16px; border-bottom:1px solid var(--line); font-size:12px;}
+  .notif-item:last-child{border-bottom:none;}
+  .notif-item .nt-title{font-weight:700; color:var(--lime); margin-bottom:6px;}
+  .notif-item .nt-msg{color:var(--ink-dim); line-height:1.6; white-space:pre-line;}
+  .notif-item .nt-time{color:#5f5185; font-size:10px; margin-top:8px;}
+  .notif-empty{padding:30px 16px; text-align:center; color:var(--ink-dim); font-size:12px;}
+
+  /* toast */
+  #toast-wrap{position:fixed; top:20px; right:20px; z-index:200; display:flex; flex-direction:column; gap:10px;}
+  .toast{background:var(--surface-2); border:2px solid var(--lime); padding:14px 18px; font-size:12px; max-width:320px; box-shadow:var(--glow-lime); animation:toastIn .2s ease;}
+  .toast.err{border-color:var(--magenta); box-shadow:var(--glow-magenta);}
+  .toast b{display:block; margin-bottom:4px; color:var(--ink);}
+  .toast span{color:var(--ink-dim); white-space:pre-line;}
+  @keyframes toastIn{from{opacity:0; transform:translateX(20px);} to{opacity:1; transform:translateX(0);}}
+
+  .balance-pill{display:flex; align-items:center; gap:8px; background:var(--surface-2); border:2px solid var(--lime); padding:9px 14px; font-size:12px; font-weight:700; color:var(--lime);}
 
   @media (max-width: 960px){
     .hero{grid-template-columns:1fr;}
@@ -261,112 +326,4 @@
     .steps{grid-template-columns:1fr;}
     .admin-grid{grid-template-columns:1fr;}
     .grid-2{grid-template-columns:1fr;}
-    nav{display:none;}
-  }
-</style>
-</head>
-<body>
-
-<header>
-  <div class="nav-wrap">
-    <a href="#home" class="logo" onclick="showView('home')">
-      <span class="logo-mark">P</span>
-      <span class="display">PIXEL<span>KHO</span></span>
-    </a>
-    <nav>
-      <div class="dd">
-        <button class="navlink">Vật phẩm ▾</button>
-        <div class="dd-menu">
-          <a href="#" onclick="return goItems('Grow A Garden')">🌱 Grow A Garden</a>
-          <a href="#" onclick="return goItems('Pet Simulator 99')">🐾 Pet Simulator 99</a>
-          <a href="#" onclick="return goItems('Garden Tower Defense')">🏰 Garden Tower Defense</a>
-          <a href="#" onclick="return goItems('Steal a Brainrot')">🧠 Steal a Brainrot</a>
-          <a href="#" onclick="return goItems('Toilet Tower Defense')">🚽 Toilet Tower Defense</a>
-        </div>
-      </div>
-      <a href="#" class="navlink" onclick="showView('recharge'); return false;">Nạp tiền</a>
-      <a href="#" class="navlink" onclick="showView('history'); return false;">Lịch sử đơn hàng</a>
-      <div class="dd">
-        <button class="navlink">Nội dung ▾</button>
-        <div class="dd-menu">
-          <a href="#">Blog</a>
-          <a href="#">FAQ</a>
-          <a href="#">Liên hệ</a>
-        </div>
-      </div>
-    </nav>
-    <div class="nav-actions">
-      <a href="#" class="icon-btn" onclick="showView('cart'); return false;" title="Giỏ hàng">
-        🛒<span class="badge" id="cart-badge">2</span>
-      </a>
-      <a href="#" class="btn btn-ghost" onclick="showView('login'); return false;">Đăng nhập</a>
-      <a href="#" class="btn btn-primary" onclick="showView('register'); return false;">Đăng ký</a>
-    </div>
-  </div>
-</header>
-
-<main>
-
-  <!-- HOME -->
-  <div class="view active" id="view-home">
-    <div class="hero">
-      <div>
-        <div class="eyebrow">Nạp trong 60 giây</div>
-        <h1 class="display">KHO VẬT PHẨM<br><em>GAME ROBLOX</em><br>UY TÍN SỐ 1</h1>
-        <p>Mua bán vật phẩm, pet, gamepass cho Grow A Garden, Pet Simulator 99 và nhiều tựa game hot khác. Giao dịch tự động, nhận hàng ngay sau khi thanh toán.</p>
-        <div class="hero-actions">
-          <a href="#" class="btn btn-primary" onclick="return goItems('Grow A Garden')">Xem vật phẩm</a>
-          <a href="#" class="btn btn-ghost" onclick="showView('register'); return false;">Tạo tài khoản</a>
-        </div>
-      </div>
-      <div class="marquee pixel-corners">
-        <div class="marquee-top">
-          <span style="font-size:11px;color:var(--ink-dim)">TRẠNG THÁI HỆ THỐNG</span>
-          <span class="dot-row"><span style="background:var(--lime)"></span></span>
-        </div>
-        <div class="marquee-row"><span>Đơn xử lý hôm nay</span><b id="kpi-orders-today">1.482</b></div>
-        <div class="marquee-row"><span>Tốc độ giao hàng TB</span><b>48 GIÂY</b></div>
-        <div class="marquee-row"><span>Tài khoản hoạt động</span><b>9.6K</b></div>
-        <div class="marquee-row"><span>Uptime 30 ngày</span><b>99.9%</b></div>
-      </div>
-    </div>
-
-    <section>
-      <div class="section-head">
-        <div><h2 class="display">CHỌN GAME</h2><p>5 tựa game đang mở kho, cập nhật vật phẩm mỗi ngày</p></div>
-      </div>
-      <div class="game-grid">
-        <div class="game-card" onclick="goItems('Grow A Garden')"><div class="g-icon">🌱</div><div class="g-name">Grow A Garden</div><div class="g-count">312 vật phẩm</div></div>
-        <div class="game-card" onclick="goItems('Pet Simulator 99')"><div class="g-icon">🐾</div><div class="g-name">Pet Simulator 99</div><div class="g-count">204 vật phẩm</div></div>
-        <div class="game-card" onclick="goItems('Garden Tower Defense')"><div class="g-icon">🏰</div><div class="g-name">Garden Tower Defense</div><div class="g-count">98 vật phẩm</div></div>
-        <div class="game-card" onclick="goItems('Steal a Brainrot')"><div class="g-icon">🧠</div><div class="g-name">Steal a Brainrot</div><div class="g-count">156 vật phẩm</div></div>
-        <div class="game-card" onclick="goItems('Toilet Tower Defense')"><div class="g-icon">🚽</div><div class="g-name">Toilet Tower Defense</div><div class="g-count">140 vật phẩm</div></div>
-      </div>
-    </section>
-
-    <section>
-      <div class="section-head">
-        <div><h2 class="display">VẬT PHẨM NỔI BẬT</h2><p>Bán chạy nhất tuần này</p></div>
-        <a href="#" class="btn btn-ghost" onclick="return goItems('Grow A Garden')">Xem tất cả</a>
-      </div>
-      <div class="item-grid">
-        <div class="item-card">
-          <div class="item-thumb">🌻</div>
-          <div class="item-body">
-            <span class="item-tag">Grow A Garden</span>
-            <span class="item-name">Hạt Giống Huyền Thoại</span>
-            <span class="item-price">45.000đ</span>
-            <button class="btn btn-primary btn-block item-buy" onclick="buyItem('Hạt Giống Huyền Thoại','Grow A Garden',45000)">Mua ngay</button>
-          </div>
-        </div>
-        <div class="item-card">
-          <div class="item-thumb">🐉</div>
-          <div class="item-body">
-            <span class="item-tag">Pet Simulator 99</span>
-            <span class="item-name">Pet Rồng Ngân Hà</span>
-            <span class="item-price">89.000đ</span>
-            <button class="btn btn-primary btn-block item-buy" onclick="buyItem('Pet Rồng Ngân Hà','Pet Simulator 99',89000)">Mua ngay</button>
-          </div>
-        </div>
-        <div class="item-card">
-          <div class="item-thumb">🗼
+    .card-provider-gr
